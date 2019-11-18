@@ -1,0 +1,46 @@
+image: hseeberger/scala-sbt:8u222_1.3.3_2.13.1
+
+cache:
+  paths:
+    - $PWD/.ivy2/
+    - $PWD/.sbt/
+
+variables:
+  GIT_STRATEGY: clone
+  GIT_SUBMODULE_STRATEGY: none
+#  SBT_OPTS: '-Xmx2g -Xss10m -Xms1g -Dsbt.supershell=false'
+  SBT_OPTS: '-Xmx2g -Xss10m -Xms1g'
+#  GET_SOURCES_ATTEMPTS: 3
+
+stages:
+  - validate
+  - publish
+
+before_script:
+  - apt update
+  - apt install --no-install-recommends -y dnsutils netcat-openbsd
+  - printenv | grep '^[A-Z][A-Z_]*=.*' | grep -v '^_..*' | sort
+
+tests:
+  stage: validate
+  script:
+    - sbt -v -ivy $PWD/.ivy2 -sbt-dir $PWD/.sbt +validate
+
+release:
+  stage: publish
+  only:
+    - master
+  script:
+    - mkdir ~/.ssh
+    - ssh-keyscan -H -p 22 gitlab.com > ~/.ssh/known_hosts
+    - echo "${_SSH_DEPLOY_PRIVATE_KEY}" > ~/.ssh/id_rsa
+    - chmod 0400 ~/.ssh/*
+    - git config user.name "Gitlab CI"
+    - git config user.email $GITLAB_USER_EMAIL
+    - git checkout $CI_COMMIT_REF_NAME
+    - git remote set-url --push origin $(perl -pe 's#.*@(.+?(\:\d+)?)/#git@\1:#' <<< $CI_REPOSITORY_URL)
+    - git config --list
+    - sbt -v -ivy $PWD/.ivy2 -sbt-dir $PWD/.sbt -Dbintray.user=$BINTRAY_USER -Dbintray.pass=${_BINTRAY_PASS} ";test:compile;release with-defaults"
+
+  after_script:
+    - rm -Rfv .ssh
