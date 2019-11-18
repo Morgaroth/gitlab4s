@@ -42,7 +42,7 @@ class SttpGitlabAPI(val config: GitlabConfig, apiConfig: GitlabRestAPIConfig)(im
         .toEither.leftMap[GitlabError](GitlabRequestingError("try-http-backend-left", requestId.id, _))
         .flatMap { response =>
           if (apiConfig.debug) logger.debug(s"received response: $response")
-          requestsLogger.info(s"Request ID {}, response: {}, payload:\n{}", requestId, response.copy(body = response.body.bimap(_ => "There is an error body", _ => "There is a success body")), response.body.fold(identity, identity), response.body.fold(identity, identity))
+          requestsLogger.info(s"Response ID {}, response: {}, payload:\n{}", requestId, response.copy(body = response.body.bimap(_ => "There is an error body", _ => "There is a success body")), response.body.fold(identity, identity))
           response.body.leftMap(error => GitlabHttpError(response.code.code, "http-response-error", requestId.id, requestId.kind, Some(error)))
         }
 

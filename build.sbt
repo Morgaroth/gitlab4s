@@ -49,7 +49,7 @@ val sttp = project.in(file("sttp")).dependsOn(core)
   .settings(
     name := "gitlab4s-sttp",
     libraryDependencies ++= Seq(
-      "com.softwaremill.sttp.client" %% "core" % "2.0.0-RC1",
+      "com.softwaremill.sttp.client" %% "core" % "2.0.0-RC6",
       "org.scalatest" %% "scalatest" % "3.0.8" % Test,
       "ch.qos.logback" % "logback-classic" % "1.2.3" % Test,
     )
@@ -68,6 +68,7 @@ val gitlab4s = project.in(file(".")).aggregate(core, sttp, akka)
   .settings(
     name := "gitlab4s",
     publish := {},
+    publishLocal := {},
     crossScalaVersions := crossScalaVersionsValues,
 
     validate := Def.sequential {

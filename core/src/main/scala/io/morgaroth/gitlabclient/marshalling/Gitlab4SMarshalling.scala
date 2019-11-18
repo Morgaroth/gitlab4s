@@ -1,7 +1,6 @@
 package io.morgaroth.gitlabclient.marshalling
 
 import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 
 import cats.Monad
 import cats.data.EitherT
@@ -10,6 +9,7 @@ import io.circe._
 import io.circe.parser.decode
 import io.circe.syntax.EncoderOps
 import io.morgaroth.gitlabclient._
+import io.morgaroth.gitlabclient.models.{MergeRequestState, MergeRequestStates, MergeStatus}
 
 import scala.language.{higherKinds, implicitConversions}
 
@@ -18,6 +18,10 @@ trait Gitlab4SMarshalling {
   implicit class Extractable(value: JsonObject) {
     def extract[T](implicit decoder: Decoder[T]): Either[Error, T] = decode[T](value.toString)
   }
+
+  implicit val mergeRequestStateCodec: Codec[MergeRequestState] = EnumMarshalling.stringEnumCodecFor(MergeRequestStates.byName)(_.name)
+  implicit val mergeStatusCodec: Codec[MergeStatus] = EnumMarshalling.stringEnumCodecFor(MergeStatus.byName)(_.name)
+  implicit val zonedDateTimeCodec: Codec[ZonedDateTime] = Codec.from(Decoder.decodeZonedDateTime, Encoder.encodeZonedDateTime)
 
   object MJson {
     def read[T](str: String)(implicit d: Decoder[T]): Either[Error, T] = decode[T](str)
@@ -37,6 +41,7 @@ trait Gitlab4SMarshalling {
     def unmarshall[TargetType: Decoder](implicit rId: RequestId): EitherT[F, GitlabError, TargetType] =
       data.flatMap(MJson.readT[F, TargetType])
   }
+
 }
 
 object Gitlab4SMarshalling extends Gitlab4SMarshalling
