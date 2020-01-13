@@ -27,7 +27,7 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
 
   protected def invokeRequest(request: GitlabRequest)(implicit requestId: RequestId): EitherT[F, GitlabError, String]
 
-  def getCurrentUser: EitherT[F, GitlabError, GitlabFullUser] = {
+  def getCurrentUser: GitlabResponse[GitlabFullUser] = {
     implicit val rId: RequestId = RequestId.newOne("get-current-user")
     val req = reqGen.get(API + "/user")
     invokeRequest(req).unmarshall[GitlabFullUser]
@@ -35,10 +35,7 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
 
   // @see: https://docs.gitlab.com/ee/api/search.html#scope-merge_requests
   private def globalSearch(scope: SearchScope, phrase: String) = {
-    val req = reqGen.get(s"$API/search",
-      scope,
-      Search(phrase)
-    )
+    val req = reqGen.get(s"$API/search", scope, Search(phrase))
     getAllPaginatedResponse[MergeRequestInfo](req, s"global-search-${scope.name}")
   }
 
@@ -50,14 +47,11 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
 
   // @see: https://docs.gitlab.com/ee/api/search.html#scope-merge_requests-1
   private def groupGlobalSearch(groupId: String, scope: SearchScope, phrase: String)(implicit rId: RequestId) = {
-    val req = reqGen.get(s"$API/groups/$groupId/search",
-      scope,
-      Search(phrase)
-    )
+    val req = reqGen.get(s"$API/groups/$groupId/search", scope, Search(phrase))
     invokeRequest(req)
   }
 
-  def groupSearchMrs(groupId: String, phrase: String): EitherT[F, GitlabError, Vector[MergeRequestInfo]] = {
+  def groupSearchMrs(groupId: String, phrase: String): GitlabResponse[Vector[MergeRequestInfo]] = {
     implicit val rId: RequestId = RequestId.newOne("group-search-mr")
     groupGlobalSearch(groupId, SearchScope.MergeRequests, phrase)
       .unmarshall[Vector[MergeRequestInfo]]
@@ -78,7 +72,7 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
 
   //  other
 
-  def groupSearchCommits(groupId: String, phrase: String): EitherT[F, GitlabError, String] = {
+  def groupSearchCommits(groupId: String, phrase: String): GitlabResponse[String] = {
     implicit val rId: RequestId = RequestId.newOne("group-search-mr")
     groupGlobalSearch(groupId, SearchScope.Commits, phrase)
   }
@@ -97,8 +91,8 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   // @see: https://docs.gitlab.com/ee/api/branches.html#list-repository-branches
   def getBranches(projectID: ProjectID, searchTerm: Option[String]): GitlabResponse[Vector[GitlabBranchInfo]] = {
     val req = reqGen.get(s"$API/projects/${projectID.toStringId}/repository/branches",
-      searchTerm.map(ParamQuery.search).getOrElse(NoParam)
-    )
+                         searchTerm.map(ParamQuery.search).getOrElse(NoParam)
+                         )
     getAllPaginatedResponse[GitlabBranchInfo](req, "merge-requests-per-project")
   }
 
