@@ -17,12 +17,12 @@ class Obfuscate extends FlatSpec with Matchers with Gitlab4SMarshalling {
   val dateFields = Set("created_at", "updated_at", "authored_date", "committed_date", "created_at")
 
   it should "work" in {
-    val resourceName = "project_mrs_result_1.json"
+    val resourceName = "merge_requests_list_2.json"
     val result = Source.fromResource(resourceName).mkString
 
     val result1 = textFields.foldLeft(result) {
       case (data, name) =>
-        data.replaceAll(s""""$name": ".*"""", s""""$name": "${Random.alphanumeric.take(40).mkString}"""")
+        data.replaceAll(s""""$name": ".+"""", s""""$name": "${Random.alphanumeric.take(40).mkString}"""")
     }
     val result2 = numberFields.foldLeft(result1) {
       case (data, name) =>
@@ -31,7 +31,7 @@ class Obfuscate extends FlatSpec with Matchers with Gitlab4SMarshalling {
     }
     val result3 = dateFields.foldLeft(result2) {
       case (data, name) =>
-        data.replaceAll(s""""$name": ".*"""", s""""$name": "1970-01-01T12:00:00.000+00:00"""")
+        data.replaceAll(s""""$name": ".+"""", s""""$name": "1970-01-01T12:00:00.000+00:00"""")
 
     }
 

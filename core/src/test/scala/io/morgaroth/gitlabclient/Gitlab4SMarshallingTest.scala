@@ -31,7 +31,8 @@ class Gitlab4SMarshallingTest extends FlatSpec with Matchers with Gitlab4SMarsha
 
   it should "parse merge requests list" in {
     Vector(
-      "merge_requests_list.json",
+      "merge_requests_list_1.json",
+      "merge_requests_list_2.json",
     ).foreach { resourceName =>
       val result = MJson.read[Vector[MergeRequestInfo]](Source.fromResource(resourceName).mkString)
       result shouldBe Symbol("right")

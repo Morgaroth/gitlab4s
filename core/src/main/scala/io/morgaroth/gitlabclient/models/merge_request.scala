@@ -69,7 +69,7 @@ case class MergeRequestInfo(
                              work_in_progress: Boolean,
                              merge_when_pipeline_succeeds: Boolean,
                              should_remove_source_branch: Option[Boolean],
-                             force_remove_source_branch: Boolean,
+                             force_remove_source_branch: Option[Boolean],
                              allow_collaboration: Option[Boolean],
                              allow_maintainer_to_push: Option[Boolean],
                              squash: Boolean,
