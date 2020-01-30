@@ -1,11 +1,12 @@
 package io.morgaroth.gitlabclient
 
 import io.morgaroth.gitlabclient.marshalling.Gitlab4SMarshalling
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.{DoNotDiscover, FlatSpec, Matchers}
 
 import scala.io.Source
 import scala.util.Random
 
+@DoNotDiscover
 class Obfuscate extends FlatSpec with Matchers with Gitlab4SMarshalling {
 
   behavior of "Obfuscate"
@@ -16,7 +17,7 @@ class Obfuscate extends FlatSpec with Matchers with Gitlab4SMarshalling {
   val dateFields = Set("created_at", "updated_at", "authored_date", "committed_date", "created_at")
 
   it should "work" in {
-    val resourceName = "project_branches_1.json"
+    val resourceName = "project_mrs_result_1.json"
     val result = Source.fromResource(resourceName).mkString
 
     val result1 = textFields.foldLeft(result) {

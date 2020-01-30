@@ -1,9 +1,6 @@
 package io.morgaroth.gitlabclient.models
 
 import java.time.ZonedDateTime
-import java.util.UUID
-
-import cats.syntax.option._
 
 case class GitlabUser(
                        id: Long,

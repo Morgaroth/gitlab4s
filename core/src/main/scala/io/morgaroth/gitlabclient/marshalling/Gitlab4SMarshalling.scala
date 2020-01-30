@@ -9,7 +9,7 @@ import io.circe._
 import io.circe.parser.decode
 import io.circe.syntax.EncoderOps
 import io.morgaroth.gitlabclient._
-import io.morgaroth.gitlabclient.models.{MergeRequestState, MergeRequestStates, MergeStatus}
+import io.morgaroth.gitlabclient.models.{AwardableType, MergeRequestState, MergeRequestStates, MergeStatus}
 
 import scala.language.{higherKinds, implicitConversions}
 
@@ -21,6 +21,7 @@ trait Gitlab4SMarshalling {
 
   implicit val mergeRequestStateCodec: Codec[MergeRequestState] = EnumMarshalling.stringEnumCodecFor(MergeRequestStates.byName)(_.name)
   implicit val mergeStatusCodec: Codec[MergeStatus] = EnumMarshalling.stringEnumCodecFor(MergeStatus.byName)(_.name)
+  implicit val awardableTypeCodec: Codec[AwardableType] = EnumMarshalling.stringEnumCodecOf(AwardableType)
   implicit val zonedDateTimeCodec: Codec[ZonedDateTime] = Codec.from(Decoder.decodeZonedDateTime, Encoder.encodeZonedDateTime)
 
   object MJson {

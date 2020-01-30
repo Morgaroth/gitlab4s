@@ -38,7 +38,7 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
   }
 
   it should "list PRs" in {
-    val result = client.getMergeRequests("be/services/be-betting-service").value.futureValue
+    val result = client.getMergeRequests("be/services/be-trading-service").value.futureValue
     result shouldBe Symbol("right")
   }
 
@@ -58,4 +58,10 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
 //    val result2 = client.getBranches("be/services/be-trading-service", None).value.futureValue
 //    result2 shouldBe Symbol("right")
   }
+
+  it should "find awardable emojis of a merge requests" in {
+    val result = client.getMergeRequestEmoji("be/services/be-trading-service", 57).value.futureValue
+    result shouldBe Symbol("right")
+  }
+
 }
