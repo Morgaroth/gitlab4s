@@ -14,7 +14,7 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
 
   private val maybeAccessToken = Option(System.getenv("gitlab-access-token"))
   private val maybeAddress = Option(System.getenv("gitlab-address"))
-  assume(maybeAccessToken.isDefined, "gitlab-private-token env must be set for this test")
+  assume(maybeAccessToken.isDefined, "gitlab-access-token env must be set for this test")
   assume(maybeAddress.isDefined, "gitlab-address env must be set for this test")
 
   val cfg = GitlabConfig(maybeAccessToken.get, maybeAddress.get, true)
@@ -40,6 +40,7 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
   it should "list PRs" in {
     val result = client.getMergeRequests("be/services/be-trading-service").value.futureValue
     result shouldBe Symbol("right")
+    result.getOrElse(throw new IllegalArgumentException).size should be > 50
   }
 
   it should "execute mr search" in {

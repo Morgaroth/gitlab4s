@@ -6,7 +6,7 @@ import cats.instances.future.catsStdInstancesForFuture
 import cats.syntax.either._
 import com.typesafe.scalalogging.{LazyLogging, Logger}
 import io.morgaroth.gitlabclient._
-import io.morgaroth.gitlabclient.query.GitlabRequest
+import io.morgaroth.gitlabclient.query.{GitlabRequest, GitlabResponse}
 import org.slf4j.LoggerFactory
 import sttp.client._
 
@@ -23,7 +23,7 @@ class SttpGitlabAPI(val config: GitlabConfig, apiConfig: GitlabRestAPIConfig)(im
   implicit val backend: SttpBackend[Try, Nothing, NothingT] = TryHttpURLConnectionBackend()
   private val requestsLogger = Logger(LoggerFactory.getLogger(getClass.getPackage.getName + ".requests"))
 
-  override def invokeRequest(requestData: GitlabRequest)(implicit requestId: RequestId): EitherT[Future, GitlabError, String] = {
+  override def invokeRequestRaw(requestData: GitlabRequest)(implicit requestId: RequestId): EitherT[Future, GitlabError, GitlabResponse] = {
     val u = requestData.render
     val requestWithoutPayload = basicRequest.method(requestData.method, uri"$u")
       .header("Private-Token", config.privateToken)
@@ -36,14 +36,18 @@ class SttpGitlabAPI(val config: GitlabConfig, apiConfig: GitlabRestAPIConfig)(im
     if (apiConfig.debug) logger.debug(s"request to send: $request")
     requestsLogger.info(s"Request ID {}, request: {}, payload:\n{}", requestId, request.body("removed for log"), request.body)
 
-    val response: Either[GitlabError, String] =
+    val response: Either[GitlabError, GitlabResponse] =
       request
         .send()
         .toEither.leftMap[GitlabError](GitlabRequestingError("try-http-backend-left", requestId.id, _))
         .flatMap { response =>
           if (apiConfig.debug) logger.debug(s"received response: $response")
           requestsLogger.info(s"Response ID {}, response: {}, payload:\n{}", requestId, response.copy(body = response.body.bimap(_ => "There is an error body", _ => "There is a success body")), response.body.fold(identity, identity))
-          response.body.leftMap(error => GitlabHttpError(response.code.code, "http-response-error", requestId.id, requestId.kind, Some(error)))
+          val headers = response.headers.map(x => x.name -> x.value)
+          response
+            .body
+            .leftMap(error => GitlabHttpError(response.code.code, "http-response-error", requestId.id, requestId.kind, Some(error)))
+            .map(payload => GitlabResponse( headers.toMap, payload))
         }
 
     EitherT.fromEither[Future](response)

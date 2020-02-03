@@ -10,6 +10,7 @@ import io.circe.parser.decode
 import io.circe.syntax.EncoderOps
 import io.morgaroth.gitlabclient._
 import io.morgaroth.gitlabclient.models.{AwardableType, MergeRequestState, MergeRequestStates, MergeStatus}
+import io.morgaroth.gitlabclient.query.GitlabResponse
 
 import scala.language.{higherKinds, implicitConversions}
 
@@ -41,6 +42,11 @@ trait Gitlab4SMarshalling {
   implicit class unmarshallEitherT[F[_]](data: EitherT[F, GitlabError, String])(implicit m: Monad[F]) {
     def unmarshall[TargetType: Decoder](implicit rId: RequestId): EitherT[F, GitlabError, TargetType] =
       data.flatMap(MJson.readT[F, TargetType])
+  }
+
+  implicit class unmarshallEitherGitlabT[F[_]](data: EitherT[F, GitlabError, GitlabResponse])(implicit m: Monad[F]) {
+    def unmarshall[TargetType: Decoder](implicit rId: RequestId): EitherT[F, GitlabError, TargetType] =
+      data.map(_.payload).flatMap(MJson.readT[F, TargetType])
   }
 
 }

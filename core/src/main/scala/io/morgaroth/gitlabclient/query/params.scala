@@ -2,9 +2,7 @@ package io.morgaroth.gitlabclient.query
 
 import java.net.URLEncoder
 
-import io.circe.Encoder
 import io.morgaroth.gitlabclient.GitlabConfig
-import io.morgaroth.gitlabclient.marshalling.Gitlab4SMarshalling
 import io.morgaroth.gitlabclient.models.{MergeRequestState, SearchScope}
 
 import scala.language.implicitConversions
@@ -81,3 +79,8 @@ case class RequestGenerator(cfg: GitlabConfig) {
   def put(path: String, data: String): GitlabRequest =
     GitlabRequest(cfg.server, Methods.Put, path, Vector.empty, Some(data))
 }
+
+case class GitlabResponse(
+                           headers: Map[String, String],
+                           payload: String,
+                         )
