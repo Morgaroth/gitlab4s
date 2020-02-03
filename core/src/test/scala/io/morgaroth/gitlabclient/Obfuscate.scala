@@ -17,7 +17,7 @@ class Obfuscate extends FlatSpec with Matchers with Gitlab4SMarshalling {
   val dateFields = Set("created_at", "updated_at", "authored_date", "committed_date", "created_at")
 
   it should "work" in {
-    val resourceName = "merge_requests_list_2.json"
+    val resourceName = "merge_requests_list_3.json"
     val result = Source.fromResource(resourceName).mkString
 
     val result1 = textFields.foldLeft(result) {

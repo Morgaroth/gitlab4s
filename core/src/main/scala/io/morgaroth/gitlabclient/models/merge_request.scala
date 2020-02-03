@@ -64,7 +64,7 @@ case class MergeRequestInfo(
                              merge_commit_sha: Option[String],
                              squash_commit_sha: Option[String],
                              user_notes_count: Int,
-                             discussion_locked: Option[String],
+                             discussion_locked: Option[Boolean],
 
                              work_in_progress: Boolean,
                              merge_when_pipeline_succeeds: Boolean,

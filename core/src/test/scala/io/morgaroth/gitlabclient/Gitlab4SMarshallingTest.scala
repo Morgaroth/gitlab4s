@@ -33,11 +33,13 @@ class Gitlab4SMarshallingTest extends FlatSpec with Matchers with Gitlab4SMarsha
     Vector(
       "merge_requests_list_1.json",
       "merge_requests_list_2.json",
+      "merge_requests_list_3.json",
     ).foreach { resourceName =>
       val result = MJson.read[Vector[MergeRequestInfo]](Source.fromResource(resourceName).mkString)
       result shouldBe Symbol("right")
     }
   }
+
   it should "parse merge requests search" in {
     Vector(
       "global-mr-search-result-1.json",
