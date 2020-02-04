@@ -4,7 +4,7 @@ import java.time.ZonedDateTime
 
 import io.morgaroth.gitlabclient.marshalling.EnumMarshallingGlue
 
-sealed abstract class AwardableScope(val name: String) {
+sealed abstract class AwardableScope(val name: String) extends Product with Serializable {
   override def toString: String = name
 }
 
@@ -18,6 +18,13 @@ object AwardableScope {
 
   val all: Seq[AwardableScope] = Seq(MergeRequests, Issues, Snippets)
   val byName: Map[String, AwardableScope] = all.map(x => x.name -> x).toMap
+
+  val awardableTypeToScope = Map(
+    AwardableType.MergeRequest -> AwardableScope.MergeRequests,
+    AwardableType.Issue -> AwardableScope.Issues,
+    AwardableType.Snippet -> AwardableScope.Snippets,
+  )
+  def fromAwardableType(awardableType: AwardableType) = awardableTypeToScope(awardableType)
 }
 
 sealed abstract class AwardableType(val name: String) extends Product with Serializable

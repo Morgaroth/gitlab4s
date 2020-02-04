@@ -61,8 +61,9 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
   }
 
   it should "find awardable emojis of a merge requests" in {
-    val result = client.getMergeRequestEmoji("be/services/be-trading-service", 57).value.futureValue
+    val result = client.getMergeRequestEmoji("be/services/be-betting-service", 156).value.futureValue
     result shouldBe Symbol("right")
+    println(result.getOrElse(???).map(_.name))
   }
 
 }

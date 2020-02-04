@@ -18,6 +18,10 @@ object ParamQuery {
 
   implicit def fromSearchScope(sc: SearchScope): ParamQuery = Scope(sc)
 
+  implicit class fromString(paramName: String) {
+    def eqParam(value:String) = new StringKVParam(paramName, value)
+  }
+
   implicit class NUmericParams(value: Int) {
     def pageNumParam = new IntKVParam("page", value)
 
@@ -73,8 +77,17 @@ case class RequestGenerator(cfg: GitlabConfig) {
   def get(path: String): GitlabRequest =
     GitlabRequest(cfg.server, Methods.Get, path, Vector.empty, None)
 
+  def delete(path: String): GitlabRequest =
+    GitlabRequest(cfg.server, Methods.Delete, path, Vector.empty, None)
+
   def get(path: String, query: ParamQuery*): GitlabRequest =
     GitlabRequest(cfg.server, Methods.Get, path, query.toVector.filterNot(_ == NoParam), None)
+
+  def post(path: String, query: ParamQuery*): GitlabRequest =
+    GitlabRequest(cfg.server, Methods.Post, path, query.toVector.filterNot(_ == NoParam), None)
+
+  def post(path: String, data: String, query: ParamQuery*): GitlabRequest =
+    GitlabRequest(cfg.server, Methods.Post, path, query.toVector.filterNot(_ == NoParam), Some(data))
 
   def put(path: String, data: String): GitlabRequest =
     GitlabRequest(cfg.server, Methods.Put, path, Vector.empty, Some(data))

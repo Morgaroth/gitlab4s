@@ -74,12 +74,49 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
     invokeRequest(req).unmarshall[MergeRequestInfo]
   }
 
-  //  other
+  // award emojis
 
   // @see: https://docs.gitlab.com/ee/api/award_emoji.html#list-an-awardables-award-emoji
+  def getEmojiAwards(projectID: ProjectID, scope: AwardableScope, awardableId: BigInt) = {
+    implicit val rId: RequestId = RequestId.newOne(s"get-$scope-awards")
+    val req = reqGen.get(s"$API/projects/${projectID.toStringId}/$scope/$awardableId/award_emoji")
+    invokeRequest(req).unmarshall[Vector[EmojiAward]]
+  }
+
+  // @see: https://docs.gitlab.com/ee/api/award_emoji.html#award-a-new-emoji
+  def awardEmoji(projectID: ProjectID, scope: AwardableScope, awardableId: BigInt, emojiName: String) = {
+    implicit val rId: RequestId = RequestId.newOne(s"award-$scope-emoji")
+    val req = reqGen.post(s"$API/projects/${projectID.toStringId}/$scope/$awardableId/award_emoji", "name".eqParam(emojiName))
+    invokeRequest(req).unmarshall[EmojiAward]
+  }
+
+  // @see: https://docs.gitlab.com/ee/api/award_emoji.html#delete-an-award-emoji
+  def unawardEmoji(projectID: ProjectID, scope: AwardableScope, awardableId: BigInt, awardId: BigInt): EitherT[F, GitlabError, Unit] = {
+    implicit val rId: RequestId = RequestId.newOne(s"unaward-$scope-emoji")
+    val req = reqGen.delete(s"$API/projects/${projectID.toStringId}/$scope/$awardableId/award_emoji/$awardId")
+    invokeRequest(req).map(_ => ())
+  }
+
+  def getEmojiAwards(mergeRequest: MergeRequestInfo): EitherT[F, GitlabError, Vector[EmojiAward]] = {
+    getEmojiAwards(mergeRequest.project_id, AwardableScope.MergeRequests, mergeRequest.iid)
+  }
+
+  def awardEmoji(mergeRequest: MergeRequestInfo, emojiName: String): EitherT[F, GitlabError, EmojiAward] = {
+    awardEmoji(mergeRequest.project_id, AwardableScope.MergeRequests, mergeRequest.iid, emojiName)
+  }
+
+  def unawardEmoji(mergeRequest: MergeRequestInfo, emojiAward: EmojiAward): EitherT[F, GitlabError, Unit] = {
+    unawardEmoji(mergeRequest.project_id, AwardableScope.MergeRequests, mergeRequest.iid, emojiAward.id)
+  }
+
+  def awardMergeRequestEmoji(projectID: ProjectID, mergeRequestIID: BigInt, emojiName: String): EitherT[F, GitlabError, EmojiAward] = {
+    awardEmoji(projectID, AwardableScope.MergeRequests, mergeRequestIID, emojiName)
+  }
+
   def getMergeRequestEmoji(projectID: ProjectID, mergeRequestIID: BigInt): EitherT[F, GitlabError, Vector[EmojiAward]] = {
     getEmojiAwards(projectID, AwardableScope.MergeRequests, mergeRequestIID)
   }
+  //  other
 
   def groupSearchCommits(groupId: String, phrase: String): GitlabResponseT[String] = {
     implicit val rId: RequestId = RequestId.newOne("group-search-mr")
@@ -103,12 +140,6 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
                          searchTerm.map(ParamQuery.search).getOrElse(NoParam)
                          )
     getAllPaginatedResponse[GitlabBranchInfo](req, "merge-requests-per-project")
-  }
-
-  private def getEmojiAwards(projectID: ProjectID, scope: AwardableScope, awardableId: BigInt) = {
-    implicit val rId: RequestId = RequestId.newOne(s"get-$scope-awards")
-    val req = reqGen.get(s"$API/projects/${projectID.toStringId}/$scope/$awardableId/award_emoji")
-    invokeRequest(req).unmarshall[Vector[EmojiAward]]
   }
 
   private def getAllPaginatedResponse[A: Decoder](req: GitlabRequest, kind: String): EitherT[F, GitlabError, Vector[A]] = {
