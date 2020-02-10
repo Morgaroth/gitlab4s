@@ -2,10 +2,11 @@ package io.morgaroth.gitlabclient.models
 
 import java.time.ZonedDateTime
 
+import io.morgaroth.gitlabclient.marshalling.EnumMarshallingGlue
 
-sealed abstract class MergeRequestState(val name: String)
+sealed abstract class MergeRequestState(val name: String) extends Product with Serializable
 
-object MergeRequestStates {
+object MergeRequestStates extends EnumMarshallingGlue[MergeRequestState] {
 
   case object Open extends MergeRequestState("opened")
 
@@ -19,12 +20,14 @@ object MergeRequestStates {
 
   val all: Seq[MergeRequestState] = Seq(Open, Closed, Locked, Merged, All)
   val byName: Map[String, MergeRequestState] = all.map(x => x.name -> x).toMap
+
+  override def rawValue: MergeRequestState => String = _.name
 }
 
 
-sealed abstract class MergeStatus(val name: String)
+sealed abstract class MergeStatus(val name: String) extends Product with Serializable
 
-object MergeStatus {
+object MergeStatus extends EnumMarshallingGlue[MergeStatus] {
 
   case object CanBeMerged extends MergeStatus("can_be_merged")
 
@@ -32,6 +35,8 @@ object MergeStatus {
 
   val all: Seq[MergeStatus] = Seq(CanBeMerged, CannotBeMerged)
   val byName: Map[String, MergeStatus] = all.map(x => x.name -> x).toMap
+
+  override def rawValue: MergeStatus => String = _.name
 }
 
 case class TaskStatus(count: Int, competed_count: Int)

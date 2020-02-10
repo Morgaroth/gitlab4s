@@ -19,5 +19,7 @@ case class PathProjectId(path: String) extends ProjectID {
 object ProjectID {
   implicit def wrapFromBigInt(value: BigInt): ProjectID = RawNumericProjectId(value)
 
+  implicit def wrapFromInt(value: Int): ProjectID = RawNumericProjectId(value)
+
   implicit def wrapFromPth(value: String): ProjectID = PathProjectId(value)
 }

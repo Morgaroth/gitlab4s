@@ -67,6 +67,13 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
     getAllPaginatedResponse[MergeRequestInfo](req, "merge-requests-per-project")
   }
 
+  // traverse over all states and fetch merge requests for every state, gitlab doesn't offer search by multiple states
+  def getMergeRequests(projectID: ProjectID, states: Iterable[MergeRequestState]): GitlabResponseT[Vector[MergeRequestInfo]] = {
+    states.toVector.traverse { state =>
+      getMergeRequests(projectID, state)
+    }.map(_.flatten)
+  }
+
   // @see: https://docs.gitlab.com/ee/api/merge_requests.html#update-mr
   def updateMergeRequest(projectID: ProjectID, mrID: BigInt, updateMrPayload: UpdateMRPayload): GitlabResponseT[MergeRequestInfo] = {
     implicit val rId: RequestId = RequestId.newOne("update-mr")
@@ -77,14 +84,14 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   // award emojis
 
   // @see: https://docs.gitlab.com/ee/api/award_emoji.html#list-an-awardables-award-emoji
-  def getEmojiAwards(projectID: ProjectID, scope: AwardableScope, awardableId: BigInt) = {
+  def getEmojiAwards(projectID: ProjectID, scope: AwardableScope, awardableId: BigInt): EitherT[F, GitlabError, Vector[EmojiAward]] = {
     implicit val rId: RequestId = RequestId.newOne(s"get-$scope-awards")
     val req = reqGen.get(s"$API/projects/${projectID.toStringId}/$scope/$awardableId/award_emoji")
     invokeRequest(req).unmarshall[Vector[EmojiAward]]
   }
 
   // @see: https://docs.gitlab.com/ee/api/award_emoji.html#award-a-new-emoji
-  def awardEmoji(projectID: ProjectID, scope: AwardableScope, awardableId: BigInt, emojiName: String) = {
+  def awardEmoji(projectID: ProjectID, scope: AwardableScope, awardableId: BigInt, emojiName: String): EitherT[F, GitlabError, EmojiAward] = {
     implicit val rId: RequestId = RequestId.newOne(s"award-$scope-emoji")
     val req = reqGen.post(s"$API/projects/${projectID.toStringId}/$scope/$awardableId/award_emoji", "name".eqParam(emojiName))
     invokeRequest(req).unmarshall[EmojiAward]
@@ -137,8 +144,8 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   // @see: https://docs.gitlab.com/ee/api/branches.html#list-repository-branches
   def getBranches(projectID: ProjectID, searchTerm: Option[String]): GitlabResponseT[Vector[GitlabBranchInfo]] = {
     val req = reqGen.get(s"$API/projects/${projectID.toStringId}/repository/branches",
-                         searchTerm.map(ParamQuery.search).getOrElse(NoParam)
-                         )
+      searchTerm.map(ParamQuery.search).getOrElse(NoParam)
+    )
     getAllPaginatedResponse[GitlabBranchInfo](req, "merge-requests-per-project")
   }
 
