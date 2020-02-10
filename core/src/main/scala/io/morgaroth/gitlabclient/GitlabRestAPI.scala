@@ -123,6 +123,16 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   def getMergeRequestEmoji(projectID: ProjectID, mergeRequestIID: BigInt): EitherT[F, GitlabError, Vector[EmojiAward]] = {
     getEmojiAwards(projectID, AwardableScope.MergeRequests, mergeRequestIID)
   }
+
+  // approvals
+
+  // @see: https://docs.gitlab.com/ee/api/merge_request_approvals.html#get-configuration-1
+  def getApprovals(projectId: ProjectID, mergeRequestIId: BigInt): EitherT[F, GitlabError, MergeRequestApprovals] = {
+    implicit val rId: RequestId = RequestId.newOne("get-mr-approvals")
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approvals")
+    invokeRequest(req).unmarshall[MergeRequestApprovals]
+  }
+
   //  other
 
   def groupSearchCommits(groupId: String, phrase: String): GitlabResponseT[String] = {

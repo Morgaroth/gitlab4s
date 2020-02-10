@@ -63,4 +63,9 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
     result shouldBe Symbol("right")
   }
 
+  it should "list merge request approvals" in {
+    val result = client.getApprovals(14470, 3).value.futureValue // bon
+    result shouldBe Symbol("right")
+  }
+
 }

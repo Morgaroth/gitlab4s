@@ -23,6 +23,7 @@ trait Gitlab4SMarshalling {
   implicit val mergeRequestStateCodec: Codec[MergeRequestState] = EnumMarshalling.stringEnumCodecOf(MergeRequestStates)
   implicit val mergeStatusCodec: Codec[MergeStatus] = EnumMarshalling.stringEnumCodecOf(MergeStatus)
   implicit val awardableTypeCodec: Codec[AwardableType] = EnumMarshalling.stringEnumCodecOf(AwardableType)
+  implicit val ruleTypeCodec: Codec[RuleType] = EnumMarshalling.stringEnumCodecOf(RuleType)
   implicit val zonedDateTimeCodec: Codec[ZonedDateTime] = Codec.from(Decoder.decodeZonedDateTime, Encoder.encodeZonedDateTime)
 
   object MJson {

@@ -24,7 +24,7 @@ object AwardableScope {
     AwardableType.Issue -> AwardableScope.Issues,
     AwardableType.Snippet -> AwardableScope.Snippets,
   )
-  def fromAwardableType(awardableType: AwardableType) = awardableTypeToScope(awardableType)
+  def fromAwardableType(awardableType: AwardableType): AwardableScope = awardableTypeToScope(awardableType)
 }
 
 sealed abstract class AwardableType(val name: String) extends Product with Serializable
