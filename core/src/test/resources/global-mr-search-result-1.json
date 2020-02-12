@@ -57,6 +57,15 @@
     "force_remove_source_branch": true,
     "reference": "xJe2g7nLGt44AKEmZOySW3cWJtHn717wxKq6rkAh",
     "web_url": "hwFP89Nf4fz35HDnaSuwPAoRnY9bF5vtPODlq5CI",
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
     "time_stats": {
       "time_estimate": 0,
       "total_time_spent": 0,
@@ -124,6 +133,15 @@
     "force_remove_source_branch": false,
     "reference": "xJe2g7nLGt44AKEmZOySW3cWJtHn717wxKq6rkAh",
     "web_url": "hwFP89Nf4fz35HDnaSuwPAoRnY9bF5vtPODlq5CI",
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
     "time_stats": {
       "time_estimate": 0,
       "total_time_spent": 0,
@@ -191,6 +209,15 @@
     "force_remove_source_branch": false,
     "reference": "xJe2g7nLGt44AKEmZOySW3cWJtHn717wxKq6rkAh",
     "web_url": "hwFP89Nf4fz35HDnaSuwPAoRnY9bF5vtPODlq5CI",
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
     "time_stats": {
       "time_estimate": 0,
       "total_time_spent": 0,

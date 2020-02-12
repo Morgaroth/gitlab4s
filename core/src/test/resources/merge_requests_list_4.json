@@ -1,0 +1,65 @@
+[
+  {
+    "id": 157284,
+    "iid": 22,
+    "project_id": 14413,
+    "title": "[WHUSP-4767] : Add PATCH functionality in order to be able to migrate account type configurations.",
+    "description": "",
+    "state": "opened",
+    "created_at": "2020-01-30T09:20:59.290Z",
+    "updated_at": "2020-02-07T13:00:00.003Z",
+    "merged_by": null,
+    "merged_at": null,
+    "closed_by": null,
+    "closed_at": null,
+    "target_branch": "develop",
+    "source_branch": "feature/WHUSP-3779",
+    "user_notes_count": 17,
+    "upvotes": 0,
+    "downvotes": 0,
+    "assignee": null,
+    "author": {
+      "id": 1814,
+      "name": "Adrian Castravet (CodeFactory)",
+      "username": "acastravet",
+      "state": "active",
+      "avatar_url": "https://secure.gravatar.com/avatar/59d6089126705962815844b9254501b6?s=80\u0026d=identicon",
+      "web_url": "https://git.nonprod.williamhill.plc/acastravet"
+    },
+    "assignees": [],
+    "source_project_id": 14413,
+    "target_project_id": 14413,
+    "labels": [],
+    "work_in_progress": false,
+    "milestone": null,
+    "merge_when_pipeline_succeeds": false,
+    "merge_status": "can_be_merged",
+    "sha": "772d367943e20f39e5e69f766291ecee219138c1",
+    "merge_commit_sha": null,
+    "squash_commit_sha": null,
+    "discussion_locked": null,
+    "should_remove_source_branch": null,
+    "force_remove_source_branch": true,
+    "reference": "!22",
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
+    "web_url": "https://git.nonprod.williamhill.plc/fsagdcrggrdcgrdgvdrgcdsgcrds/merge_requests/22",
+    "time_stats": {
+      "time_estimate": 0,
+      "total_time_spent": 0,
+      "human_time_estimate": null,
+      "human_total_time_spent": null
+    },
+    "squash": true,
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "has_conflicts": false,
+    "blocking_discussions_resolved": false,
+    "approvals_before_merge": null
+  }
+]

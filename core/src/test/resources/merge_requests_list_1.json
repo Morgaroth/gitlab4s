@@ -39,9 +39,19 @@
     "merge_commit_sha": null,
     "user_notes_count": 0,
     "discussion_locked": null,
+    "reference": "!111",
     "should_remove_source_branch": null,
     "force_remove_source_branch": false,
     "web_url": "obfuscated",
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
     "time_stats": {
       "time_estimate": 0,
       "total_time_spent": 0,
@@ -64,6 +74,7 @@
     "source_branch": "obfuscated",
     "upvotes": 0,
     "downvotes": 0,
+    "reference": "!111",
     "author": {
       "id": 1111,
       "name": "obfuscated",
@@ -94,6 +105,15 @@
     "should_remove_source_branch": null,
     "force_remove_source_branch": false,
     "web_url": "obfuscated",
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
     "time_stats": {
       "time_estimate": 0,
       "total_time_spent": 0,
@@ -116,6 +136,7 @@
     "source_branch": "obfuscated",
     "upvotes": 0,
     "downvotes": 0,
+    "reference": "!111",
     "author": {
       "id": 1111,
       "name": "obfuscated",
@@ -139,6 +160,15 @@
     "should_remove_source_branch": null,
     "force_remove_source_branch": true,
     "web_url": "obfuscated",
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
     "time_stats": {
       "time_estimate": 0,
       "total_time_spent": 0,
@@ -159,6 +189,7 @@
     "updated_at": "2019-11-15T12:43:45.731Z",
     "target_branch": "obfuscated",
     "source_branch": "obfuscated",
+    "reference": "!111",
     "upvotes": 0,
     "downvotes": 0,
     "author": {
@@ -191,6 +222,15 @@
     "should_remove_source_branch": null,
     "force_remove_source_branch": false,
     "web_url": "obfuscated",
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
     "time_stats": {
       "time_estimate": 0,
       "total_time_spent": 0,
@@ -210,6 +250,7 @@
     "created_at": "2019-11-14T10:41:13.628Z",
     "updated_at": "2019-11-14T12:35:41.832Z",
     "target_branch": "obfuscated",
+    "reference": "!111",
     "source_branch": "obfuscated",
     "upvotes": 0,
     "downvotes": 0,
@@ -236,6 +277,15 @@
     "should_remove_source_branch": null,
     "force_remove_source_branch": false,
     "web_url": "obfuscated",
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
     "time_stats": {
       "time_estimate": 0,
       "total_time_spent": 0,
@@ -254,6 +304,7 @@
     "state": "opened",
     "created_at": "2019-11-14T08:29:49.089Z",
     "updated_at": "2019-11-15T12:52:03.399Z",
+    "reference": "!111",
     "target_branch": "obfuscated",
     "source_branch": "obfuscated",
     "upvotes": 0,
@@ -281,6 +332,15 @@
     "should_remove_source_branch": null,
     "force_remove_source_branch": true,
     "web_url": "obfuscated",
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
     "time_stats": {
       "time_estimate": 0,
       "total_time_spent": 0,
@@ -301,6 +361,7 @@
     "updated_at": "2019-11-14T12:13:54.045Z",
     "target_branch": "obfuscated",
     "source_branch": "obfuscated",
+    "reference": "!111",
     "upvotes": 0,
     "downvotes": 0,
     "author": {
@@ -326,6 +387,15 @@
     "should_remove_source_branch": null,
     "force_remove_source_branch": true,
     "web_url": "obfuscated",
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
     "time_stats": {
       "time_estimate": 0,
       "total_time_spent": 0,
@@ -343,6 +413,7 @@
     "description": "obfuscated",
     "state": "merged",
     "created_at": "2019-11-13T08:52:50.065Z",
+    "reference": "!111",
     "updated_at": "2019-11-14T15:32:34.169Z",
     "target_branch": "obfuscated",
     "source_branch": "obfuscated",
@@ -378,6 +449,15 @@
     "should_remove_source_branch": null,
     "force_remove_source_branch": true,
     "web_url": "obfuscated",
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
     "time_stats": {
       "time_estimate": 0,
       "total_time_spent": 0,
@@ -399,6 +479,7 @@
     "target_branch": "obfuscated",
     "source_branch": "obfuscated",
     "upvotes": 0,
+    "reference": "!111",
     "downvotes": 0,
     "author": {
       "id": 1111,
@@ -430,6 +511,15 @@
     "should_remove_source_branch": null,
     "force_remove_source_branch": true,
     "web_url": "obfuscated",
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
     "time_stats": {
       "time_estimate": 0,
       "total_time_spent": 0,
@@ -444,6 +534,7 @@
     "iid": 1111,
     "project_id": 1111,
     "title": "obfuscated",
+    "reference": "!111",
     "description": "obfuscated",
     "state": "opened",
     "created_at": "2019-11-13T07:44:19.541Z",
@@ -482,6 +573,15 @@
     "should_remove_source_branch": null,
     "force_remove_source_branch": true,
     "web_url": "obfuscated",
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
     "time_stats": {
       "time_estimate": 0,
       "total_time_spent": 0,
@@ -498,6 +598,7 @@
     "title": "obfuscated",
     "description": "obfuscated",
     "state": "merged",
+    "reference": "!111",
     "created_at": "2019-11-12T16:04:01.953Z",
     "updated_at": "2019-11-13T17:05:43.306Z",
     "target_branch": "obfuscated",
@@ -534,6 +635,15 @@
     "should_remove_source_branch": null,
     "force_remove_source_branch": false,
     "web_url": "obfuscated",
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
     "time_stats": {
       "time_estimate": 0,
       "total_time_spent": 0,
@@ -581,11 +691,21 @@
     "merge_status": "can_be_merged",
     "sha": "obfuscated",
     "merge_commit_sha": null,
+    "reference": "!111",
     "user_notes_count": 2,
     "discussion_locked": null,
     "should_remove_source_branch": null,
     "force_remove_source_branch": false,
     "web_url": "obfuscated",
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
     "time_stats": {
       "time_estimate": 0,
       "total_time_spent": 0,
@@ -629,8 +749,18 @@
     "user_notes_count": 20,
     "discussion_locked": null,
     "should_remove_source_branch": null,
+    "reference": "!111",
     "force_remove_source_branch": false,
     "web_url": "obfuscated",
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
     "time_stats": {
       "time_estimate": 0,
       "total_time_spent": 0,
@@ -667,6 +797,7 @@
     "labels": [],
     "work_in_progress": true,
     "milestone": null,
+    "reference": "!111",
     "merge_when_pipeline_succeeds": false,
     "merge_status": "can_be_merged",
     "sha": "obfuscated",
@@ -676,6 +807,15 @@
     "should_remove_source_branch": null,
     "force_remove_source_branch": false,
     "web_url": "obfuscated",
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
     "time_stats": {
       "time_estimate": 0,
       "total_time_spent": 0,
@@ -721,6 +861,7 @@
     "milestone": null,
     "merge_when_pipeline_succeeds": false,
     "merge_status": "can_be_merged",
+    "reference": "!111",
     "sha": "obfuscated",
     "merge_commit_sha": null,
     "user_notes_count": 31,
@@ -728,6 +869,15 @@
     "should_remove_source_branch": null,
     "force_remove_source_branch": true,
     "web_url": "obfuscated",
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
     "time_stats": {
       "time_estimate": 0,
       "total_time_spent": 0,
@@ -769,10 +919,20 @@
     "sha": "obfuscated",
     "merge_commit_sha": null,
     "user_notes_count": 9,
+    "reference": "!111",
     "discussion_locked": null,
     "should_remove_source_branch": null,
     "force_remove_source_branch": false,
     "web_url": "obfuscated",
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
     "time_stats": {
       "time_estimate": 0,
       "total_time_spent": 0,
@@ -825,6 +985,16 @@
     "should_remove_source_branch": null,
     "force_remove_source_branch": false,
     "web_url": "obfuscated",
+    "reference": "!111",
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
     "time_stats": {
       "time_estimate": 0,
       "total_time_spent": 0,
@@ -872,11 +1042,21 @@
     "merge_status": "can_be_merged",
     "sha": "obfuscated",
     "merge_commit_sha": null,
+    "reference": "!111",
     "user_notes_count": 1,
     "discussion_locked": null,
     "should_remove_source_branch": null,
     "force_remove_source_branch": true,
     "web_url": "obfuscated",
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
     "time_stats": {
       "time_estimate": 0,
       "total_time_spent": 0,
@@ -927,8 +1107,18 @@
     "user_notes_count": 0,
     "discussion_locked": null,
     "should_remove_source_branch": null,
+    "reference": "!111",
     "force_remove_source_branch": true,
     "web_url": "obfuscated",
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
     "time_stats": {
       "time_estimate": 0,
       "total_time_spent": 0,
@@ -965,6 +1155,7 @@
     "labels": [],
     "work_in_progress": false,
     "milestone": null,
+    "reference": "!111",
     "merge_when_pipeline_succeeds": false,
     "merge_status": "can_be_merged",
     "sha": "obfuscated",
@@ -974,6 +1165,15 @@
     "should_remove_source_branch": null,
     "force_remove_source_branch": true,
     "web_url": "obfuscated",
+    "task_completion_status": {
+      "count": 0,
+      "completed_count": 0
+    },
+    "references": {
+      "short": "!22",
+      "relative": "!22",
+      "full": "fsagdcrggrdcgrdgvdrgcdsgcrds!22"
+    },
     "time_stats": {
       "time_estimate": 0,
       "total_time_spent": 0,
