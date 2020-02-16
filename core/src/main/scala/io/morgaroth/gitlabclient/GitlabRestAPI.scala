@@ -50,32 +50,46 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   }
 
   // @see: https://docs.gitlab.com/ee/api/search.html#scope-merge_requests-1
-  private def groupGlobalSearch(groupId: String, scope: SearchScope, phrase: String)(implicit rId: RequestId) = {
-    val req = reqGen.get(s"$API/groups/$groupId/search", scope, Search(phrase))
+  private def groupGlobalSearch(groupId: EntityId, scope: SearchScope, phrase: Option[String])
+                               (implicit rId: RequestId) = {
+    val req = reqGen.get(s"$API/groups/${groupId.toStringId}/search", scope, phrase.map(Search).getOrElse(NoParam))
     invokeRequest(req)
   }
 
-  def groupSearchMrs(groupId: String, phrase: String): GitlabResponseT[Vector[MergeRequestInfo]] = {
+  def groupSearchMrs(groupId: EntityId, phrase: String): GitlabResponseT[Vector[MergeRequestInfo]] = {
     implicit val rId: RequestId = RequestId.newOne("group-search-mr")
-    groupGlobalSearch(groupId, SearchScope.MergeRequests, phrase)
+    groupGlobalSearch(groupId, SearchScope.MergeRequests, Some(phrase))
       .unmarshall[Vector[MergeRequestInfo]]
   }
 
   // @see: https://docs.gitlab.com/ee/api/merge_requests.html#list-project-merge-requests
-  def getMergeRequests(projectID: ProjectID, state: MergeRequestState = MergeRequestStates.All): GitlabResponseT[Vector[MergeRequestInfo]] = {
+  def getMergeRequests(projectID: EntityId, state: MergeRequestState = MergeRequestStates.All): GitlabResponseT[Vector[MergeRequestInfo]] = {
     val req = reqGen.get(s"$API/projects/${projectID.toStringId}/merge_requests", state)
     getAllPaginatedResponse[MergeRequestInfo](req, "merge-requests-per-project")
   }
 
   // traverse over all states and fetch merge requests for every state, gitlab doesn't offer search by multiple states
-  def getMergeRequests(projectID: ProjectID, states: Iterable[MergeRequestState]): GitlabResponseT[Vector[MergeRequestInfo]] = {
+  def getMergeRequests(projectID: EntityId, states: Iterable[MergeRequestState]): GitlabResponseT[Vector[MergeRequestInfo]] = {
     states.toVector.traverse { state =>
       getMergeRequests(projectID, state)
     }.map(_.flatten)
   }
 
+  // @see: https://docs.gitlab.com/ee/api/merge_requests.html#list-group-merge-requests
+  def getGroupMergeRequests(groupId: EntityId, state: MergeRequestState = MergeRequestStates.All): GitlabResponseT[Vector[MergeRequestInfo]] = {
+    val req = reqGen.get(s"$API/groups/${groupId.toStringId}/merge_requests", state)
+    getAllPaginatedResponse[MergeRequestInfo](req, "merge-requests-per-group")
+  }
+
+  // traverse over all states and fetch merge requests for every state, gitlab doesn't offer search by multiple states
+  def getGroupMergeRequests(groupId: EntityId, states: Iterable[MergeRequestState]): GitlabResponseT[Vector[MergeRequestInfo]] = {
+    states.toVector.traverse { state =>
+      getGroupMergeRequests(groupId, state)
+    }.map(_.flatten)
+  }
+
   // @see: https://docs.gitlab.com/ee/api/merge_requests.html#update-mr
-  def updateMergeRequest(projectID: ProjectID, mrID: BigInt, updateMrPayload: UpdateMRPayload): GitlabResponseT[MergeRequestInfo] = {
+  def updateMergeRequest(projectID: EntityId, mrID: BigInt, updateMrPayload: UpdateMRPayload): GitlabResponseT[MergeRequestInfo] = {
     implicit val rId: RequestId = RequestId.newOne("update-mr")
     val req = reqGen.put(s"$API/projects/${projectID.toStringId}/merge_requests/$mrID", MJson.write(updateMrPayload))
     invokeRequest(req).unmarshall[MergeRequestInfo]
@@ -84,21 +98,21 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   // award emojis
 
   // @see: https://docs.gitlab.com/ee/api/award_emoji.html#list-an-awardables-award-emoji
-  def getEmojiAwards(projectID: ProjectID, scope: AwardableScope, awardableId: BigInt): EitherT[F, GitlabError, Vector[EmojiAward]] = {
+  def getEmojiAwards(projectID: EntityId, scope: AwardableScope, awardableId: BigInt): EitherT[F, GitlabError, Vector[EmojiAward]] = {
     implicit val rId: RequestId = RequestId.newOne(s"get-$scope-awards")
     val req = reqGen.get(s"$API/projects/${projectID.toStringId}/$scope/$awardableId/award_emoji")
     invokeRequest(req).unmarshall[Vector[EmojiAward]]
   }
 
   // @see: https://docs.gitlab.com/ee/api/award_emoji.html#award-a-new-emoji
-  def awardEmoji(projectID: ProjectID, scope: AwardableScope, awardableId: BigInt, emojiName: String): EitherT[F, GitlabError, EmojiAward] = {
+  def awardEmoji(projectID: EntityId, scope: AwardableScope, awardableId: BigInt, emojiName: String): EitherT[F, GitlabError, EmojiAward] = {
     implicit val rId: RequestId = RequestId.newOne(s"award-$scope-emoji")
     val req = reqGen.post(s"$API/projects/${projectID.toStringId}/$scope/$awardableId/award_emoji", "name".eqParam(emojiName))
     invokeRequest(req).unmarshall[EmojiAward]
   }
 
   // @see: https://docs.gitlab.com/ee/api/award_emoji.html#delete-an-award-emoji
-  def unawardEmoji(projectID: ProjectID, scope: AwardableScope, awardableId: BigInt, awardId: BigInt): EitherT[F, GitlabError, Unit] = {
+  def unawardEmoji(projectID: EntityId, scope: AwardableScope, awardableId: BigInt, awardId: BigInt): EitherT[F, GitlabError, Unit] = {
     implicit val rId: RequestId = RequestId.newOne(s"unaward-$scope-emoji")
     val req = reqGen.delete(s"$API/projects/${projectID.toStringId}/$scope/$awardableId/award_emoji/$awardId")
     invokeRequest(req).map(_ => ())
@@ -116,18 +130,18 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
     unawardEmoji(mergeRequest.project_id, AwardableScope.MergeRequests, mergeRequest.iid, emojiAward.id)
   }
 
-  def awardMergeRequestEmoji(projectID: ProjectID, mergeRequestIID: BigInt, emojiName: String): EitherT[F, GitlabError, EmojiAward] = {
+  def awardMergeRequestEmoji(projectID: EntityId, mergeRequestIID: BigInt, emojiName: String): EitherT[F, GitlabError, EmojiAward] = {
     awardEmoji(projectID, AwardableScope.MergeRequests, mergeRequestIID, emojiName)
   }
 
-  def getMergeRequestEmoji(projectID: ProjectID, mergeRequestIID: BigInt): EitherT[F, GitlabError, Vector[EmojiAward]] = {
+  def getMergeRequestEmoji(projectID: EntityId, mergeRequestIID: BigInt): EitherT[F, GitlabError, Vector[EmojiAward]] = {
     getEmojiAwards(projectID, AwardableScope.MergeRequests, mergeRequestIID)
   }
 
   // approvals
 
   // @see: https://docs.gitlab.com/ee/api/merge_request_approvals.html#get-configuration-1
-  def getApprovals(projectId: ProjectID, mergeRequestIId: BigInt): EitherT[F, GitlabError, MergeRequestApprovals] = {
+  def getApprovals(projectId: EntityId, mergeRequestIId: BigInt): EitherT[F, GitlabError, MergeRequestApprovals] = {
     implicit val rId: RequestId = RequestId.newOne("get-mr-approvals")
     val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approvals")
     invokeRequest(req).unmarshall[MergeRequestApprovals]
@@ -135,13 +149,13 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
 
   //  other
 
-  def groupSearchCommits(groupId: String, phrase: String): GitlabResponseT[String] = {
+  def groupSearchCommits(groupId: EntityId, phrase: String): GitlabResponseT[String] = {
     implicit val rId: RequestId = RequestId.newOne("group-search-mr")
-    groupGlobalSearch(groupId, SearchScope.Commits, phrase)
+    groupGlobalSearch(groupId, SearchScope.Commits, Some(phrase))
   }
 
   // @see: https://docs.gitlab.com/ee/api/projects.html#get-single-project
-  def getProject(projectId: ProjectID): GitlabResponseT[ProjectInfo] = {
+  def getProject(projectId: EntityId): GitlabResponseT[ProjectInfo] = {
     implicit val rId: RequestId = RequestId.newOne("get-project-by-id")
     val req = reqGen.get(API + s"/projects/${projectId.toStringId}")
     invokeRequest(req).unmarshall[ProjectInfo]
@@ -152,7 +166,7 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   }
 
   // @see: https://docs.gitlab.com/ee/api/branches.html#list-repository-branches
-  def getBranches(projectID: ProjectID, searchTerm: Option[String]): GitlabResponseT[Vector[GitlabBranchInfo]] = {
+  def getBranches(projectID: EntityId, searchTerm: Option[String]): GitlabResponseT[Vector[GitlabBranchInfo]] = {
     val req = reqGen.get(s"$API/projects/${projectID.toStringId}/repository/branches",
       searchTerm.map(ParamQuery.search).getOrElse(NoParam)
     )

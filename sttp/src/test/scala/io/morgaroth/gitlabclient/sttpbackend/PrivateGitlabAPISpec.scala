@@ -1,5 +1,6 @@
 package io.morgaroth.gitlabclient.sttpbackend
 
+import io.morgaroth.gitlabclient.models.MergeRequestStates
 import io.morgaroth.gitlabclient.{GitlabConfig, GitlabRestAPIConfig}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Minutes, Span}
@@ -65,6 +66,10 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
 
   it should "list merge request approvals" in {
     val result = client.getApprovals(14470, 3).value.futureValue // bon
+    result shouldBe Symbol("right")
+  }
+  it should "return lot of merge requests" in {
+    val result = client.getGroupMergeRequests(1905).value.futureValue // global
     result shouldBe Symbol("right")
   }
 
