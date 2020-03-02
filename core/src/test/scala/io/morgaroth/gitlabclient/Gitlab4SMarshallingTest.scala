@@ -29,7 +29,7 @@ class Gitlab4SMarshallingTest extends FlatSpec with Matchers with Gitlab4SMarsha
   )
   it should "parse project info" in {
     forAll(projectInfos) { resourceName =>
-    val result = MJson.read[ProjectInfo](Source.fromResource(resourceName).mkString)
+      val result = MJson.read[ProjectInfo](Source.fromResource(resourceName).mkString)
       result shouldBe Symbol("right")
     }
   }
@@ -60,7 +60,7 @@ class Gitlab4SMarshallingTest extends FlatSpec with Matchers with Gitlab4SMarsha
   it should "parse branches search" in {
     Vector(
       "project_branches_1.json",
-      ).foreach { resourceName =>
+    ).foreach { resourceName =>
       val result = MJson.read[Vector[GitlabBranchInfo]](Source.fromResource(resourceName).mkString)
       result shouldBe Symbol("right")
     }
@@ -69,16 +69,18 @@ class Gitlab4SMarshallingTest extends FlatSpec with Matchers with Gitlab4SMarsha
   it should "parse awardable emojis" in {
     Vector(
       "awards_of_mr_1.json",
-      ).foreach { resourceName =>
+    ).foreach { resourceName =>
       val result = MJson.read[Vector[EmojiAward]](Source.fromResource(resourceName).mkString)
       result shouldBe Symbol("right")
     }
   }
 
+  val approvalsListTable = Table("merge request approvals") ++ Seq(
+    "approvals_of_mr_1.json",
+    "approvals_of_mr_2.json",
+  )
   it should "parse approvals list" in {
-    Vector(
-      "approvals_of_mr_1.json",
-      ).foreach { resourceName =>
+    forAll(approvalsListTable) { resourceName =>
       val result = MJson.read[MergeRequestApprovals](Source.fromResource(resourceName).mkString)
       result shouldBe Symbol("right")
     }

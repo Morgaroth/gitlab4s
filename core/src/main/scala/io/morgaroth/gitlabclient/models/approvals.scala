@@ -16,7 +16,9 @@ object RuleType extends EnumMarshallingGlue[RuleType] {
 
   final case object Regular extends RuleType("regular")
 
-  val all: Seq[RuleType] = Seq(Regular)
+  final case object AnyApprover extends RuleType("any_approver")
+
+  val all: Seq[RuleType] = Seq(Regular, AnyApprover)
   val byName: Map[String, RuleType] = all.map(x => x.name -> x).toMap
 
   override def rawValue: RuleType => String = _.name
@@ -49,4 +51,5 @@ case class MergeRequestApprovals(
                                   has_approval_rules: Boolean,
                                   merge_request_approvers_available: Boolean,
                                   multiple_approval_rules_available: Boolean,
+                                  require_password_to_approve: Option[Boolean],
                                 )
