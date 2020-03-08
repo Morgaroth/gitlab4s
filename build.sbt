@@ -1,7 +1,7 @@
 val akkaV = "2.5.6"
 val akkaHttpVer = "10.0.9"
-
 val circeVersion = "0.12.2"
+val silencerVersion = "1.6.0"
 
 val validate = Def.taskKey[Unit]("Validates entire project")
 
@@ -15,7 +15,16 @@ val commonSettings = Seq(
     ("Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/").withAllowInsecureProtocol(true),
     Resolver.bintrayRepo("morgaroth", "maven"),
   ),
-  scalacOptions ++= Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-Xfatal-warnings", "-feature"),
+  scalacOptions ++= Seq(
+    "-unchecked", "-deprecation", "-encoding", "utf8", "-Xfatal-warnings", "-feature",
+    "-language:higherKinds", "-language:postfixOps", "-language:implicitConversions",
+    "-Ywarn-unused:imports",
+    "-P:silencer:checkUnused",
+  ),
+  libraryDependencies ++= Seq(
+    compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
+    "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
+  ),
 
   logBuffered := false,
 

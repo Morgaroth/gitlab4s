@@ -2,8 +2,6 @@ package io.morgaroth.gitlabclient
 
 import io.morgaroth.gitlabclient.query.{Method, Methods}
 
-import scala.language.implicitConversions
-
 package object sttpbackend {
 
 

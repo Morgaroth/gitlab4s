@@ -1,0 +1,35 @@
+[
+  {
+    "id": 111,
+    "type": "DiffNote",
+    "body": "do37aqHe39yq01hdiStkUPbx0hiuANJGFEmn2dvp",
+    "attachment": null,
+    "author": {
+      "id": 111,
+      "name": "M89unLxn1ppglChRtLSEl3F4LfEo2B2tg1nZwM9K",
+      "username": "hZDkZPUuQhrcn39lKtfrRAPSUkHBc30NfJviuGPS",
+      "state": "active",
+      "avatar_url": "https://google.com?q=azEVdYzP88",
+      "web_url": "https://google.com?q=5517GYK3qh"
+    },
+    "created_at": "1970-01-01T12:00:00.000+00:00",
+    "updated_at": "1970-01-01T12:00:00.000+00:00",
+    "system": false,
+    "noteable_id": 111,
+    "noteable_type": "MergeRequest",
+    "position": {
+      "base_sha": "635c65b158ad752ed05a07589cd14d450c04bfa1",
+      "start_sha": "635c65b158ad752ed05a07589cd14d450c04bfa1",
+      "head_sha": "635c65b158ad752ed05a07589cd14d450c04bfa1",
+      "old_path": "bfljRqiCRW6G58wC2cx9Hqi3w5jEprRVR8teHgxn",
+      "new_path": "6tIjuLtmYutcbZU0JET5wXxS9aiD7p7CJxqYGHSx",
+      "position_type": "text",
+      "old_line": null,
+      "new_line": 253
+    },
+    "resolvable": true,
+    "resolved": false,
+    "resolved_by": null,
+    "noteable_iid": 111
+  }
+]

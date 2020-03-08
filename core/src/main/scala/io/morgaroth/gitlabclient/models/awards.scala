@@ -2,7 +2,8 @@ package io.morgaroth.gitlabclient.models
 
 import java.time.ZonedDateTime
 
-import io.morgaroth.gitlabclient.marshalling.EnumMarshallingGlue
+import io.circe.Codec
+import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
 sealed abstract class AwardableScope(val name: String) extends Product with Serializable {
   override def toString: String = name
@@ -24,6 +25,7 @@ object AwardableScope {
     AwardableType.Issue -> AwardableScope.Issues,
     AwardableType.Snippet -> AwardableScope.Snippets,
   )
+
   def fromAwardableType(awardableType: AwardableType): AwardableScope = awardableTypeToScope(awardableType)
 }
 
@@ -41,6 +43,8 @@ object AwardableType extends EnumMarshallingGlue[AwardableType] {
   val byName: Map[String, AwardableType] = all.map(x => x.name -> x).toMap
 
   override def rawValue: AwardableType => String = _.name
+
+  implicit val AwardableTypeCirceCodec: Codec[AwardableType] = EnumMarshalling.stringEnumCodecOf(AwardableType)
 }
 
 case class EmojiAward(

@@ -2,8 +2,6 @@ package io.morgaroth.gitlabclient
 
 import java.net.URLEncoder
 
-import scala.language.implicitConversions
-
 trait EntityId {
   def toStringId: String
 }

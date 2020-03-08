@@ -12,8 +12,6 @@ import io.morgaroth.gitlabclient.models._
 import io.morgaroth.gitlabclient.query.ParamQuery._
 import io.morgaroth.gitlabclient.query._
 
-import scala.language.{higherKinds, postfixOps}
-
 trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   type GitlabResponseT[A] = EitherT[F, GitlabError, A]
 
@@ -63,9 +61,10 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   }
 
   // @see: https://docs.gitlab.com/ee/api/merge_requests.html#list-project-merge-requests
-  def getMergeRequests(projectID: EntityId, state: MergeRequestState = MergeRequestStates.All): GitlabResponseT[Vector[MergeRequestInfo]] = {
-    val req = reqGen.get(s"$API/projects/${projectID.toStringId}/merge_requests", state)
-    getAllPaginatedResponse[MergeRequestInfo](req, "merge-requests-per-project")
+  def getMergeRequests(projectID: EntityId, state: MergeRequestState = MergeRequestStates.All, paging: Paging = AllPages, sort: Option[Sorting[MergeRequestsSort]] = None): GitlabResponseT[Vector[MergeRequestInfo]] = {
+    val q = sort.map(s => List("order_by".eqParam(s.field.property), "sort".eqParam(s.direction.toString))).toList.flatten :+ (state:ParamQuery)
+    val req = reqGen.get(s"$API/projects/${projectID.toStringId}/merge_requests", q)
+    getAllPaginatedResponse[MergeRequestInfo](req, "merge-requests-per-project", paging)
   }
 
   // traverse over all states and fetch merge requests for every state, gitlab doesn't offer search by multiple states
@@ -147,6 +146,16 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
     invokeRequest(req).unmarshall[MergeRequestApprovals]
   }
 
+  // merge-request comments
+
+  // @see: https://docs.gitlab.com/ee/api/notes.html#list-all-merge-request-notes
+  def getMergeRequestNotes(projectId: EntityId, mergeRequestIId: BigInt, paging: Paging = AllPages, sort: Option[Sorting[MergeRequestNotesSort]] = None): EitherT[F, GitlabError, Vector[MergeRequestNote]] = {
+    val q = sort.map(s => Seq("order_by".eqParam(s.field.property), "sort".eqParam(s.direction.toString))).toList.flatten
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes", q: _*)
+
+    getAllPaginatedResponse[MergeRequestNote](req, "merge-request-notes", paging)
+  }
+
   //  other
 
   def groupSearchCommits(groupId: EntityId, phrase: String): GitlabResponseT[String] = {
@@ -192,5 +201,41 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
     }
 
     getAll(1, 100, Vector.empty)
+  }
+
+  private def getAllPaginatedResponse[A: Decoder](req: GitlabRequest, kind: String, paging: Paging): EitherT[F, GitlabError, Vector[A]] = {
+
+    val pageSize = paging match {
+      case PageCount(_, pageSize) => pageSize
+      case EntitiesCount(count) if count < 100 => count
+      case _ => 100
+    }
+
+    val entitiesLimit = paging match {
+      case PageCount(pagesCount, pageSize) => pageSize * pagesCount
+      case EntitiesCount(expectedEntitiesCount) => expectedEntitiesCount
+      case _ => Int.MaxValue
+    }
+
+    def getAll(pageNo: Int, pageSizeEff: Int, acc: Vector[A]): EitherT[F, GitlabError, Vector[A]] = {
+      implicit val rId: RequestId = RequestId.newOne(s"$kind-page-$pageNo")
+
+      val resp = invokeRequestRaw(req.withParams(pageSizeEff.pageSizeParam, pageNo.pageNumParam))
+
+      def nextPageHeaders(headers: Map[String, String]): Option[(Int, Int)] = for {
+        nextPageNum <- headers.get("X-Next-Page").filter(_.nonEmpty).map(_.toInt)
+        perPage <- headers.get("X-Per-Page").filter(_.nonEmpty).map(_.toInt)
+      } yield (nextPageNum, perPage)
+
+      for {
+        result <- resp.unmarshall[Vector[A]]
+        respHeaders <- resp.map(_.headers)
+        currentResult = acc ++ result
+        nextPageInfo = nextPageHeaders(respHeaders).map(x => x._1 -> math.min(x._2, entitiesLimit - currentResult.length)).filter(_._2 > 0)
+        res <- nextPageInfo.map(p => getAll(p._1, p._2, currentResult)).getOrElse(EitherT.pure[F, GitlabError](currentResult))
+      } yield res
+    }
+
+    getAll(1, pageSize, Vector.empty)
   }
 }

@@ -3,8 +3,6 @@ package io.morgaroth.gitlabclient.marshalling
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-import scala.language.implicitConversions
-
 trait CommonDateSerializer {
   def print(d: ZonedDateTime): String = {
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")

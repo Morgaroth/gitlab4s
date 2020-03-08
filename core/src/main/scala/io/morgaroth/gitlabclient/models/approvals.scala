@@ -2,7 +2,8 @@ package io.morgaroth.gitlabclient.models
 
 import java.time.ZonedDateTime
 
-import io.morgaroth.gitlabclient.marshalling.EnumMarshallingGlue
+import io.circe.Codec
+import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
 
 case class ApprovedBy(
@@ -23,6 +24,7 @@ object RuleType extends EnumMarshallingGlue[RuleType] {
 
   override def rawValue: RuleType => String = _.name
 
+  implicit val RuleTypeCirceCodec: Codec[RuleType] = EnumMarshalling.stringEnumCodecOf(RuleType)
 }
 
 case class ApprovalRule(

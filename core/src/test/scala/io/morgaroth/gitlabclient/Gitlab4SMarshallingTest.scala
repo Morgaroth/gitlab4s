@@ -85,4 +85,15 @@ class Gitlab4SMarshallingTest extends FlatSpec with Matchers with Gitlab4SMarsha
       result shouldBe Symbol("right")
     }
   }
+
+  val mergeRequestNotesListTable = Table("merge request notes") ++ Seq(
+    "merge_request_notes_list_1.json",
+    "merge_request_notes_list_2.json",
+  )
+  it should "parse merge request's notes list" in {
+    forAll(mergeRequestNotesListTable) { resourceName =>
+      val result = MJson.read[Vector[MergeRequestNote]](Source.fromResource(resourceName).mkString)
+      result shouldBe Symbol("right")
+    }
+  }
 }

@@ -5,8 +5,6 @@ import java.net.URLEncoder
 import io.morgaroth.gitlabclient.GitlabConfig
 import io.morgaroth.gitlabclient.models.{MergeRequestState, SearchScope}
 
-import scala.language.implicitConversions
-
 sealed trait ParamQuery {
   def render: String
 }
@@ -19,7 +17,7 @@ object ParamQuery {
   implicit def fromSearchScope(sc: SearchScope): ParamQuery = Scope(sc)
 
   implicit class fromString(paramName: String) {
-    def eqParam(value:String) = new StringKVParam(paramName, value)
+    def eqParam(value: String) = new StringKVParam(paramName, value)
   }
 
   implicit class NUmericParams(value: Int) {
@@ -81,6 +79,9 @@ case class RequestGenerator(cfg: GitlabConfig) {
     GitlabRequest(cfg.server, Methods.Delete, path, Vector.empty, None)
 
   def get(path: String, query: ParamQuery*): GitlabRequest =
+    GitlabRequest(cfg.server, Methods.Get, path, query.toVector.filterNot(_ == NoParam), None)
+
+  def get(path: String, query: List[ParamQuery]): GitlabRequest =
     GitlabRequest(cfg.server, Methods.Get, path, query.toVector.filterNot(_ == NoParam), None)
 
   def post(path: String, query: ParamQuery*): GitlabRequest =

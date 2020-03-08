@@ -2,9 +2,14 @@ package io.morgaroth.gitlabclient.models
 
 import java.time.ZonedDateTime
 
-import io.morgaroth.gitlabclient.marshalling.EnumMarshallingGlue
+import io.circe.Codec
+import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
 sealed abstract class MergeRequestState(val name: String) extends Product with Serializable
+
+object MergeRequestState {
+  implicit val MergeRequestStateCirceCodec: Codec[MergeRequestState] = EnumMarshalling.stringEnumCodecOf(MergeRequestStates)
+}
 
 object MergeRequestStates extends EnumMarshallingGlue[MergeRequestState] {
 
@@ -18,7 +23,7 @@ object MergeRequestStates extends EnumMarshallingGlue[MergeRequestState] {
 
   case object All extends MergeRequestState("all")
 
-  val all   : Seq[MergeRequestState]         = Seq(Open, Closed, Locked, Merged, All)
+  val all: Seq[MergeRequestState] = Seq(Open, Closed, Locked, Merged, All)
   val byName: Map[String, MergeRequestState] = all.map(x => x.name -> x).toMap
 
   override def rawValue: MergeRequestState => String = _.name
@@ -33,10 +38,12 @@ object MergeStatus extends EnumMarshallingGlue[MergeStatus] {
 
   case object CannotBeMerged extends MergeStatus("cannot_be_merged")
 
-  val all   : Seq[MergeStatus]         = Seq(CanBeMerged, CannotBeMerged)
+  val all: Seq[MergeStatus] = Seq(CanBeMerged, CannotBeMerged)
   val byName: Map[String, MergeStatus] = all.map(x => x.name -> x).toMap
 
   override def rawValue: MergeStatus => String = _.name
+
+  implicit val MergeStatusCirceCodec: Codec[MergeStatus] = EnumMarshalling.stringEnumCodecOf(MergeStatus)
 }
 
 case class TaskStatus(count: Int, completed_count: Int)
@@ -71,7 +78,7 @@ case class MergeRequestInfo(
                              merge_commit_sha: Option[String],
                              squash_commit_sha: Option[String],
                              user_notes_count: Int,
-                             reference : String,
+                             reference: String,
                              references: ReferencesInfo,
                              discussion_locked: Option[Boolean],
 
@@ -90,18 +97,18 @@ case class MergeRequestInfo(
                            )
 
 case class UpdateMRPayload(
-                            target_branch           : Option[String] = None,
-                            title                   : Option[String] = None,
-                            assignee_id             : Option[Long] = None,
-                            assignee_ids            : Option[Vector[Long]] = None,
-                            milestone_id            : Option[Long] = None,
-                            labels                  : Option[Vector[String]] = None,
-                            description             : Option[String] = None,
-                            state_event             : Option[MergeRequestState] = None,
-                            remove_source_branch    : Option[Boolean] = None,
-                            squash                  : Option[Boolean] = None,
-                            discussion_locked       : Option[Boolean] = None,
-                            allow_collaboration     : Option[Boolean] = None,
+                            target_branch: Option[String] = None,
+                            title: Option[String] = None,
+                            assignee_id: Option[Long] = None,
+                            assignee_ids: Option[Vector[Long]] = None,
+                            milestone_id: Option[Long] = None,
+                            labels: Option[Vector[String]] = None,
+                            description: Option[String] = None,
+                            state_event: Option[MergeRequestState] = None,
+                            remove_source_branch: Option[Boolean] = None,
+                            squash: Option[Boolean] = None,
+                            discussion_locked: Option[Boolean] = None,
+                            allow_collaboration: Option[Boolean] = None,
                             allow_maintainer_to_push: Option[Boolean] = None,
                           )
 
