@@ -1,5 +1,6 @@
 package io.morgaroth.gitlabclient.sttpbackend
 
+import cats.syntax.either._
 import io.morgaroth.gitlabclient.{GitlabConfig, GitlabRestAPIConfig}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Minutes, Span}
@@ -76,5 +77,11 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
   it should "return merge request notes" in {
     val result = client.getMergeRequestNotes(14415, 74).value.futureValue
     result shouldBe Symbol("right")
+  }
+  it should "return merge request discussions" in {
+    val result = client.getMergeRequestDiscussions(14415, 74).value.futureValue
+    result shouldBe Symbol("right")
+    val result2 = result.valueOr(x => throw new RuntimeException(x.toString))
+    result2.count(_.individual_note == false) shouldBe 98
   }
 }

@@ -8,9 +8,7 @@ cache:
 variables:
   GIT_STRATEGY: clone
   GIT_SUBMODULE_STRATEGY: none
-#  SBT_OPTS: '-Xmx2g -Xss10m -Xms1g -Dsbt.supershell=false'
   SBT_OPTS: '-Xmx2g -Xss10m -Xms1g'
-#  GET_SOURCES_ATTEMPTS: 3
 
 stages:
   - validate
@@ -41,6 +39,6 @@ release:
     - git remote set-url --push origin $(perl -pe 's#.*@(.+?(\:\d+)?)/#git@\1:#' <<< $CI_REPOSITORY_URL)
     - git config --list
     - sbt -v -ivy $PWD/.ivy2 -sbt-dir $PWD/.sbt -Dbintray.user=$BINTRAY_USER -Dbintray.pass=${_BINTRAY_PASS} ";test:compile;release with-defaults"
-
-  after_script:
-    - rm -Rfv .ssh
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /\[no release\]/

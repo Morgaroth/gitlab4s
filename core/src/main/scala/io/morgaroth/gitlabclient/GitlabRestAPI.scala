@@ -38,7 +38,7 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   // @see: https://docs.gitlab.com/ee/api/search.html#scope-merge_requests
   private def globalSearch(scope: SearchScope, phrase: String) = {
     val req = reqGen.get(s"$API/search", scope, Search(phrase))
-    getAllPaginatedResponse[MergeRequestInfo](req, s"global-search-${scope.name}")
+    getAllPaginatedResponse[MergeRequestInfo](req, s"global-search-${scope.name}", AllPages)
   }
 
   // Merge requests
@@ -62,7 +62,7 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
 
   // @see: https://docs.gitlab.com/ee/api/merge_requests.html#list-project-merge-requests
   def getMergeRequests(projectID: EntityId, state: MergeRequestState = MergeRequestStates.All, paging: Paging = AllPages, sort: Option[Sorting[MergeRequestsSort]] = None): GitlabResponseT[Vector[MergeRequestInfo]] = {
-    val q = sort.map(s => List("order_by".eqParam(s.field.property), "sort".eqParam(s.direction.toString))).toList.flatten :+ (state:ParamQuery)
+    val q = sort.map(s => List("order_by".eqParam(s.field.property), "sort".eqParam(s.direction.toString))).toList.flatten :+ (state: ParamQuery)
     val req = reqGen.get(s"$API/projects/${projectID.toStringId}/merge_requests", q)
     getAllPaginatedResponse[MergeRequestInfo](req, "merge-requests-per-project", paging)
   }
@@ -77,7 +77,7 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   // @see: https://docs.gitlab.com/ee/api/merge_requests.html#list-group-merge-requests
   def getGroupMergeRequests(groupId: EntityId, state: MergeRequestState = MergeRequestStates.All): GitlabResponseT[Vector[MergeRequestInfo]] = {
     val req = reqGen.get(s"$API/groups/${groupId.toStringId}/merge_requests", state)
-    getAllPaginatedResponse[MergeRequestInfo](req, "merge-requests-per-group")
+    getAllPaginatedResponse[MergeRequestInfo](req, "merge-requests-per-group", AllPages)
   }
 
   // traverse over all states and fetch merge requests for every state, gitlab doesn't offer search by multiple states
@@ -146,14 +146,22 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
     invokeRequest(req).unmarshall[MergeRequestApprovals]
   }
 
-  // merge-request comments
+  // merge-request discussions & notes
 
   // @see: https://docs.gitlab.com/ee/api/notes.html#list-all-merge-request-notes
-  def getMergeRequestNotes(projectId: EntityId, mergeRequestIId: BigInt, paging: Paging = AllPages, sort: Option[Sorting[MergeRequestNotesSort]] = None): EitherT[F, GitlabError, Vector[MergeRequestNote]] = {
+  def getMergeRequestNotes(projectId: EntityId, mergeRequestIId: BigInt, paging: Paging = AllPages, sort: Option[Sorting[MergeRequestNotesSort]] = None)
+  : EitherT[F, GitlabError, Vector[MergeRequestNote]] = {
     val q = sort.map(s => Seq("order_by".eqParam(s.field.property), "sort".eqParam(s.direction.toString))).toList.flatten
     val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes", q: _*)
 
     getAllPaginatedResponse[MergeRequestNote](req, "merge-request-notes", paging)
+  }
+
+  // @see: https://docs.gitlab.com/ee/api/discussions.html#list-project-merge-request-discussion-items
+  def getMergeRequestDiscussions(projectId: EntityId, mergeRequestIId: BigInt): EitherT[F, GitlabError, Vector[MergeRequestDiscussion]] = {
+    implicit val rId: RequestId = RequestId.newOne("get-merge-request-discussions")
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/discussions")
+    getAllPaginatedResponse[MergeRequestDiscussion](req, "get-merge-request-discussions", AllPages)
   }
 
   //  other
@@ -179,28 +187,7 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
     val req = reqGen.get(s"$API/projects/${projectID.toStringId}/repository/branches",
       searchTerm.map(ParamQuery.search).getOrElse(NoParam)
     )
-    getAllPaginatedResponse[GitlabBranchInfo](req, "merge-requests-per-project")
-  }
-
-  private def getAllPaginatedResponse[A: Decoder](req: GitlabRequest, kind: String): EitherT[F, GitlabError, Vector[A]] = {
-    def getAll(pageNo: Int, pageSizeEff: Int, acc: Vector[A]): EitherT[F, GitlabError, Vector[A]] = {
-      implicit val rId: RequestId = RequestId.newOne(s"$kind-page-$pageNo")
-
-      val resp = invokeRequestRaw(req.withParams(pageSizeEff.pageSizeParam, pageNo.pageNumParam))
-
-      def nextPage(headers: Map[String, String]): Option[(Int, Int)] = for {
-        nextPageNum <- headers.get("X-Next-Page").filter(_.nonEmpty).map(_.toInt)
-        perPage <- headers.get("X-Per-Page").filter(_.nonEmpty).map(_.toInt)
-      } yield (nextPageNum, perPage)
-
-      for {
-        result <- resp.unmarshall[Vector[A]]
-        respHeaders <- resp.map(_.headers)
-        res <- nextPage(respHeaders).map(p => getAll(p._1, p._2, acc ++ result)).getOrElse(EitherT.pure[F, GitlabError](acc ++ result))
-      } yield res
-    }
-
-    getAll(1, 100, Vector.empty)
+    getAllPaginatedResponse[GitlabBranchInfo](req, "merge-requests-per-project", AllPages)
   }
 
   private def getAllPaginatedResponse[A: Decoder](req: GitlabRequest, kind: String, paging: Paging): EitherT[F, GitlabError, Vector[A]] = {
