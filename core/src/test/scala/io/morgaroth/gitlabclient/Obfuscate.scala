@@ -11,7 +11,7 @@ class Obfuscate extends FlatSpec with Matchers with Gitlab4SMarshalling {
 
   behavior of "Obfuscate"
 
-  val textFields = Set("title", "body", "source_branch", "target_branch",
+  val textFields = Set("title", "body", "source_branch", "target_branch", "diff", "a_mode", "b_mode",
     "reference", "description", "message", "full_name", "full_path", "path", "old_path", "new_path")
   val numberFields = Set("id", "project_id", "iid", "source_project_id", "target_project_id", "noteable_iid", "noteable_id")
   val dateFields = Set("created_at", "updated_at", "authored_date", "committed_date", "created_at")
@@ -22,7 +22,7 @@ class Obfuscate extends FlatSpec with Matchers with Gitlab4SMarshalling {
   val fullUserNameFields = Set("author_name", "committer_name", "name")
 
   it should "work" in {
-    val resourceName = "project_mrs_result_1.json"
+    val resourceName = "commit_diffs_1.json"
     val result = Source.fromResource(resourceName).mkString
 
     val result1 = textFields.foldLeft(result) {

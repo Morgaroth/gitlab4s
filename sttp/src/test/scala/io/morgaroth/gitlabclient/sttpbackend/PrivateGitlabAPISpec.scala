@@ -1,7 +1,10 @@
 package io.morgaroth.gitlabclient.sttpbackend
 
+import java.time.{ZoneOffset, ZonedDateTime}
+
 import cats.syntax.either._
-import io.morgaroth.gitlabclient.{GitlabConfig, GitlabRestAPIConfig}
+import io.morgaroth.gitlabclient.models.MergeRequestStates
+import io.morgaroth.gitlabclient.{EntitiesCount, GitlabConfig, GitlabRestAPIConfig}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Minutes, Span}
 import org.scalatest.{FlatSpec, Matchers}
@@ -9,7 +12,6 @@ import org.scalatest.{FlatSpec, Matchers}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
-
 
   override implicit def patienceConfig: PatienceConfig = PatienceConfig(Span(1, Minutes))
 
@@ -60,7 +62,7 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
   }
 
   it should "find awardable emojis of a merge requests" in {
-    val result = client.getMergeRequestEmoji(14415, 156).value.futureValue // t
+    val result = client.getMergeRequestEmoji(14415, 74).value.futureValue // t
     result shouldBe Symbol("right")
   }
 
@@ -70,7 +72,7 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
   }
 
   it should "return lot of merge requests" in {
-    val result = client.getGroupMergeRequests(1905).value.futureValue // global
+    val result = client.getGroupMergeRequests(1905, MergeRequestStates.All, EntitiesCount(100)).value.futureValue // global
     result shouldBe Symbol("right")
   }
 
@@ -78,10 +80,30 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
     val result = client.getMergeRequestNotes(14415, 74).value.futureValue
     result shouldBe Symbol("right")
   }
+
   it should "return merge request discussions" in {
     val result = client.getMergeRequestDiscussions(14415, 74).value.futureValue
     result shouldBe Symbol("right")
     val result2 = result.valueOr(x => throw new RuntimeException(x.toString))
     result2.count(_.individual_note == false) shouldBe 98
+  }
+
+  it should "return commits" in {
+    val result = client.getCommits(14415, paging = EntitiesCount(300)).value.futureValue
+    result shouldBe Symbol("right")
+  }
+
+  it should "fetch some diffs" in {
+    val result = client.getDiffOfACommit(14415, "1c7ea4367f4bf20bf3f10d7bae97d75a3956bf7d").value.futureValue
+    result shouldBe Symbol("right")
+  }
+
+  it should "return commits from given period" in {
+    val startTime = ZonedDateTime.of(2019, 8, 1, 0, 0, 0, 0, ZoneOffset.ofHours(2))
+    val endTime = ZonedDateTime.of(2020, 2, 1, 0, 0, 0, 0, ZoneOffset.ofHours(2))
+    val result = client.getCommits(14415, since = startTime, until = endTime).value.futureValue
+    result shouldBe Symbol("right")
+    val result2 = result.valueOr(x => throw new RuntimeException(x.toString))
+    result2.size shouldBe 120
   }
 }

@@ -74,7 +74,7 @@ case class MergeRequestInfo(
                              target_project_id: BigInt,
                              labels: Vector[String],
                              merge_status: Option[MergeStatus],
-                             sha: String,
+                             sha: Option[String],
                              merge_commit_sha: Option[String],
                              squash_commit_sha: Option[String],
                              user_notes_count: Int,

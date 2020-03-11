@@ -1,5 +1,7 @@
 package io.morgaroth.gitlabclient
 
+import java.time.ZonedDateTime
+
 import cats.Monad
 import cats.data.EitherT
 import cats.instances.vector._
@@ -7,6 +9,7 @@ import cats.syntax.traverse._
 import com.typesafe.scalalogging.LazyLogging
 import io.circe.Decoder
 import io.circe.generic.auto._
+import io.morgaroth.gitlabclient.helpers.CustomDateTimeFormatter.RichZonedDateTime
 import io.morgaroth.gitlabclient.marshalling.Gitlab4SMarshalling
 import io.morgaroth.gitlabclient.models._
 import io.morgaroth.gitlabclient.query.ParamQuery._
@@ -75,9 +78,9 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   }
 
   // @see: https://docs.gitlab.com/ee/api/merge_requests.html#list-group-merge-requests
-  def getGroupMergeRequests(groupId: EntityId, state: MergeRequestState = MergeRequestStates.All): GitlabResponseT[Vector[MergeRequestInfo]] = {
+  def getGroupMergeRequests(groupId: EntityId, state: MergeRequestState = MergeRequestStates.All, paging: Paging = AllPages): GitlabResponseT[Vector[MergeRequestInfo]] = {
     val req = reqGen.get(s"$API/groups/${groupId.toStringId}/merge_requests", state)
-    getAllPaginatedResponse[MergeRequestInfo](req, "merge-requests-per-group", AllPages)
+    getAllPaginatedResponse[MergeRequestInfo](req, "merge-requests-per-group", paging)
   }
 
   // traverse over all states and fetch merge requests for every state, gitlab doesn't offer search by multiple states
@@ -159,9 +162,36 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
 
   // @see: https://docs.gitlab.com/ee/api/discussions.html#list-project-merge-request-discussion-items
   def getMergeRequestDiscussions(projectId: EntityId, mergeRequestIId: BigInt): EitherT[F, GitlabError, Vector[MergeRequestDiscussion]] = {
-    implicit val rId: RequestId = RequestId.newOne("get-merge-request-discussions")
     val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/discussions")
     getAllPaginatedResponse[MergeRequestDiscussion](req, "get-merge-request-discussions", AllPages)
+  }
+
+  // commits
+
+  // @see: https://docs.gitlab.com/ee/api/discussions.html#list-project-merge-request-discussion-items
+  def getCommits(projectId: EntityId,
+                 path: String = null,
+                 ref: String = null,
+                 since: ZonedDateTime = null,
+                 until: ZonedDateTime = null,
+                 paging: Paging = AllPages,
+                ): EitherT[F, GitlabError, Vector[CommitSimple]] = {
+    val params = Vector(
+      Option(ref).map("ref_name".eqParam(_)).toList,
+      Option(path).map("path".eqParam(_)).toList,
+      Option(since).map(_.toISO8601UTC).map("since".eqParam(_)).toList,
+      Option(until).map(_.toISO8601UTC).map("until".eqParam(_)).toList,
+    ).flatten
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits", params: _*)
+    getAllPaginatedResponse[CommitSimple](req, "get-commits", paging)
+  }
+
+  // @see: https://docs.gitlab.com/ee/api/commits.html#get-the-diff-of-a-commit
+  //  GET /projects/:id/repository/commits/:sha/diff
+  def getDiffOfACommit(projectId: EntityId, ref: String): EitherT[F, GitlabError, Vector[CommitDiff]] = {
+    implicit val rId: RequestId = RequestId.newOne("get-commits-diff")
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$ref/diff")
+    invokeRequest(req).unmarshall[Vector[CommitDiff]]
   }
 
   //  other
