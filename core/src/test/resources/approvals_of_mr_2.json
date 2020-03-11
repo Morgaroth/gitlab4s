@@ -2,7 +2,7 @@
   "id": 111,
   "iid": 111,
   "project_id": 111,
-  "title": "76mcA4oWXx6p7s7KVQwtVtGdpOvWgizelBhflbNA",
+  "title": "sga5gKn3Elx6XLFagenm8gyJh9uhYK9rjuyiLE0l",
   "description": "",
   "state": "merged",
   "created_at": "1970-01-01T12:00:00.000+00:00",
@@ -21,7 +21,7 @@
   "approval_rules_left": [
     {
       "id": 111,
-      "name": "1AEY1m42zTqurS1yNX7ldEeXHMoPfNphLasrl4UV",
+      "name": "Arleyne Encratis",
       "rule_type": "any_approver"
     }
   ],
