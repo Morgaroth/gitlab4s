@@ -149,6 +149,35 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
     invokeRequest(req).unmarshall[MergeRequestApprovals]
   }
 
+  // @see https://docs.gitlab.com/ee/api/merge_request_approvals.html#get-the-approval-state-of-merge-requests
+  def getMergeRequestApprovalRules(projectId: EntityId, mergeRequestIId: BigInt): EitherT[F, GitlabError, Vector[MergeRequestApprovalRule]] = {
+    implicit val rId: RequestId = RequestId.newOne("get-mr-approval-rules")
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approval_rules")
+    invokeRequest(req).unmarshall[Vector[MergeRequestApprovalRule]]
+  }
+
+  // @see https://docs.gitlab.com/ee/api/merge_request_approvals.html#create-merge-request-level-rule
+  def createApprovalRule(projectId: EntityId, mergeRequestIId: BigInt, payload: CreateMergeRequestApprovalRule): EitherT[F, GitlabError, MergeRequestApprovalRule] = {
+    implicit val rId: RequestId = RequestId.newOne("create-mr-approval-rule")
+    val req = reqGen.post(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approval_rules", MJson.write(payload))
+    invokeRequest(req).unmarshall[MergeRequestApprovalRule]
+  }
+
+  def createApprovalRule(projectId: EntityId, mergeRequestIId: BigInt, name: String, userIds: Vector[BigInt]): EitherT[F, GitlabError, MergeRequestApprovalRule] = {
+    createApprovalRule(projectId, mergeRequestIId, CreateMergeRequestApprovalRule.oneOf(name, userIds: _*))
+  }
+
+  // @see https://docs.gitlab.com/ee/api/merge_request_approvals.html#delete-merge-request-level-rule
+  def deleteApprovalRule(projectId: EntityId, mergeRequestIId: BigInt, approvalRuleId: BigInt): EitherT[F, GitlabError, String] = {
+    implicit val rId: RequestId = RequestId.newOne("delete-mr-approval-rule")
+    val req = reqGen.delete(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approval_rules/$approvalRuleId")
+    invokeRequest(req)
+  }
+
+  def deleteApprovalRule(projectId: EntityId, mergeRequestIId: BigInt, approvalRule: MergeRequestApprovalRule): EitherT[F, GitlabError, String] = {
+    deleteApprovalRule(projectId, mergeRequestIId, approvalRule.id)
+  }
+
   // merge-request discussions & notes
 
   // @see: https://docs.gitlab.com/ee/api/notes.html#list-all-merge-request-notes

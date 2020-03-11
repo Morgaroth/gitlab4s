@@ -55,3 +55,36 @@ case class MergeRequestApprovals(
                                   multiple_approval_rules_available: Boolean,
                                   require_password_to_approve: Option[Boolean],
                                 )
+
+case class SourceApprovalRuleInfo(
+                                   approvals_required: Int,
+                                 )
+
+case class MergeRequestApprovalRule(
+                                     id: BigInt,
+                                     name: String,
+                                     rule_type: RuleType,
+                                     eligible_approvers: Vector[GitlabUser],
+                                     approvals_required: Int,
+                                     source_rule: Option[SourceApprovalRuleInfo],
+                                     users: Vector[GitlabUser],
+                                     groups: Vector[GitlabGroup],
+                                     contains_hidden_groups: Boolean,
+                                   )
+
+case class MergeRequestApprovalRules(
+                                      approval_rules_overwritten: Boolean,
+                                      rules: Vector[MergeRequestApprovalRule],
+                                    )
+
+case class CreateMergeRequestApprovalRule(
+                                           name: String,
+                                           approvals_required: Int,
+                                           approval_project_rule_id: Option[BigInt],
+                                           user_ids: Option[Vector[BigInt]],
+                                           group_ids: Option[Vector[BigInt]],
+                                         )
+
+object CreateMergeRequestApprovalRule {
+  def oneOf(name: String, userId: BigInt*): CreateMergeRequestApprovalRule = new CreateMergeRequestApprovalRule(name, 1, None, Some(userId.toVector), None)
+}

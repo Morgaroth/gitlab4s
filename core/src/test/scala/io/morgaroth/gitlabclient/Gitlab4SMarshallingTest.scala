@@ -96,4 +96,14 @@ class Gitlab4SMarshallingTest extends FlatSpec with Matchers with Gitlab4SMarsha
       result shouldBe Symbol("right")
     }
   }
+  val mergeRequestApprovalRules = Table("merge request approval rules") ++ Seq(
+    "approval_rules_of_mr_1.json",
+    "approval_rules_of_mr_2.json",
+  )
+  it should "parse merge request's approval rules" in {
+    forAll(mergeRequestApprovalRules) { resourceName =>
+      val result = MJson.read[Vector[MergeRequestApprovalRule]](Source.fromResource(resourceName).mkString)
+      result shouldBe Symbol("right")
+    }
+  }
 }

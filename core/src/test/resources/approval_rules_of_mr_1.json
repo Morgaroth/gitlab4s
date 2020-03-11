@@ -1,0 +1,114 @@
+
+
+[
+  {
+    "id": 111,
+    "name": "Meg Elene",
+    "rule_type": "regular",
+    "eligible_approvers": [],
+    "approvals_required": 1,
+    "users": [
+      {
+        "id": 111,
+        "name": "Meg Elene",
+        "username": "cchrysler",
+        "state": "active",
+        "avatar_url": "https://google.com?q=jkThXJ0FQ8",
+        "web_url": "https://google.com?q=37OlrVP8Uh"
+      }
+    ],
+    "groups": [],
+    "contains_hidden_groups": false,
+    "source_rule": null
+  },
+  {
+    "id": 111,
+    "name": "Meg Elene",
+    "rule_type": "regular",
+    "eligible_approvers": [
+      {
+        "id": 111,
+        "name": "Meg Elene",
+        "username": "cchrysler",
+        "state": "active",
+        "avatar_url": "https://google.com?q=jkThXJ0FQ8",
+        "web_url": "https://google.com?q=37OlrVP8Uh"
+      },
+      {
+        "id": 111,
+        "name": "Meg Elene",
+        "username": "cchrysler",
+        "state": "active",
+        "avatar_url": "https://google.com?q=jkThXJ0FQ8",
+        "web_url": "https://google.com?q=37OlrVP8Uh"
+      },
+      {
+        "id": 111,
+        "name": "Meg Elene",
+        "username": "cchrysler",
+        "state": "active",
+        "avatar_url": "https://google.com?q=jkThXJ0FQ8",
+        "web_url": "https://google.com?q=37OlrVP8Uh"
+      },
+      {
+        "id": 111,
+        "name": "Meg Elene",
+        "username": "cchrysler",
+        "state": "active",
+        "avatar_url": "https://google.com?q=jkThXJ0FQ8",
+        "web_url": "https://google.com?q=37OlrVP8Uh"
+      }
+    ],
+    "approvals_required": 3,
+    "users": [],
+    "groups": [
+      {
+        "id": 111,
+        "web_url": "https://google.com?q=37OlrVP8Uh",
+        "name": "Meg Elene",
+        "path": "AeMrf2ToFzVcfmHTuYfOUAyh1qzfdn3gKi5cUaRz",
+        "description": "NE36U2Vjx4F9QytxKrZgXbQMvriypaibPgXKqvbB",
+        "visibility": "public",
+        "share_with_group_lock": false,
+        "require_two_factor_authentication": false,
+        "two_factor_grace_period": 48,
+        "project_creation_level": "developer",
+        "auto_devops_enabled": null,
+        "subgroup_creation_level": "owner",
+        "emails_disabled": null,
+        "mentions_disabled": null,
+        "lfs_enabled": true,
+        "avatar_url": "https://google.com?q=jkThXJ0FQ8",
+        "request_access_enabled": false,
+        "full_name": "PDeXSgaUOmovlS0xgZW1ZhKbJPCiaNn0BD5Rs6wl",
+        "full_path": "8pAt6xm2yoMVi67VtvErArLeYKUGfpTUarufyJpI",
+        "parent_id": null,
+        "ldap_cn": null,
+        "ldap_access": null,
+        "file_template_project_id": null
+      }
+    ],
+    "contains_hidden_groups": false,
+    "source_rule": {
+      "approvals_required": 2
+    }
+  },
+  {
+    "id": 111,
+    "name": "Meg Elene",
+    "rule_type": "any_approver",
+    "eligible_approvers": [],
+    "approvals_required": 0,
+    "users": [],
+    "groups": [],
+    "contains_hidden_groups": false,
+    "source_rule": null
+  }
+]
+
+
+
+
+Disconnected from the target VM, address: '127.0.0.1:53757', transport: 'socket'
+
+Process finished with exit code 0

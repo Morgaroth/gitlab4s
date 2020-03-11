@@ -22,7 +22,7 @@ class Obfuscate extends FlatSpec with Matchers with Gitlab4SMarshalling {
   val fullUserNameFields = Set("author_name", "committer_name", "name")
 
   it should "work" in {
-    val resourceName = "commit_diffs_1.json"
+    val resourceName = "approval_rules_of_mr_2.json"
     val result = Source.fromResource(resourceName).mkString
 
     val result1 = textFields.foldLeft(result) {

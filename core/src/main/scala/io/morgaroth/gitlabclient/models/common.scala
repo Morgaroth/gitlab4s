@@ -25,6 +25,19 @@ case class GitlabFullUser(
                            email: String,
                          )
 
+case class GitlabGroup(
+                        id: BigInt,
+                        web_url: String,
+                        name: String,
+                        path: String,
+                        description: String,
+                        visibility: String,
+                        avatar_url: String,
+                        request_access_enabled: Boolean,
+                        full_name: String,
+                        full_path: String,
+                      )
+
 case class PaginatedResponse[A](
                                  size: Option[Int],
                                  page: Int,

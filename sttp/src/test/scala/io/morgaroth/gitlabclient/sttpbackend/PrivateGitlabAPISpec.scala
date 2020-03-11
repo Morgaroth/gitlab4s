@@ -3,7 +3,7 @@ package io.morgaroth.gitlabclient.sttpbackend
 import java.time.{ZoneOffset, ZonedDateTime}
 
 import cats.syntax.either._
-import io.morgaroth.gitlabclient.models.MergeRequestStates
+import io.morgaroth.gitlabclient.models.{CreateMergeRequestApprovalRule, MergeRequestStates}
 import io.morgaroth.gitlabclient.{EntitiesCount, GitlabConfig, GitlabRestAPIConfig}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Minutes, Span}
@@ -105,5 +105,19 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
     result shouldBe Symbol("right")
     val result2 = result.valueOr(x => throw new RuntimeException(x.toString))
     result2.size shouldBe 120
+  }
+
+  it should "read approval rules" in {
+    val result = client.getMergeRequestApprovalRules(14414, 23).value.futureValue // b
+    result shouldBe Symbol("right")
+    val result2 = client.getMergeRequestApprovalRules(14413, 28).value.futureValue // a
+    result2 shouldBe Symbol("right")
+  }
+
+  it should "create & delete approval rules" ignore { // ignored, as it is unsafe to run at any time
+    val result2 = client.createApprovalRule(14413, 28, CreateMergeRequestApprovalRule.oneOf("TEST_APPROVAL_RULE_CREATED_BY_BOT", 1789, 754)).value.futureValue // a
+    result2 shouldBe Symbol("right")
+    val result3 = client.deleteApprovalRule(14413, 28, result2.getOrElse(throw new RuntimeException(""))).value.futureValue
+    result3 shouldBe Symbol("right")
   }
 }
