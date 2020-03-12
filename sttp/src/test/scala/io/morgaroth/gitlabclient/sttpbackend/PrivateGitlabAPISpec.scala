@@ -13,6 +13,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
 
+  implicit class RightValueable[E, V](either: Either[E, V]) {
+    def rightValue: V = {
+      either.valueOr(_ => fail(s"either is $either"))
+    }
+  }
+
   override implicit def patienceConfig: PatienceConfig = PatienceConfig(Span(1, Minutes))
 
   private val maybeAccessToken = Option(System.getenv("gitlab-access-token"))
@@ -20,7 +26,7 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
   assume(maybeAccessToken.isDefined, "gitlab-access-token env must be set for this test")
   assume(maybeAddress.isDefined, "gitlab-address env must be set for this test")
 
-  val cfg = GitlabConfig(maybeAccessToken.get, maybeAddress.get, true)
+  val cfg = GitlabConfig(maybeAccessToken.get, maybeAddress.get, ignoreSslErrors = true)
   val client = new SttpGitlabAPI(cfg, GitlabRestAPIConfig(true))
 
   behavior of "SttpGitlabAPI"
@@ -43,7 +49,7 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
   it should "list PRs" in {
     val result = client.getMergeRequests(14415).value.futureValue // t
     result shouldBe Symbol("right")
-    result.getOrElse(throw new IllegalArgumentException).size should be > 50
+    result.rightValue.size should be > 50
   }
 
   it should "execute mr search" in {
@@ -84,7 +90,7 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
   it should "return merge request discussions" in {
     val result = client.getMergeRequestDiscussions(14415, 74).value.futureValue
     result shouldBe Symbol("right")
-    val result2 = result.valueOr(x => throw new RuntimeException(x.toString))
+    val result2 = result.rightValue
     result2.count(_.individual_note == false) shouldBe 98
   }
 
@@ -101,10 +107,8 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
   it should "return commits from given period" in {
     val startTime = ZonedDateTime.of(2019, 8, 1, 0, 0, 0, 0, ZoneOffset.ofHours(2))
     val endTime = ZonedDateTime.of(2020, 2, 1, 0, 0, 0, 0, ZoneOffset.ofHours(2))
-    val result = client.getCommits(14415, since = startTime, until = endTime).value.futureValue
-    result shouldBe Symbol("right")
-    val result2 = result.valueOr(x => throw new RuntimeException(x.toString))
-    result2.size shouldBe 120
+    val result = client.getCommits(14415, since = startTime, until = endTime).value.futureValue.rightValue
+    result.size shouldBe 120
   }
 
   it should "read approval rules" in {
@@ -117,7 +121,17 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
   it should "create & delete approval rules" ignore { // ignored, as it is unsafe to run at any time
     val result2 = client.createApprovalRule(14413, 28, CreateMergeRequestApprovalRule.oneOf("TEST_APPROVAL_RULE_CREATED_BY_BOT", 1789, 754)).value.futureValue // a
     result2 shouldBe Symbol("right")
-    val result3 = client.deleteApprovalRule(14413, 28, result2.getOrElse(throw new RuntimeException(""))).value.futureValue
+    val result3 = client.deleteApprovalRule(14413, 28, result2.rightValue).value.futureValue
     result3 shouldBe Symbol("right")
+  }
+
+  it should "return merge request related to commit" in {
+    val result2 = client.getMergeRequestsOfCommit(16395, "3edf5c2b1cc575af2e3c67d345891dcbf2ed58f5").value.futureValue // private
+    result2.rightValue should have size 1
+  }
+
+  it should "return references commit is pushed to" in {
+    val result2 = client.getCommitsReferences(16395, "31096d65dfe1a671ce0eca8801b9642a0e5a6c6e").value.futureValue // private
+    result2.rightValue should have size 3
   }
 }

@@ -216,11 +216,24 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   }
 
   // @see: https://docs.gitlab.com/ee/api/commits.html#get-the-diff-of-a-commit
-  //  GET /projects/:id/repository/commits/:sha/diff
   def getDiffOfACommit(projectId: EntityId, ref: String): EitherT[F, GitlabError, Vector[CommitDiff]] = {
     implicit val rId: RequestId = RequestId.newOne("get-commits-diff")
     val req = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$ref/diff")
     invokeRequest(req).unmarshall[Vector[CommitDiff]]
+  }
+
+  // @see: https://docs.gitlab.com/ee/api/commits.html#list-merge-requests-associated-with-a-commit
+  def getMergeRequestsOfCommit(projectId: EntityId, commitSha: String): EitherT[F, GitlabError, Vector[MergeRequestInfo]] = {
+    implicit val rId: RequestId = RequestId.newOne("get-commit-merge-requests")
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$commitSha/merge_requests")
+    invokeRequest(req).unmarshall[Vector[MergeRequestInfo]]
+  }
+
+  // @see: https://docs.gitlab.com/ee/api/commits.html#get-references-a-commit-is-pushed-to
+  def getCommitsReferences(projectId: EntityId, commitSha: String): EitherT[F, GitlabError, Vector[CommitReference]] = {
+    implicit val rId: RequestId = RequestId.newOne("get-commit-references")
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$commitSha/refs")
+    invokeRequest(req).unmarshall[Vector[CommitReference]]
   }
 
   //  other
