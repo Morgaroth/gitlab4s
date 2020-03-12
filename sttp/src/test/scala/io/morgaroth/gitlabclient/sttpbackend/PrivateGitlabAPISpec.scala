@@ -78,7 +78,7 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
   }
 
   it should "return lot of merge requests" in {
-    val result = client.getGroupMergeRequests(1905, MergeRequestStates.All, EntitiesCount(100)).value.futureValue // global
+    val result = client.getGroupMergeRequests(1905, MergeRequestStates.All, paging = EntitiesCount(100)).value.futureValue // global
     result shouldBe Symbol("right")
   }
 
@@ -133,5 +133,22 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
   it should "return references commit is pushed to" in {
     val result2 = client.getCommitsReferences(16395, "31096d65dfe1a671ce0eca8801b9642a0e5a6c6e").value.futureValue // private
     result2.rightValue should have size 3
+  }
+
+  it should "return merge requests for requested creation times" in {
+    val startTime = ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(2))
+    val endTime = ZonedDateTime.of(2020, 1, 10, 0, 0, 0, 0, ZoneOffset.ofHours(2))
+    val result = client.getGroupMergeRequests(1905, MergeRequestStates.All, createdAfter = startTime, createdBefore = endTime).value.futureValue.rightValue // global
+    result should have size 51
+    result.foreach { entry =>
+      entry.created_at.isBefore(endTime) shouldBe true
+      entry.created_at.isAfter(startTime) shouldBe true
+    }
+  }
+
+  it should "return merge requests for requested emoji" in {
+    val timeBarrier = ZonedDateTime.of(2020, 3, 12, 0, 0, 0, 0, ZoneOffset.ofHours(2))
+    val result = client.getGroupMergeRequests(1905, MergeRequestStates.All, myReaction = "eyes", createdBefore = timeBarrier).value.futureValue.rightValue // global
+    result should have size 9
   }
 }

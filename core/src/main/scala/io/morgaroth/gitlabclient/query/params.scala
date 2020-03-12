@@ -1,8 +1,10 @@
 package io.morgaroth.gitlabclient.query
 
 import java.net.URLEncoder
+import java.time.ZonedDateTime
 
 import io.morgaroth.gitlabclient.GitlabConfig
+import io.morgaroth.gitlabclient.helpers.CustomDateTimeFormatter
 import io.morgaroth.gitlabclient.models.{MergeRequestState, SearchScope}
 
 sealed trait ParamQuery {
@@ -12,15 +14,23 @@ sealed trait ParamQuery {
 object ParamQuery {
   def search(value: String) = new StringKVParam("search", value)
 
-  implicit def fromMRState(mr: MergeRequestState): ParamQuery = MRStateParam(mr)
-
-  implicit def fromSearchScope(sc: SearchScope): ParamQuery = Scope(sc)
-
-  implicit class fromString(paramName: String) {
-    def eqParam(value: String) = new StringKVParam(paramName, value)
+  implicit class fromMRState(mr: MergeRequestState) {
+    def toParam: ParamQuery = MRStateParam(mr)
   }
 
-  implicit class NUmericParams(value: Int) {
+  implicit class fromSearchScope(sc: SearchScope) {
+    def toParam: ParamQuery = Scope(sc)
+  }
+
+  implicit class fromString(paramName: String) {
+    def eqParam(value: String): ParamQuery = new StringKVParam(paramName, value)
+
+    def eqParam(value: ZonedDateTime): ParamQuery = new StringKVParam(paramName, CustomDateTimeFormatter.toISO8601UTC(value))
+
+    def eqParam(value: MergeRequestState): ParamQuery = new StringKVParam(paramName, value.name)
+  }
+
+  implicit class NumericParams(value: Int) {
     def pageNumParam = new IntKVParam("page", value)
 
     def pageSizeParam = new IntKVParam("per_page", value)

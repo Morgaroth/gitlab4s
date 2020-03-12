@@ -40,7 +40,7 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
 
   // @see: https://docs.gitlab.com/ee/api/search.html#scope-merge_requests
   private def globalSearch(scope: SearchScope, phrase: String) = {
-    val req = reqGen.get(s"$API/search", scope, Search(phrase))
+    val req = reqGen.get(s"$API/search", scope.toParam, search(phrase))
     getAllPaginatedResponse[MergeRequestInfo](req, s"global-search-${scope.name}", AllPages)
   }
 
@@ -53,7 +53,7 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   // @see: https://docs.gitlab.com/ee/api/search.html#scope-merge_requests-1
   private def groupGlobalSearch(groupId: EntityId, scope: SearchScope, phrase: Option[String])
                                (implicit rId: RequestId) = {
-    val req = reqGen.get(s"$API/groups/${groupId.toStringId}/search", scope, phrase.map(Search).getOrElse(NoParam))
+    val req = reqGen.get(s"$API/groups/${groupId.toStringId}/search", scope.toParam, phrase.map(Search).getOrElse(NoParam))
     invokeRequest(req)
   }
 
@@ -64,9 +64,19 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   }
 
   // @see: https://docs.gitlab.com/ee/api/merge_requests.html#list-project-merge-requests
-  def getMergeRequests(projectID: EntityId, state: MergeRequestState = MergeRequestStates.All, paging: Paging = AllPages, sort: Option[Sorting[MergeRequestsSort]] = None): GitlabResponseT[Vector[MergeRequestInfo]] = {
-    val q = sort.map(s => List("order_by".eqParam(s.field.property), "sort".eqParam(s.direction.toString))).toList.flatten :+ (state: ParamQuery)
-    val req = reqGen.get(s"$API/projects/${projectID.toStringId}/merge_requests", q)
+  def getMergeRequests(
+                        projectID: EntityId,
+                        state: MergeRequestState = MergeRequestStates.All,
+                        myReaction: String = null,
+                        updatedBefore: ZonedDateTime = null,
+                        updatedAfter: ZonedDateTime = null,
+                        createdBefore: ZonedDateTime = null,
+                        createdAfter: ZonedDateTime = null,
+                        paging: Paging = AllPages,
+                        sort: Sorting[MergeRequestsSort] = null
+                      ): GitlabResponseT[Vector[MergeRequestInfo]] = {
+    val q = renderParams(myReaction, state, updatedBefore, updatedAfter, createdBefore, createdAfter, sort)
+    val req = reqGen.get(s"$API/projects/${projectID.toStringId}/merge_requests", q: _*)
     getAllPaginatedResponse[MergeRequestInfo](req, "merge-requests-per-project", paging)
   }
 
@@ -78,15 +88,44 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   }
 
   // @see: https://docs.gitlab.com/ee/api/merge_requests.html#list-group-merge-requests
-  def getGroupMergeRequests(groupId: EntityId, state: MergeRequestState = MergeRequestStates.All, paging: Paging = AllPages): GitlabResponseT[Vector[MergeRequestInfo]] = {
-    val req = reqGen.get(s"$API/groups/${groupId.toStringId}/merge_requests", state)
+  def getGroupMergeRequests(
+                             groupId: EntityId,
+                             state: MergeRequestState = MergeRequestStates.All,
+                             myReaction: String = null,
+                             updatedBefore: ZonedDateTime = null,
+                             updatedAfter: ZonedDateTime = null,
+                             createdBefore: ZonedDateTime = null,
+                             createdAfter: ZonedDateTime = null,
+                             paging: Paging = AllPages,
+                             sort: Sorting[MergeRequestsSort] = null,
+                           ): GitlabResponseT[Vector[MergeRequestInfo]] = {
+    val q = renderParams(myReaction, state, updatedBefore, updatedAfter, createdBefore, createdAfter, sort)
+
+    val req = reqGen.get(s"$API/groups/${groupId.toStringId}/merge_requests", q: _*)
     getAllPaginatedResponse[MergeRequestInfo](req, "merge-requests-per-group", paging)
+  }
+
+  private def renderParams(
+                            myReaction: String, state: MergeRequestState,
+                            updatedBefore: ZonedDateTime, updatedAfter: ZonedDateTime,
+                            createdBefore: ZonedDateTime, createdAfter: ZonedDateTime,
+                            sort: Sorting[MergeRequestsSort],
+                          ): Vector[ParamQuery] = {
+    Vector(
+      Option(sort).map(s => List("order_by".eqParam(s.field.property), "sort".eqParam(s.direction.toString))).toList.flatten,
+      Option(myReaction).map("my_reaction_emoji".eqParam).toList,
+      Option(updatedBefore).map("updated_before".eqParam).toList,
+      Option(updatedAfter).map("updated_after".eqParam).toList,
+      Option(createdBefore).map("created_before".eqParam).toList,
+      Option(createdAfter).map("created_after".eqParam).toList,
+      List(state.toParam),
+    ).flatten
   }
 
   // traverse over all states and fetch merge requests for every state, gitlab doesn't offer search by multiple states
   def getGroupMergeRequests(groupId: EntityId, states: Iterable[MergeRequestState]): GitlabResponseT[Vector[MergeRequestInfo]] = {
     states.toVector.traverse { state =>
-      getGroupMergeRequests(groupId, state)
+      getGroupMergeRequests(groupId, state = state)
     }.map(_.flatten)
   }
 
