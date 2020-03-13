@@ -77,3 +77,48 @@ case class MergeRequestDiscussion(
                                    individual_note: Boolean,
                                    notes: Vector[MergeRequestNote]
                                  )
+
+case class NewThreadPosition(
+                              base_sha: String,
+                              start_sha: String,
+                              head_sha: String,
+                              position_type: String,
+                              new_path: String,
+                              old_path: String,
+                              new_line: Option[Int],
+                              old_line: Option[Int],
+                            )
+
+object NewThreadPosition {
+  def apply(shaRefs: DiffRefs, change: FileDiff, newLine: Option[Int], oldLine: Option[Int]): NewThreadPosition =
+    new NewThreadPosition(shaRefs.base_sha.get, shaRefs.start_sha, shaRefs.head_sha.get, "text", change.new_path, change.old_path, newLine, oldLine)
+}
+
+case class CreateMRDiscussion(
+                               body: String,
+                               position: Option[NewThreadPosition],
+                             )
+
+object CreateMRDiscussion {
+  def mrDiscussion(body: String): CreateMRDiscussion =
+    CreateMRDiscussion(body, None)
+
+  def threadOnNewLine(diff: DiffRefs, change: FileDiff, line: Int, body: String): CreateMRDiscussion =
+    CreateMRDiscussion(body, Some(NewThreadPosition(diff, change, Some(line), None)))
+
+  def threadOnOldLine(diff: DiffRefs, change: FileDiff, line: Int, body: String): CreateMRDiscussion =
+    CreateMRDiscussion(body, Some(NewThreadPosition(diff, change, None, Some(line))))
+}
+
+case class MRDiscussionUpdate private(
+                                       body: Option[String],
+                                       resolved: Option[Boolean],
+                                     )
+
+object MRDiscussionUpdate {
+  def resolve(newValue: Boolean): MRDiscussionUpdate =
+    MRDiscussionUpdate(None, Some(newValue))
+
+  def body(newValue: String): MRDiscussionUpdate =
+    MRDiscussionUpdate(Some(newValue), None)
+}

@@ -160,7 +160,8 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   }
 
   // @see: https://docs.gitlab.com/ee/api/award_emoji.html#award-a-new-emoji
-  def awardEmoji(projectID: EntityId, scope: AwardableScope, awardableId: BigInt, emojiName: String): EitherT[F, GitlabError, EmojiAward] = {
+  def awardEmoji(projectID: EntityId, scope: AwardableScope, awardableId: BigInt, emojiName: String)
+  : EitherT[F, GitlabError, EmojiAward] = {
     implicit val rId: RequestId = RequestId.newOne(s"award-$scope-emoji")
     val req = reqGen.post(s"$API/projects/${projectID.toStringId}/$scope/$awardableId/award_emoji", "name".eqParam(emojiName))
     invokeRequest(req).unmarshall[EmojiAward]
@@ -210,18 +211,21 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   }
 
   // @see https://docs.gitlab.com/ee/api/merge_request_approvals.html#create-merge-request-level-rule
-  def createApprovalRule(projectId: EntityId, mergeRequestIId: BigInt, payload: CreateMergeRequestApprovalRule): EitherT[F, GitlabError, MergeRequestApprovalRule] = {
+  def createApprovalRule(projectId: EntityId, mergeRequestIId: BigInt, payload: CreateMergeRequestApprovalRule)
+  : EitherT[F, GitlabError, MergeRequestApprovalRule] = {
     implicit val rId: RequestId = RequestId.newOne("create-mr-approval-rule")
     val req = reqGen.post(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approval_rules", MJson.write(payload))
     invokeRequest(req).unmarshall[MergeRequestApprovalRule]
   }
 
-  def createApprovalRule(projectId: EntityId, mergeRequestIId: BigInt, name: String, userIds: Vector[BigInt]): EitherT[F, GitlabError, MergeRequestApprovalRule] = {
+  def createApprovalRule(projectId: EntityId, mergeRequestIId: BigInt, name: String, userIds: Vector[BigInt])
+  : EitherT[F, GitlabError, MergeRequestApprovalRule] = {
     createApprovalRule(projectId, mergeRequestIId, CreateMergeRequestApprovalRule.oneOf(name, userIds: _*))
   }
 
   // @see https://docs.gitlab.com/ee/api/merge_request_approvals.html#delete-merge-request-level-rule
-  def deleteApprovalRule(projectId: EntityId, mergeRequestIId: BigInt, approvalRuleId: BigInt): EitherT[F, GitlabError, String] = {
+  def deleteApprovalRule(projectId: EntityId, mergeRequestIId: BigInt, approvalRuleId: BigInt)
+  : EitherT[F, GitlabError, String] = {
     implicit val rId: RequestId = RequestId.newOne("delete-mr-approval-rule")
     val req = reqGen.delete(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approval_rules/$approvalRuleId")
     invokeRequest(req)
@@ -251,7 +255,8 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   }
 
   // @see: https://docs.gitlab.com/ee/api/notes.html#modify-existing-merge-request-note
-  def updateMergeRequestNote(projectId: EntityId, mergeRequestIId: BigInt, noteId: BigInt, newBody: String): EitherT[F, GitlabError, MergeRequestNote] = {
+  def updateMergeRequestNote(projectId: EntityId, mergeRequestIId: BigInt, noteId: BigInt, newBody: String)
+  : EitherT[F, GitlabError, MergeRequestNote] = {
     implicit val rId: RequestId = RequestId.newOne("merge-request-note-update")
     val payload = MJson.write(MergeRequestNoteCreate(newBody))
     val req = reqGen.put(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes/$noteId", payload)
@@ -269,6 +274,48 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   def getMergeRequestDiscussions(projectId: EntityId, mergeRequestIId: BigInt): EitherT[F, GitlabError, Vector[MergeRequestDiscussion]] = {
     val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/discussions")
     getAllPaginatedResponse[MergeRequestDiscussion](req, "get-merge-request-discussions", AllPages)
+  }
+
+  // @see: https://docs.gitlab.com/ee/api/discussions.html#get-single-merge-request-discussion-item
+  def getMergeRequestDiscussion(projectId: EntityId, mergeRequestIId: BigInt, discussionId: String)
+  : EitherT[F, GitlabError, MergeRequestDiscussion] = {
+    implicit val rId: RequestId = RequestId.newOne("get-merge-request-discussion")
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/discussions/$discussionId")
+    invokeRequest(req).unmarshall[MergeRequestDiscussion]
+  }
+
+  // @see: https://docs.gitlab.com/ee/api/discussions.html#create-new-merge-request-thread
+  def createMergeRequestDiscussion(projectId: EntityId, mergeRequestIId: BigInt, payload: CreateMRDiscussion)
+  : EitherT[F, GitlabError, MergeRequestDiscussion] = {
+    implicit val rId: RequestId = RequestId.newOne("post-mr-discussion")
+    val req = reqGen.post(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/discussions", MJson.write(payload))
+    invokeRequest(req).unmarshall[MergeRequestDiscussion]
+  }
+
+  // @see: https://docs.gitlab.com/ee/api/discussions.html#resolve-a-merge-request-thread
+  def resolveMergeRequestDiscussion(projectId: EntityId, mergeRequestIId: BigInt, discussionId: String, resolved: Boolean)
+  : EitherT[F, GitlabError, MergeRequestDiscussion] = {
+    implicit val rId: RequestId = RequestId.newOne("resolve-mr-discussion")
+    val payload = MRDiscussionUpdate.resolve(resolved)
+    val req = reqGen.put(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/discussions/$discussionId", MJson.write(payload))
+    invokeRequest(req).unmarshall[MergeRequestDiscussion]
+  }
+
+  // @see: https://docs.gitlab.com/ee/api/discussions.html#create-new-merge-request-thread
+  def createMergeRequestDiscussionNote(projectId: EntityId, mergeRequestIId: BigInt, discussionId: String, body: String)
+  : EitherT[F, GitlabError, MergeRequestNote] = {
+    implicit val rId: RequestId = RequestId.newOne("reply-mr-discussion")
+    val payload = MergeRequestNoteCreate(body)
+    val req = reqGen.post(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/discussions/$discussionId/notes", MJson.write(payload))
+    invokeRequest(req).unmarshall[MergeRequestNote]
+  }
+
+  // @see: https://docs.gitlab.com/ee/api/discussions.html#modify-an-existing-merge-request-thread-note
+  def updateMergeRequestDiscussionNote(projectId: EntityId, mergeRequestIId: BigInt, discussionId: String, noteId: BigInt, payload: MRDiscussionUpdate)
+  : EitherT[F, GitlabError, MergeRequestNote] = {
+    implicit val rId: RequestId = RequestId.newOne("update-mr-discussion-note")
+    val req = reqGen.put(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/discussions/$discussionId/notes/$noteId", MJson.write(payload))
+    invokeRequest(req).unmarshall[MergeRequestNote]
   }
 
   // commits

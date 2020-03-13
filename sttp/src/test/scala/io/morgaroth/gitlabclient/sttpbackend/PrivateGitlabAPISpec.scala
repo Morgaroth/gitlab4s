@@ -6,13 +6,15 @@ import java.time.{ZoneOffset, ZonedDateTime}
 import cats.data.EitherT
 import cats.syntax.either._
 import com.typesafe.scalalogging.LazyLogging
-import io.morgaroth.gitlabclient.models.{CreateMergeRequestApprovalRule, MergeRequestStates}
+import io.morgaroth.gitlabclient.models.{CreateMRDiscussion, CreateMergeRequestApprovalRule, MRDiscussionUpdate, MergeRequestStates}
 import io.morgaroth.gitlabclient.{EntitiesCount, GitlabConfig, GitlabRestAPIConfig}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Minutes, Span}
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.collection.convert.AsJavaConverters
+//import org.wickedsource.diffparser.api.UnifiedDiffParser
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.io.Source
@@ -171,6 +173,36 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with
     client.getMergeRequestNotes(16395, 3).exec() shouldBe Vector(updatedNote)
     client.deleteMergeRequestNote(16395, 3, note.id).exec()
     client.getMergeRequestNotes(16395, 3).exec() shouldBe empty
+  }
+
+  it should "post merge thread" in {
+    val mrIIdForTest = 4
+    val mr = client.getMergeRequestDiff(16395, mrIIdForTest).exec()
+    val diffToComment = mr.changes.get.head
+    val payload = CreateMRDiscussion.threadOnNewLine(mr.diff_refs, diffToComment, 7, "some comment")
+    val thread = client.createMergeRequestDiscussion(16395, mrIIdForTest, payload).exec()
+    client.getMergeRequestDiscussions(16395, mrIIdForTest).exec() should contain(thread)
+    val replyNote = client.createMergeRequestDiscussionNote(16395, mrIIdForTest, thread.id, "no no no").exec()
+
+    val notesAfterCreation = client.getMergeRequestDiscussions(16395, mrIIdForTest).exec()
+    notesAfterCreation.find(_.id == thread.id).get.notes should have size 2
+
+    val updatedHead = client.updateMergeRequestDiscussionNote(16395, mrIIdForTest, thread.id, thread.notes.head.id, MRDiscussionUpdate.body("updated problem")).exec()
+    val updatedReply = client.updateMergeRequestDiscussionNote(16395, mrIIdForTest, thread.id, replyNote.id, MRDiscussionUpdate.body("updated no no no")).exec()
+
+    val notesAfterUpdates = client.getMergeRequestDiscussion(16395, mrIIdForTest, thread.id).exec()
+    notesAfterUpdates.notes should contain theSameElementsAs Vector(updatedHead, updatedReply)
+
+    client.updateMergeRequestNote(16395, mrIIdForTest, replyNote.id, "another update no no").exec()
+    client.updateMergeRequestNote(16395, mrIIdForTest, thread.notes.head.id, "another head update").exec()
+    val reUpdatedNote = client.updateMergeRequestDiscussionNote(16395, mrIIdForTest, thread.id, replyNote.id, MRDiscussionUpdate.resolve(true)).exec()
+
+    val currentThread = client.resolveMergeRequestDiscussion(16395, mrIIdForTest, thread.id, resolved = true).exec()
+
+    currentThread.notes should contain(reUpdatedNote)
+
+    client.deleteMergeRequestNote(16395, mrIIdForTest, replyNote.id).exec()
+    client.deleteMergeRequestNote(16395, mrIIdForTest, thread.notes.head.id).exec()
   }
 
   it should "return merge request diff" in {
