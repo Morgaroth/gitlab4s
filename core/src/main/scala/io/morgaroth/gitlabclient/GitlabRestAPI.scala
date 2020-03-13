@@ -130,10 +130,24 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   }
 
   // @see: https://docs.gitlab.com/ee/api/merge_requests.html#update-mr
-  def updateMergeRequest(projectID: EntityId, mrID: BigInt, updateMrPayload: UpdateMRPayload): GitlabResponseT[MergeRequestInfo] = {
+  def updateMergeRequest(projectID: EntityId, mrId: BigInt, updateMrPayload: UpdateMRPayload): GitlabResponseT[MergeRequestInfo] = {
     implicit val rId: RequestId = RequestId.newOne("update-mr")
-    val req = reqGen.put(s"$API/projects/${projectID.toStringId}/merge_requests/$mrID", MJson.write(updateMrPayload))
+    val req = reqGen.put(s"$API/projects/${projectID.toStringId}/merge_requests/$mrId", MJson.write(updateMrPayload))
     invokeRequest(req).unmarshall[MergeRequestInfo]
+  }
+
+  // @see: https://docs.gitlab.com/ee/api/merge_requests.html#get-single-mr
+  def getMergeRequest(projectID: EntityId, mrId: BigInt): EitherT[F, GitlabError, MergeRequestFull] = {
+    implicit val rId: RequestId = RequestId.newOne("get-merge-request-info")
+    val req = reqGen.get(s"$API/projects/${projectID.toStringId}/merge_requests/$mrId")
+    invokeRequest(req).unmarshall[MergeRequestFull]
+  }
+
+  // @see: https://docs.gitlab.com/ee/api/merge_requests.html#get-single-mr-changes
+  def getMergeRequestDiff(projectID: EntityId, mrId: BigInt): EitherT[F, GitlabError, MergeRequestFull] = {
+    implicit val rId: RequestId = RequestId.newOne("get-merge-request-diff")
+    val req = reqGen.get(s"$API/projects/${projectID.toStringId}/merge_requests/$mrId/changes")
+    invokeRequest(req).unmarshall[MergeRequestFull]
   }
 
   // award emojis
@@ -255,10 +269,10 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   }
 
   // @see: https://docs.gitlab.com/ee/api/commits.html#get-the-diff-of-a-commit
-  def getDiffOfACommit(projectId: EntityId, ref: String): EitherT[F, GitlabError, Vector[CommitDiff]] = {
+  def getDiffOfACommit(projectId: EntityId, ref: String): EitherT[F, GitlabError, Vector[FileDiff]] = {
     implicit val rId: RequestId = RequestId.newOne("get-commits-diff")
     val req = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$ref/diff")
-    invokeRequest(req).unmarshall[Vector[CommitDiff]]
+    invokeRequest(req).unmarshall[Vector[FileDiff]]
   }
 
   // @see: https://docs.gitlab.com/ee/api/commits.html#list-merge-requests-associated-with-a-commit

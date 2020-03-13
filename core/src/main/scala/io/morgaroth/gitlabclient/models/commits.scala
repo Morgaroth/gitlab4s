@@ -69,7 +69,7 @@ case class Commit(
                    status: String,
                  )
 
-case class CommitDiff(
+case class FileDiff(
                        diff: String,
                        new_path: String,
                        old_path: String,

@@ -41,15 +41,15 @@ object NoteableTypes extends EnumMarshallingGlue[NoteableType] {
 }
 
 case class NotePosition(
-                                     base_sha: String,
-                                     start_sha: String,
-                                     head_sha: String,
-                                     old_path: String,
-                                     new_path: String,
-                                     position_type: String,
-                                     old_line: Option[Int],
-                                     new_line: Option[Int],
-                                   )
+                         base_sha: String,
+                         start_sha: String,
+                         head_sha: String,
+                         old_path: String,
+                         new_path: String,
+                         position_type: String,
+                         old_line: Option[Int],
+                         new_line: Option[Int],
+                       )
 
 case class MergeRequestNote(
                              id: BigInt,

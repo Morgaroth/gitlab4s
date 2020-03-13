@@ -1,8 +1,10 @@
 package io.morgaroth.gitlabclient.sttpbackend
 
+import java.io.{BufferedWriter, File, FileNotFoundException, FileWriter}
 import java.time.{ZoneOffset, ZonedDateTime}
 
 import cats.syntax.either._
+import com.typesafe.scalalogging.LazyLogging
 import io.morgaroth.gitlabclient.models.{CreateMergeRequestApprovalRule, MergeRequestStates}
 import io.morgaroth.gitlabclient.{EntitiesCount, GitlabConfig, GitlabRestAPIConfig}
 import org.scalatest.concurrent.ScalaFutures
@@ -10,8 +12,9 @@ import org.scalatest.time.{Minutes, Span}
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.io.Source
 
-class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
+class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with LazyLogging {
 
   implicit class RightValueable[E, V](either: Either[E, V]) {
     def rightValue: V = {
@@ -150,5 +153,48 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
     val timeBarrier = ZonedDateTime.of(2020, 3, 12, 0, 0, 0, 0, ZoneOffset.ofHours(2))
     val result = client.getGroupMergeRequests(1905, MergeRequestStates.All, myReaction = "eyes", createdBefore = timeBarrier).value.futureValue.rightValue // global
     result should have size 9
+  }
+
+  it should "return merge request diff" in {
+    client.getMergeRequestDiff(14415, 74).value.futureValue.rightValue // t
+    client.getMergeRequestDiff(14414, 187).value.futureValue.rightValue // b
+  }
+
+  //  var mrsChecked: Set[(BigInt, BigInt)] = Fi.readFile("checked-prs.log")
+  //  it should "get full merge request info for all MRs" in {
+  //    try {
+  //      client.getGroupMergeRequests(1905, paging = AllPages)
+  //        .value.futureValue.rightValue
+  //        .filterNot { mr => mrsChecked.contains(mr.project_id -> mr.iid) }
+  //        .foreach { mr =>
+  //          client.getMergeRequest(mr.project_id, mr.iid).value.futureValue.rightValue
+  //          mrsChecked += (mr.project_id -> mr.iid)
+  //        }
+  //    } finally {
+  //      Fi.writeFile("checked.log", mrsChecked)
+  //    }
+  //  }
+}
+
+object Fi {
+  def readFile(filename: String): Set[(BigInt, BigInt)] = {
+    try {
+      val br = Source.fromFile(filename)
+      val res = br.getLines().map { x =>
+        val l :: r :: Nil = x.split(":").toList
+        (BigInt(l), BigInt(r))
+      }.toSet
+      br.close()
+      res
+    } catch {
+      case _: FileNotFoundException => Set.empty
+    }
+  }
+
+  def writeFile(filename: String, lines: Set[(BigInt, BigInt)]): Unit = {
+    val file = new File(filename)
+    val bw = new BufferedWriter(new FileWriter(file))
+    lines.foreach(line => bw.write(s"${line._1}:${line._2}\n"))
+    bw.close()
   }
 }
