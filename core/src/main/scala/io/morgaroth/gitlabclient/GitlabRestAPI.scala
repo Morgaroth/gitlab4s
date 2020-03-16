@@ -242,6 +242,29 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
     getAllPaginatedResponse[MergeRequestNote](req, "merge-request-notes", paging)
   }
 
+  // @see: https://docs.gitlab.com/ee/api/notes.html#create-new-merge-request-note
+  def createMergeRequestNote(projectId: EntityId, mergeRequestIId: BigInt, body: String): EitherT[F, GitlabError, MergeRequestNote] = {
+    implicit val rId: RequestId = RequestId.newOne("merge-request-note-create")
+    val payload = MJson.write(MergeRequestNoteCreate(body))
+    val req = reqGen.post(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes", payload)
+    invokeRequest(req).unmarshall[MergeRequestNote]
+  }
+
+  // @see: https://docs.gitlab.com/ee/api/notes.html#modify-existing-merge-request-note
+  def updateMergeRequestNote(projectId: EntityId, mergeRequestIId: BigInt, noteId: BigInt, newBody: String): EitherT[F, GitlabError, MergeRequestNote] = {
+    implicit val rId: RequestId = RequestId.newOne("merge-request-note-update")
+    val payload = MJson.write(MergeRequestNoteCreate(newBody))
+    val req = reqGen.put(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes/$noteId", payload)
+    invokeRequest(req).unmarshall[MergeRequestNote]
+  }
+
+  // @see: https://docs.gitlab.com/ee/api/notes.html#delete-a-merge-request-note
+  def deleteMergeRequestNote(projectId: EntityId, mergeRequestIId: BigInt, noteId: BigInt): EitherT[F, GitlabError, Unit] = {
+    implicit val rId: RequestId = RequestId.newOne("merge-request-note-delete")
+    val req = reqGen.delete(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes/$noteId")
+    invokeRequest(req).map(_ => ())
+  }
+
   // @see: https://docs.gitlab.com/ee/api/discussions.html#list-project-merge-request-discussion-items
   def getMergeRequestDiscussions(projectId: EntityId, mergeRequestIId: BigInt): EitherT[F, GitlabError, Vector[MergeRequestDiscussion]] = {
     val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/discussions")

@@ -3,6 +3,7 @@ package io.morgaroth.gitlabclient.sttpbackend
 import java.io.{BufferedWriter, File, FileNotFoundException, FileWriter}
 import java.time.{ZoneOffset, ZonedDateTime}
 
+import cats.data.EitherT
 import cats.syntax.either._
 import com.typesafe.scalalogging.LazyLogging
 import io.morgaroth.gitlabclient.models.{CreateMergeRequestApprovalRule, MergeRequestStates}
@@ -11,14 +12,22 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Minutes, Span}
 import org.scalatest.{FlatSpec, Matchers}
 
+import scala.collection.convert.AsJavaConverters
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.io.Source
 
-class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with LazyLogging {
+class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with LazyLogging with AsJavaConverters {
 
   implicit class RightValueable[E, V](either: Either[E, V]) {
     def rightValue: V = {
       either.valueOr(_ => fail(s"either is $either"))
+    }
+  }
+
+  implicit class execable[E, V](either: EitherT[Future, E, V]) {
+    def exec(): V = {
+      either.value.futureValue.rightValue
     }
   }
 
@@ -29,7 +38,7 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with
   assume(maybeAccessToken.isDefined, "gitlab-access-token env must be set for this test")
   assume(maybeAddress.isDefined, "gitlab-address env must be set for this test")
 
-  val cfg = GitlabConfig(maybeAccessToken.get, maybeAddress.get, ignoreSslErrors = true)
+  private val cfg = GitlabConfig(maybeAccessToken.get, maybeAddress.get, ignoreSslErrors = true)
   val client = new SttpGitlabAPI(cfg, GitlabRestAPIConfig(true))
 
   behavior of "SttpGitlabAPI"
@@ -110,7 +119,7 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with
   it should "return commits from given period" in {
     val startTime = ZonedDateTime.of(2019, 8, 1, 0, 0, 0, 0, ZoneOffset.ofHours(2))
     val endTime = ZonedDateTime.of(2020, 2, 1, 0, 0, 0, 0, ZoneOffset.ofHours(2))
-    val result = client.getCommits(14415, since = startTime, until = endTime).value.futureValue.rightValue
+    val result = client.getCommits(14415, since = startTime, until = endTime).exec()
     result.size shouldBe 120
   }
 
@@ -141,7 +150,7 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with
   it should "return merge requests for requested creation times" in {
     val startTime = ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(2))
     val endTime = ZonedDateTime.of(2020, 1, 10, 0, 0, 0, 0, ZoneOffset.ofHours(2))
-    val result = client.getGroupMergeRequests(1905, MergeRequestStates.All, createdAfter = startTime, createdBefore = endTime).value.futureValue.rightValue // global
+    val result = client.getGroupMergeRequests(1905, MergeRequestStates.All, createdAfter = startTime, createdBefore = endTime).exec() // global
     result should have size 51
     result.foreach { entry =>
       entry.created_at.isBefore(endTime) shouldBe true
@@ -151,23 +160,32 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with
 
   it should "return merge requests for requested emoji" in {
     val timeBarrier = ZonedDateTime.of(2020, 3, 12, 0, 0, 0, 0, ZoneOffset.ofHours(2))
-    val result = client.getGroupMergeRequests(1905, MergeRequestStates.All, myReaction = "eyes", createdBefore = timeBarrier).value.futureValue.rightValue // global
+    val result = client.getGroupMergeRequests(1905, MergeRequestStates.All, myReaction = "eyes", createdBefore = timeBarrier).exec() // global
     result should have size 9
   }
 
+  it should "create, update and delete merge request note" in { // private project
+    val note = client.createMergeRequestNote(16395, 3, "a new note!").exec()
+    client.getMergeRequestNotes(16395, 3).exec() shouldBe Vector(note)
+    val updatedNote = client.updateMergeRequestNote(16395, 3, note.id, "updated note").exec()
+    client.getMergeRequestNotes(16395, 3).exec() shouldBe Vector(updatedNote)
+    client.deleteMergeRequestNote(16395, 3, note.id).exec()
+    client.getMergeRequestNotes(16395, 3).exec() shouldBe empty
+  }
+
   it should "return merge request diff" in {
-    client.getMergeRequestDiff(14415, 74).value.futureValue.rightValue // t
-    client.getMergeRequestDiff(14414, 187).value.futureValue.rightValue // b
+    client.getMergeRequestDiff(14415, 74).exec() // t
+    client.getMergeRequestDiff(14414, 187).exec() // b
   }
 
   //  var mrsChecked: Set[(BigInt, BigInt)] = Fi.readFile("checked-prs.log")
   //  it should "get full merge request info for all MRs" in {
   //    try {
   //      client.getGroupMergeRequests(1905, paging = AllPages)
-  //        .value.futureValue.rightValue
+  //        .exec()
   //        .filterNot { mr => mrsChecked.contains(mr.project_id -> mr.iid) }
   //        .foreach { mr =>
-  //          client.getMergeRequest(mr.project_id, mr.iid).value.futureValue.rightValue
+  //          client.getMergeRequest(mr.project_id, mr.iid).exec()
   //          mrsChecked += (mr.project_id -> mr.iid)
   //        }
   //    } finally {
@@ -195,6 +213,14 @@ object Fi {
     val file = new File(filename)
     val bw = new BufferedWriter(new FileWriter(file))
     lines.foreach(line => bw.write(s"${line._1}:${line._2}\n"))
+    bw.close()
+  }
+
+  def writeFile(filename: String, data: String): Unit = {
+    val file = new File(filename)
+    val bw = new BufferedWriter(new FileWriter(file))
+    bw.write(data)
+    bw.flush()
     bw.close()
   }
 }

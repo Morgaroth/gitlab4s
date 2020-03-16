@@ -68,6 +68,10 @@ case class MergeRequestNote(
                              resolved_by: Option[GitlabUser],
                            )
 
+case class MergeRequestNoteCreate(
+                                   body: String,
+                                 )
+
 case class MergeRequestDiscussion(
                                    id: String,
                                    individual_note: Boolean,
