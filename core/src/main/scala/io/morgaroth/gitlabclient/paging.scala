@@ -36,3 +36,47 @@ case object CreatedBy extends MergeRequestNotesSort with MergeRequestsSort {
 case object UpdatedBy extends MergeRequestNotesSort with MergeRequestsSort {
   override val property: String = "updated_at"
 }
+
+sealed trait TagsSort extends SortingFamily
+
+object TagsSort {
+
+  case object Updated extends TagsSort {
+    override val property: String = "updated"
+  }
+
+  case object Name extends TagsSort {
+    override val property: String = "name"
+  }
+
+}
+
+sealed trait ProjectsSort extends SortingFamily
+
+object ProjectsSort {
+
+  case object Id extends ProjectsSort {
+    override val property: String = "id"
+  }
+
+  case object Name extends ProjectsSort {
+    override val property: String = "name"
+  }
+
+  case object CreatedAt extends ProjectsSort {
+    override val property: String = "created_at"
+  }
+
+  case object UpdatedAt extends ProjectsSort {
+    override val property: String = "updated_at"
+  }
+
+  case object LastActivityAt extends ProjectsSort {
+    override val property: String = "last_activity_at"
+  }
+
+  case object Path extends ProjectsSort {
+    override val property: String = "path"
+  }
+
+}

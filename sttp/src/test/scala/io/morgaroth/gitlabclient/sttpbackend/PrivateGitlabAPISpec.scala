@@ -1,42 +1,22 @@
 package io.morgaroth.gitlabclient.sttpbackend
 
-import java.io.{BufferedWriter, File, FileNotFoundException, FileWriter}
 import java.time.{ZoneOffset, ZonedDateTime}
 
-import cats.data.EitherT
-import cats.syntax.either._
 import com.typesafe.scalalogging.LazyLogging
+import io.morgaroth.gitlabclient._
 import io.morgaroth.gitlabclient.models.{CreateMRDiscussion, CreateMergeRequestApprovalRule, MRDiscussionUpdate, MergeRequestStates}
-import io.morgaroth.gitlabclient.{EntitiesCount, GitlabConfig, GitlabRestAPIConfig}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Minutes, Span}
 import org.scalatest.{FlatSpec, Matchers}
 
-import scala.collection.convert.AsJavaConverters
-//import org.wickedsource.diffparser.api.UnifiedDiffParser
-
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-import scala.io.Source
 
-class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with LazyLogging with AsJavaConverters {
-
-  implicit class RightValueable[E, V](either: Either[E, V]) {
-    def rightValue: V = {
-      either.valueOr(_ => fail(s"either is $either"))
-    }
-  }
-
-  implicit class execable[E, V](either: EitherT[Future, E, V]) {
-    def exec(): V = {
-      either.value.futureValue.rightValue
-    }
-  }
+class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with LazyLogging with HelperClasses {
 
   override implicit def patienceConfig: PatienceConfig = PatienceConfig(Span(1, Minutes))
 
   private val maybeAccessToken = Option(System.getenv("gitlab-access-token"))
-  private val maybeAddress = Option(System.getenv("gitlab-address"))
+  private val maybeAddress     = Option(System.getenv("gitlab-address"))
   assume(maybeAccessToken.isDefined, "gitlab-access-token env must be set for this test")
   assume(maybeAddress.isDefined, "gitlab-address env must be set for this test")
 
@@ -120,8 +100,8 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with
 
   it should "return commits from given period" in {
     val startTime = ZonedDateTime.of(2019, 8, 1, 0, 0, 0, 0, ZoneOffset.ofHours(2))
-    val endTime = ZonedDateTime.of(2020, 2, 1, 0, 0, 0, 0, ZoneOffset.ofHours(2))
-    val result = client.getCommits(14415, since = startTime, until = endTime).exec()
+    val endTime   = ZonedDateTime.of(2020, 2, 1, 0, 0, 0, 0, ZoneOffset.ofHours(2))
+    val result    = client.getCommits(14415, since = startTime, until = endTime).exec()
     result.size shouldBe 120
   }
 
@@ -151,8 +131,8 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with
 
   it should "return merge requests for requested creation times" in {
     val startTime = ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(2))
-    val endTime = ZonedDateTime.of(2020, 1, 10, 0, 0, 0, 0, ZoneOffset.ofHours(2))
-    val result = client.getGroupMergeRequests(1905, MergeRequestStates.All, createdAfter = startTime, createdBefore = endTime).exec() // global
+    val endTime   = ZonedDateTime.of(2020, 1, 10, 0, 0, 0, 0, ZoneOffset.ofHours(2))
+    val result    = client.getGroupMergeRequests(1905, MergeRequestStates.All, createdAfter = startTime, createdBefore = endTime).exec() // global
     result should have size 51
     result.foreach { entry =>
       entry.created_at.isBefore(endTime) shouldBe true
@@ -162,7 +142,7 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with
 
   it should "return merge requests for requested emoji" in {
     val timeBarrier = ZonedDateTime.of(2020, 3, 12, 0, 0, 0, 0, ZoneOffset.ofHours(2))
-    val result = client.getGroupMergeRequests(1905, MergeRequestStates.All, myReaction = "eyes", createdBefore = timeBarrier).exec() // global
+    val result      = client.getGroupMergeRequests(1905, MergeRequestStates.All, myReaction = "eyes", createdBefore = timeBarrier).exec() // global
     result should have size 9
   }
 
@@ -176,18 +156,18 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with
   }
 
   it should "post merge thread" in {
-    val mrIIdForTest = 4
-    val mr = client.getMergeRequestDiff(16395, mrIIdForTest).exec()
+    val mrIIdForTest  = 4
+    val mr            = client.getMergeRequestDiff(16395, mrIIdForTest).exec()
     val diffToComment = mr.changes.get.head
-    val payload = CreateMRDiscussion.threadOnNewLine(mr.diff_refs, diffToComment, 7, "some comment")
-    val thread = client.createMergeRequestDiscussion(16395, mrIIdForTest, payload).exec()
+    val payload       = CreateMRDiscussion.threadOnNewLine(mr.diff_refs, diffToComment, 7, "some comment")
+    val thread        = client.createMergeRequestDiscussion(16395, mrIIdForTest, payload).exec()
     client.getMergeRequestDiscussions(16395, mrIIdForTest).exec() should contain(thread)
     val replyNote = client.createMergeRequestDiscussionNote(16395, mrIIdForTest, thread.id, "no no no").exec()
 
     val notesAfterCreation = client.getMergeRequestDiscussions(16395, mrIIdForTest).exec()
     notesAfterCreation.find(_.id == thread.id).get.notes should have size 2
 
-    val updatedHead = client.updateMergeRequestDiscussionNote(16395, mrIIdForTest, thread.id, thread.notes.head.id, MRDiscussionUpdate.body("updated problem")).exec()
+    val updatedHead  = client.updateMergeRequestDiscussionNote(16395, mrIIdForTest, thread.id, thread.notes.head.id, MRDiscussionUpdate.body("updated problem")).exec()
     val updatedReply = client.updateMergeRequestDiscussionNote(16395, mrIIdForTest, thread.id, replyNote.id, MRDiscussionUpdate.body("updated no no no")).exec()
 
     val notesAfterUpdates = client.getMergeRequestDiscussion(16395, mrIIdForTest, thread.id).exec()
@@ -210,6 +190,18 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with
     client.getMergeRequestDiff(14414, 187).exec() // b
   }
 
+  it should "return tags" in {
+    client.getProjectTags(14415).exec() should have size 3
+  }
+
+  it should "create and delete tags" in {
+    val tag = client.createTag(16395, "3.0.0", "ad82f5a3f8f37d3f0315b76383f495054eb74afb", None, None).exec()
+    client.getProjectTags(16395).exec() should contain(tag)
+    client.getTag(16395, "3.0.0").exec() shouldBe tag
+    client.deleteTag(16395, "3.0.0").exec()
+    client.getProjectTags(16395).exec() should not contain tag
+  }
+
   //  var mrsChecked: Set[(BigInt, BigInt)] = Fi.readFile("checked-prs.log")
   //  it should "get full merge request info for all MRs" in {
   //    try {
@@ -224,35 +216,4 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with
   //      Fi.writeFile("checked.log", mrsChecked)
   //    }
   //  }
-}
-
-object Fi {
-  def readFile(filename: String): Set[(BigInt, BigInt)] = {
-    try {
-      val br = Source.fromFile(filename)
-      val res = br.getLines().map { x =>
-        val l :: r :: Nil = x.split(":").toList
-        (BigInt(l), BigInt(r))
-      }.toSet
-      br.close()
-      res
-    } catch {
-      case _: FileNotFoundException => Set.empty
-    }
-  }
-
-  def writeFile(filename: String, lines: Set[(BigInt, BigInt)]): Unit = {
-    val file = new File(filename)
-    val bw = new BufferedWriter(new FileWriter(file))
-    lines.foreach(line => bw.write(s"${line._1}:${line._2}\n"))
-    bw.close()
-  }
-
-  def writeFile(filename: String, data: String): Unit = {
-    val file = new File(filename)
-    val bw = new BufferedWriter(new FileWriter(file))
-    bw.write(data)
-    bw.flush()
-    bw.close()
-  }
 }

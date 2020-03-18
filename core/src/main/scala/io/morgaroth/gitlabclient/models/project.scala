@@ -29,8 +29,8 @@ case class GitlabNamespace(
 
 case class ProjectLinks(
                          self: String,
-                         issues: String,
-                         merge_requests: String,
+                         issues: Option[String],
+                         merge_requests: Option[String],
                          repo_branches: String,
                          labels: String,
                          events: String,
@@ -39,13 +39,13 @@ case class ProjectLinks(
 
 case class ProjectInfo(
                         id: BigInt,
-                        description: String,
+                        description: Option[String],
                         name: String,
                         name_with_namespace: String,
                         path: String,
                         path_with_namespace: String,
                         created_at: ZonedDateTime,
-                        default_branch: String,
+                        default_branch: Option[String],
                         tag_list: Vector[String],
                         ssh_url_to_repo: String,
                         http_url_to_repo: String,
@@ -77,5 +77,4 @@ case class ProjectInfo(
                         lfs_enabled: Boolean,
                         creator_id: BigInt,
                         merge_method: String,
-
                       )

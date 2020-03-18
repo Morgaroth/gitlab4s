@@ -3,9 +3,9 @@ package io.morgaroth.gitlabclient.query
 import java.net.URLEncoder
 import java.time.ZonedDateTime
 
-import io.morgaroth.gitlabclient.GitlabConfig
 import io.morgaroth.gitlabclient.helpers.CustomDateTimeFormatter
 import io.morgaroth.gitlabclient.models.{MergeRequestState, SearchScope}
+import io.morgaroth.gitlabclient.{GitlabConfig, Sorting, SortingFamily}
 
 sealed trait ParamQuery {
   def render: String
@@ -20,6 +20,12 @@ object ParamQuery {
 
   implicit class fromSearchScope(sc: SearchScope) {
     def toParam: ParamQuery = Scope(sc)
+  }
+
+  implicit class fromSorting[A <: SortingFamily](sc: Sorting[A]) {
+    def toParams: List[ParamQuery] = {
+      List("order_by".eqParam(sc.field.property), "sort".eqParam(sc.direction.toString))
+    }
   }
 
   implicit class fromString(paramName: String) {
@@ -64,10 +70,10 @@ object Methods {
 
 }
 
-case class GitlabRequest(server: String,
-                         method: Method,
-                         path: String,
-                         query: Vector[ParamQuery],
+case class GitlabRequest(server : String,
+                         method : Method,
+                         path   : String,
+                         query  : Vector[ParamQuery],
                          payload: Option[String],
                         ) {
   def withParams(params: ParamQuery*): GitlabRequest =
@@ -87,6 +93,9 @@ case class RequestGenerator(cfg: GitlabConfig) {
 
   def delete(path: String): GitlabRequest =
     GitlabRequest(cfg.server, Methods.Delete, path, Vector.empty, None)
+
+  def delete(path: String, query: ParamQuery*): GitlabRequest =
+    GitlabRequest(cfg.server, Methods.Delete, path, query.toVector.filterNot(_ == NoParam), None)
 
   def get(path: String, query: ParamQuery*): GitlabRequest =
     GitlabRequest(cfg.server, Methods.Get, path, query.toVector.filterNot(_ == NoParam), None)
