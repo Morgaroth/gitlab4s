@@ -1,5 +1,3 @@
-
-
 [
   {
     "id": 111,
@@ -105,10 +103,3 @@
     "source_rule": null
   }
 ]
-
-
-
-
-Disconnected from the target VM, address: '127.0.0.1:53757', transport: 'socket'
-
-Process finished with exit code 0
