@@ -67,6 +67,7 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   def getMergeRequests(
                         projectID: EntityId,
                         state: MergeRequestState = MergeRequestStates.All,
+                        search: String = null,
                         myReaction: String = null,
                         updatedBefore: ZonedDateTime = null,
                         updatedAfter: ZonedDateTime = null,
@@ -75,7 +76,7 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
                         paging: Paging = AllPages,
                         sort: Sorting[MergeRequestsSort] = null
                       ): GitlabResponseT[Vector[MergeRequestInfo]] = {
-    val q = renderParams(myReaction, state, updatedBefore, updatedAfter, createdBefore, createdAfter, sort)
+    val q = renderParams(myReaction, search, state, updatedBefore, updatedAfter, createdBefore, createdAfter, sort)
     val req = reqGen.get(s"$API/projects/${projectID.toStringId}/merge_requests", q: _*)
     getAllPaginatedResponse[MergeRequestInfo](req, "merge-requests-per-project", paging)
   }
@@ -91,6 +92,7 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   def getGroupMergeRequests(
                              groupId: EntityId,
                              state: MergeRequestState = MergeRequestStates.All,
+                             search: String = null,
                              myReaction: String = null,
                              updatedBefore: ZonedDateTime = null,
                              updatedAfter: ZonedDateTime = null,
@@ -99,14 +101,14 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
                              paging: Paging = AllPages,
                              sort: Sorting[MergeRequestsSort] = null,
                            ): GitlabResponseT[Vector[MergeRequestInfo]] = {
-    val q = renderParams(myReaction, state, updatedBefore, updatedAfter, createdBefore, createdAfter, sort)
+    val q = renderParams(myReaction, search, state, updatedBefore, updatedAfter, createdBefore, createdAfter, sort)
 
     val req = reqGen.get(s"$API/groups/${groupId.toStringId}/merge_requests", q: _*)
     getAllPaginatedResponse[MergeRequestInfo](req, "merge-requests-per-group", paging)
   }
 
   private def renderParams(
-                            myReaction: String, state: MergeRequestState,
+                            myReaction: String, search: String, state: MergeRequestState,
                             updatedBefore: ZonedDateTime, updatedAfter: ZonedDateTime,
                             createdBefore: ZonedDateTime, createdAfter: ZonedDateTime,
                             sort: Sorting[MergeRequestsSort],
@@ -118,6 +120,7 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
       Option(updatedAfter).map("updated_after".eqParam).toList,
       Option(createdBefore).map("created_before".eqParam).toList,
       Option(createdAfter).map("created_after".eqParam).toList,
+      Option(search).map("search".eqParam).toList,
       List(state.toParam),
     ).flatten
   }

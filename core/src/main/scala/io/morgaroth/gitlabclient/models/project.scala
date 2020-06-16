@@ -61,7 +61,7 @@ case class ProjectInfo(
                         archived: Boolean,
                         visibility: String,
                         owner: Option[GitlabUser],
-                        container_registry_enabled: Boolean,
+                        container_registry_enabled: Option[Boolean],
                         issues_enabled: Boolean,
                         merge_requests_enabled: Boolean,
                         wiki_enabled: Boolean,

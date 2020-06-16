@@ -9,7 +9,7 @@ val crossScalaVersionsValues = Seq("2.12.10", "2.13.1")
 
 val commonSettings = Seq(
   organization := "io.morgaroth",
-  scalaVersion := "2.13.1",
+  scalaVersion := "2.13.2",
   crossScalaVersions := crossScalaVersionsValues,
   resolvers ++= Seq(
     ("Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/").withAllowInsecureProtocol(true),
