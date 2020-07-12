@@ -82,10 +82,16 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with
   }
 
   it should "return merge request discussions" in {
-    val result = client.getMergeRequestDiscussions(14415, 74).value.futureValue
+//    val result = client.getMergeRequestDiscussions(14415, 74).value.futureValue
+    val result = client.getMergeRequestDiscussions(13605, 539).value.futureValue
     result shouldBe Symbol("right")
     val result2 = result.rightValue
     result2.count(_.individual_note == false) shouldBe 98
+  }
+
+  it should "return commit" in {
+    val result = client.getCommit(14504, "03dbf882").value.futureValue
+    result shouldBe Symbol("right")
   }
 
   it should "return commits" in {
