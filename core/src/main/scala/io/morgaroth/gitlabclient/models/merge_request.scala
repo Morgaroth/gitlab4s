@@ -38,7 +38,16 @@ object MergeStatus extends EnumMarshallingGlue[MergeStatus] {
 
   case object CannotBeMerged extends MergeStatus("cannot_be_merged")
 
-  val all: Seq[MergeStatus] = Seq(CanBeMerged, CannotBeMerged)
+  case object Checking extends MergeStatus("checking")
+
+  case object Unchecked extends MergeStatus("unchecked")
+
+  case object CannotBeMergedRecheck extends MergeStatus("cannot_be_merged_recheck")
+
+  val all: Seq[MergeStatus] = Seq(
+    CanBeMerged, CannotBeMerged,
+    Checking, Unchecked, CannotBeMergedRecheck,
+  )
   val byName: Map[String, MergeStatus] = all.map(x => x.name -> x).toMap
 
   override def rawValue: MergeStatus => String = _.name
@@ -73,7 +82,7 @@ case class MergeRequestInfo(
                              source_project_id: BigInt,
                              target_project_id: BigInt,
                              labels: Vector[String],
-                             merge_status: Option[MergeStatus],
+                             merge_status: MergeStatus,
                              sha: Option[String],
                              merge_commit_sha: Option[String],
                              squash_commit_sha: Option[String],

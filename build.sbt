@@ -5,7 +5,7 @@ val silencerVersion = "1.6.0"
 
 val validate = Def.taskKey[Unit]("Validates entire project")
 
-val crossScalaVersionsValues = Seq("2.12.10", "2.13.1")
+val crossScalaVersionsValues = Seq("2.12.11", "2.13.2")
 
 val commonSettings = Seq(
   organization := "io.morgaroth",
@@ -20,11 +20,15 @@ val commonSettings = Seq(
     "-language:higherKinds", "-language:postfixOps", "-language:implicitConversions",
     "-Ywarn-unused:imports",
     "-P:silencer:checkUnused",
-  ),
+  ) ++ {
+    if (scalaVersion.value.startsWith("2.13")) Seq("-Ymacro-annotations") else Seq.empty
+  },
   libraryDependencies ++= Seq(
     compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
     "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
-  ),
+  ) ++ {
+    if (scalaVersion.value.startsWith("2.12")) Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)) else Seq.empty
+  },
 
   logBuffered := false,
 
@@ -34,7 +38,6 @@ val commonSettings = Seq(
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
   bintrayVcsUrl := Some("https://gitlab.com/morgaroth/gitlab4s.git"),
 )
-
 
 val core = project
   .settings(commonSettings: _*)

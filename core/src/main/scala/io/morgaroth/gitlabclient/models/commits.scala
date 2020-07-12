@@ -3,6 +3,7 @@ package io.morgaroth.gitlabclient.models
 import java.time.ZonedDateTime
 
 import io.circe.Codec
+import io.circe.generic.extras._
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
 sealed abstract class ReferenceType(val name: String) extends Product with Serializable
@@ -65,20 +66,26 @@ case class Commit(
                    parent_ids: Vector[String],
                    web_url: String,
                    stats: CommitStats,
-                   last_pipeline: LastPipelineInfo,
-                   status: String,
+                   last_pipeline: Option[LastPipelineInfo],
+                   status: Option[String],
                  )
 
+@ConfiguredJsonCodec
+case class RefSimpleInfo(
+                          name: String,
+                          @JsonKey("type") kind: String,
+                        )
+
 case class FileDiff(
-                       diff: String,
-                       new_path: String,
-                       old_path: String,
-                       a_mode: String,
-                       b_mode: String,
-                       new_file: Boolean,
-                       renamed_file: Boolean,
-                       deleted_file: Boolean,
-                     )
+                     diff: String,
+                     new_path: String,
+                     old_path: String,
+                     a_mode: String,
+                     b_mode: String,
+                     new_file: Boolean,
+                     renamed_file: Boolean,
+                     deleted_file: Boolean,
+                   )
 
 case class CommitReference(
                             `type`: ReferenceType,

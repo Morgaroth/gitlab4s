@@ -4,7 +4,7 @@ import java.time.{ZoneOffset, ZonedDateTime}
 
 import com.typesafe.scalalogging.LazyLogging
 import io.morgaroth.gitlabclient._
-import io.morgaroth.gitlabclient.models.{CreateMRDiscussion, CreateMergeRequestApprovalRule, MRDiscussionUpdate, MergeRequestStates}
+import io.morgaroth.gitlabclient.models._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Minutes, Span}
 import org.scalatest.{FlatSpec, Matchers}

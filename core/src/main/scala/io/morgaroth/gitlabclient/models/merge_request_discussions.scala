@@ -34,14 +34,18 @@ object NoteableTypes extends EnumMarshallingGlue[NoteableType] {
 
   case object MergeRequest extends NoteableType("MergeRequest")
 
-  val all: Seq[NoteableType] = Seq(MergeRequest)
+  case object Commit extends NoteableType("Commit")
+
+  case object Issue extends NoteableType("Issue")
+
+  val all: Seq[NoteableType] = Seq(MergeRequest, Commit, Issue)
   val byName: Map[String, NoteableType] = all.map(x => x.name -> x).toMap
 
   override def rawValue: NoteableType => String = _.name
 }
 
 case class NotePosition(
-                         base_sha: String,
+                         base_sha: Option[String], // not sure in what case
                          start_sha: String,
                          head_sha: String,
                          old_path: String,
@@ -59,9 +63,9 @@ case class MergeRequestNote(
                              created_at: ZonedDateTime,
                              updated_at: ZonedDateTime,
                              system: Boolean,
-                             noteable_id: BigInt,
-                             noteable_iid: BigInt,
                              noteable_type: NoteableType,
+                             noteable_id: Option[BigInt], // when noteable_type is commit
+                             noteable_iid: Option[BigInt], // when noteable_type is commit
                              position: Option[NotePosition], // not present for system "new commits added..." etc, present when MR comment
                              resolvable: Boolean,
                              resolved: Option[Boolean], // not present for system "new commits added..." etc, present when MR comment

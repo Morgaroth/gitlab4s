@@ -114,13 +114,13 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
                             sort: Sorting[MergeRequestsSort],
                           ): Vector[ParamQuery] = {
     Vector(
-      Option(sort).map(s => List("order_by".eqParam(s.field.property), "sort".eqParam(s.direction.toString))).toList.flatten,
-      Option(myReaction).map("my_reaction_emoji".eqParam).toList,
-      Option(updatedBefore).map("updated_before".eqParam).toList,
-      Option(updatedAfter).map("updated_after".eqParam).toList,
-      Option(createdBefore).map("created_before".eqParam).toList,
-      Option(createdAfter).map("created_after".eqParam).toList,
-      Option(search).map("search".eqParam).toList,
+      wrap(sort).flatMap(s => List("order_by".eqParam(s.field.property), "sort".eqParam(s.direction.toString))),
+      wrap(myReaction).map("my_reaction_emoji".eqParam),
+      wrap(updatedBefore).map("updated_before".eqParam),
+      wrap(updatedAfter).map("updated_after".eqParam),
+      wrap(createdBefore).map("created_before".eqParam),
+      wrap(createdAfter).map("created_after".eqParam),
+      wrap(search).map("search".eqParam),
       List(state.toParam),
     ).flatten
   }
@@ -332,10 +332,10 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
                  paging: Paging = AllPages,
                 ): EitherT[F, GitlabError, Vector[CommitSimple]] = {
     val params = Vector(
-      Option(ref).map("ref_name".eqParam(_)).toList,
-      Option(path).map("path".eqParam(_)).toList,
-      Option(since).map(_.toISO8601UTC).map("since".eqParam(_)).toList,
-      Option(until).map(_.toISO8601UTC).map("until".eqParam(_)).toList,
+      wrap(ref).map("ref_name".eqParam(_)),
+      wrap(path).map("path".eqParam(_)),
+      wrap(since).map(_.toISO8601UTC).map("since".eqParam(_)),
+      wrap(until).map(_.toISO8601UTC).map("until".eqParam(_)),
     ).flatten
     val req = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits", params: _*)
     getAllPaginatedResponse[CommitSimple](req, "get-commits", paging)
@@ -372,8 +372,8 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
                     ): EitherT[F, GitlabError, Vector[TagInfo]] = {
 
     val q = Vector(
-      Option(sort).map(_.toParams).toList.flatten,
-      Option(search).map("search".eqParam).toList,
+      wrap(sort).flatMap(_.toParams),
+      wrap(search).map("search".eqParam),
     ).flatten
     val req = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/tags", q: _*)
     getAllPaginatedResponse[TagInfo](req, "get-tags", paging)
@@ -383,11 +383,11 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   def createTag(projectId: EntityId, tagName: String, refToTag: String, message: Option[String], description: Option[String])
   : EitherT[F, GitlabError, TagInfo] = {
     implicit val rId: RequestId = RequestId.newOne("create-tag")
-    val q   = Vector(
+    val q = Vector(
       Vector("tag_name".eqParam(tagName), "ref".eqParam(refToTag)),
       message.map("message".eqParam).toList,
       description.map("release_description".eqParam).toList,
-      ).flatten
+    ).flatten
     val req = reqGen.post(s"$API/projects/${projectId.toStringId}/repository/tags", q: _*)
     invokeRequest(req).unmarshall[TagInfo]
   }
@@ -429,9 +429,9 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   def getProjects(paging: Paging = AllPages, sort: Sorting[ProjectsSort] = null): GitlabResponseT[Vector[ProjectInfo]] = {
     implicit val rId: RequestId = RequestId.newOne("get-all-projects")
     val q = Vector(
-      Option(sort).map(_.toParams).toList.flatten,
-      Vector( "min_access_level".eqParam("40")),
-      ).flatten
+      wrap(sort).flatMap(_.toParams),
+      Vector("min_access_level".eqParam("40")),
+    ).flatten
     val req = reqGen.get(API + s"/projects", q: _*)
     getAllPaginatedResponse(req, "get-all-projects", paging)
   }
@@ -479,4 +479,6 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling {
 
     getAll(1, pageSize, Vector.empty)
   }
+
+  def wrap[T](value: T): List[T] = Option(value).toList
 }
