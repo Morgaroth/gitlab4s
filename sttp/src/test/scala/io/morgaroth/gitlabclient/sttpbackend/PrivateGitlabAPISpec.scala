@@ -215,6 +215,14 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with
     data should not be empty
   }
 
+  it should "read events" in {
+    val startTime = UtcDate.of(ZonedDateTime.of(2020, 5, 1, 12, 0, 0, 0, ZoneOffset.ofHours(1)))
+    //    val endTime   = ZonedDateTime.of(2020, 7, 3, 17, 0, 0, 0, ZoneOffset.ofHours(2))
+    val result = client.getEvents(startTime, action = ActionTypes.Commented).exec()
+
+    result.foreach(println)
+  }
+
   //  var mrsChecked: Set[(BigInt, BigInt)] = Fi.readFile("checked-prs.log")
   //  it should "get full merge request info for all MRs" in {
   //    try {

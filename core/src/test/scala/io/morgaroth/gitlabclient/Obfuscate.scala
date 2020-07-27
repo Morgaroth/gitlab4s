@@ -11,16 +11,24 @@ class Obfuscate extends FlatSpec with Matchers with Gitlab4SMarshalling {
 
   behavior of "Obfuscate"
 
+  val safeFields = Set("state", "action_name", "ref_type", "action", "commit_count", "target_type", "type", "noteable_type",
+    "position_type", "resolved", "system", "resolvable", "new_line", "old_line").map(x => s""""$x"""")
+  val staticOverrides = Set(""""project_id": 111""", """"target_id": 111""", """"target_iid": 111""", """"author_id": 111""", """"id": 111""",
+    """"noteable_id": 111""", """"noteable_iid": 111""",
+    """"created_at": "1970-01-01T12:00:00.000+00:00"""", """"updated_at": "1970-01-01T12:00:00.000+00:00"""",
+    """"commands_changes": {}""")
+
   val textFields = Set("title", "body", "diff", "a_mode", "b_mode", "slug", "stage",
     "description", "message", "full_name", "full_path", "path", "old_path", "new_path", "linkedin", "twitter", "skype", "bio",
-    "job_title", "organization")
+    "job_title", "organization", "commit_title", "target_title")
   val branchFields = Set("ref", "source_branch", "target_branch", "reference")
-  val numberFields = Set("id", "project_id", "iid", "source_project_id", "target_project_id", "noteable_iid", "noteable_id")
+  val numberFields = Set("id", "project_id", "iid", "source_project_id", "target_project_id", "noteable_iid", "noteable_id",
+    "target_id", "target_iid", "author_id")
   val dateFields = Set("created_at", "updated_at", "authored_date", "committed_date", "created_at", "started_at", "finished_at")
-  val shaFields = Set("base_sha", "sha", "start_sha", "head_sha", "id", "short_id")
+  val shaFields = Set("base_sha", "sha", "start_sha", "head_sha", "id", "short_id", "commit_from", "commit_to")
   val urlFields = Set("avatar_url", "web_url")
   val emailFields = Set("author_email", "committer_email", "public_email")
-  val usernameFields = Set("username")
+  val usernameFields = Set("username", "author_username")
   val fullUserNameFields = Set("author_name", "committer_name", "name")
   val filenameFields = Set("filename")
   val ipFields = Set("ip_address")
@@ -28,7 +36,7 @@ class Obfuscate extends FlatSpec with Matchers with Gitlab4SMarshalling {
   val rand = new Random(new java.util.Random())
 
   it should "work" in {
-    val resourceName = "project_deployments_1.json"
+    val resourceName = "events_4.json"
     val result = Source.fromResource(resourceName).mkString
 
     val result1 = textFields.foldLeft(result) {
@@ -75,6 +83,19 @@ class Obfuscate extends FlatSpec with Matchers with Gitlab4SMarshalling {
       case (data, name) =>
         data.replaceAll(s""""$name": ".+"""", s""""$name": "1.1.1.1"""")
     }
+    val initialLines = result.split("\n")
+    val resultLines = result11.split("\n")
+    val diff = initialLines.zip(resultLines).filter {
+      case (l, r) if l.trim == r.trim && Set("{", "[", "}", "]", "},", "],").contains(l.trim) => false
+      case (l, r) if l.split(":").head == r.split(":").head && Set("null", "null,").contains(l.split(":")(1).trim) => false
+      case (l, r) if l.split(":").head == r.split(":").head && safeFields.contains(l.split(":").head.trim) => false
+      case (l, r) if l.split(":").head == r.split(":").head && l.trim.endsWith("{") => false
+      case (l, r) if l.split(":").head == r.split(":").head && l.trim != r.trim => false
+      case (l, r) if l.split(":").head == r.split(":").head && staticOverrides.contains(l.trim.stripSuffix(",")) => false
+      case _ => true
+    }
+    diff.foreach(println)
+
     println(result11)
   }
 

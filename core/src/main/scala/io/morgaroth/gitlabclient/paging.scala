@@ -98,3 +98,11 @@ object ProjectsSort {
   }
 
 }
+sealed trait EventsSort extends SortingFamily
+
+object EventsSort {
+
+  case object CreatedAt extends EventsSort {
+    override val property: String = "created_at"
+  }
+}

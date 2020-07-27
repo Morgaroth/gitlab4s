@@ -1,6 +1,5 @@
 package io.morgaroth.gitlabclient
 
-import cats.syntax.either._
 import io.circe.generic.auto._
 import io.morgaroth.gitlabclient.marshalling.Gitlab4SMarshalling
 import io.morgaroth.gitlabclient.models._
@@ -118,4 +117,18 @@ class Gitlab4SMarshallingTest extends FlatSpec with Matchers with Gitlab4SMarsha
       result shouldBe Symbol("right")
     }
   }
+
+  val events = Table("events") ++ Seq(
+    "events_1.json",
+    "events_2.json",
+    "events_3.json",
+    "events_4.json",
+  )
+  it should "parse events" in {
+    forAll(events) { resourceName =>
+      val result = MJson.read[Vector[EventInfo]](Source.fromResource(resourceName).mkString)
+      result shouldBe Symbol("right")
+    }
+  }
+
 }

@@ -1,7 +1,7 @@
 package io.morgaroth.gitlabclient.query
 
 import java.net.URLEncoder
-import java.time.ZonedDateTime
+import java.time.{LocalDate, ZonedDateTime}
 
 import io.morgaroth.gitlabclient.helpers.CustomDateTimeFormatter
 import io.morgaroth.gitlabclient.models.{MergeRequestState, SearchScope}
@@ -32,6 +32,8 @@ object ParamQuery {
     def eqParam(value: String): ParamQuery = new StringKVParam(paramName, value)
 
     def eqParam(value: ZonedDateTime): ParamQuery = new StringKVParam(paramName, CustomDateTimeFormatter.toISO8601UTC(value))
+
+    def eqParam(value: LocalDate): ParamQuery = new StringKVParam(paramName, CustomDateTimeFormatter.toDate(value))
 
     def eqParam(value: MergeRequestState): ParamQuery = new StringKVParam(paramName, value.name)
   }
@@ -70,10 +72,10 @@ object Methods {
 
 }
 
-case class GitlabRequest(server : String,
-                         method : Method,
-                         path   : String,
-                         query  : Vector[ParamQuery],
+case class GitlabRequest(server: String,
+                         method: Method,
+                         path: String,
+                         query: Vector[ParamQuery],
                          payload: Option[String],
                         ) {
   def withParams(params: ParamQuery*): GitlabRequest =
