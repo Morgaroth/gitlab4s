@@ -1,5 +1,6 @@
 package io.morgaroth.gitlabclient
 
+import cats.syntax.either._
 import io.circe.generic.auto._
 import io.morgaroth.gitlabclient.marshalling.Gitlab4SMarshalling
 import io.morgaroth.gitlabclient.models._
@@ -104,6 +105,16 @@ class Gitlab4SMarshallingTest extends FlatSpec with Matchers with Gitlab4SMarsha
   it should "parse merge request's approval rules" in {
     forAll(mergeRequestApprovalRules) { resourceName =>
       val result = MJson.read[Vector[MergeRequestApprovalRule]](Source.fromResource(resourceName).mkString)
+      result shouldBe Symbol("right")
+    }
+  }
+  val deploymentsList = Table("project deployments") ++ Seq(
+    "project_deployments_1.json",
+    "project_deployments_2.json",
+  )
+  it should "parse project's deployments list" in {
+    forAll(deploymentsList) { resourceName =>
+      val result = MJson.read[Vector[DeploymentInfo]](Source.fromResource(resourceName).mkString)
       result shouldBe Symbol("right")
     }
   }

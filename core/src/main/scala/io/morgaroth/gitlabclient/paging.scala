@@ -51,6 +51,24 @@ object TagsSort {
 
 }
 
+sealed class DeploymentsSort(value: String) extends SortingFamily {
+  override def property = value
+}
+
+object DeploymentsSort {
+
+  case object IId extends DeploymentsSort("updated")
+
+  case object Id extends DeploymentsSort("id")
+
+  case object CreatedAt extends DeploymentsSort("created_at")
+
+  case object UpdatedAt extends DeploymentsSort("updated_at")
+
+  case object Ref extends DeploymentsSort("ref")
+
+}
+
 sealed trait ProjectsSort extends SortingFamily
 
 object ProjectsSort {

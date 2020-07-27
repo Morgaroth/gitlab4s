@@ -34,6 +34,7 @@ val commonSettings = Seq(
 
   testOptions in Test += Tests.Filter(suiteName => !suiteName.endsWith("ISpec")),
 
+  sources in doc := Seq.empty,
   // Bintray
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
   bintrayVcsUrl := Some("https://gitlab.com/morgaroth/gitlab4s.git"),

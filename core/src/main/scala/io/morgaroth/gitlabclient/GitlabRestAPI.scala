@@ -18,6 +18,7 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling
   with EmojiAwardsAPI[F]
   with TagsAPI[F]
   with MergeRequestsAPI[F]
+  with DeploymentsAPI[F]
   with CommitsAPI[F] {
 
   type GitlabResponseT[A] = EitherT[F, GitlabError, A]

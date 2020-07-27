@@ -11,23 +11,29 @@ class Obfuscate extends FlatSpec with Matchers with Gitlab4SMarshalling {
 
   behavior of "Obfuscate"
 
-  val textFields = Set("title", "body", "source_branch", "target_branch", "diff", "a_mode", "b_mode",
-    "reference", "description", "message", "full_name", "full_path", "path", "old_path", "new_path")
+  val textFields = Set("title", "body", "diff", "a_mode", "b_mode", "slug", "stage",
+    "description", "message", "full_name", "full_path", "path", "old_path", "new_path", "linkedin", "twitter", "skype", "bio",
+    "job_title", "organization")
+  val branchFields = Set("ref", "source_branch", "target_branch", "reference")
   val numberFields = Set("id", "project_id", "iid", "source_project_id", "target_project_id", "noteable_iid", "noteable_id")
-  val dateFields = Set("created_at", "updated_at", "authored_date", "committed_date", "created_at")
+  val dateFields = Set("created_at", "updated_at", "authored_date", "committed_date", "created_at", "started_at", "finished_at")
   val shaFields = Set("base_sha", "sha", "start_sha", "head_sha", "id", "short_id")
   val urlFields = Set("avatar_url", "web_url")
-  val emailFields = Set("author_email", "committer_email")
+  val emailFields = Set("author_email", "committer_email", "public_email")
   val usernameFields = Set("username")
   val fullUserNameFields = Set("author_name", "committer_name", "name")
+  val filenameFields = Set("filename")
+  val ipFields = Set("ip_address")
+
+  val rand = new Random(new java.util.Random())
 
   it should "work" in {
-    val resourceName = "approval_rules_of_mr_2.json"
+    val resourceName = "project_deployments_1.json"
     val result = Source.fromResource(resourceName).mkString
 
     val result1 = textFields.foldLeft(result) {
       case (data, name) =>
-        data.replaceAll(s""""$name": ".+"""", s""""$name": "${Random.alphanumeric.take(40).mkString}"""")
+        data.replaceAll(s""""$name": ".+"""", s""""$name": "${rand.alphanumeric.take(40).mkString}"""")
     }
     val result2 = numberFields.foldLeft(result1) {
       case (data, name) =>
@@ -43,7 +49,7 @@ class Obfuscate extends FlatSpec with Matchers with Gitlab4SMarshalling {
     }
     val result5 = urlFields.foldLeft(result4) {
       case (data, name) =>
-        data.replaceAll(s""""$name": ".+"""", s""""$name": "https://google.com?q=${Random.alphanumeric.take(10).mkString}"""")
+        data.replaceAll(s""""$name": ".+"""", s""""$name": "https://google.com?q=${rand.alphanumeric.take(10).mkString}"""")
     }
     val result6 = emailFields.foldLeft(result5) {
       case (data, name) =>
@@ -57,20 +63,45 @@ class Obfuscate extends FlatSpec with Matchers with Gitlab4SMarshalling {
       case (data, name) =>
         data.replaceAll(s""""$name": ".+"""", s""""$name": "$randomUsername"""")
     }
-
-    println(result8)
+    val result9 = branchFields.foldLeft(result8) {
+      case (data, name) =>
+        data.replaceAll(s""""$name": ".+"""", s""""$name": "$randomBranch"""")
+    }
+    val result10 = filenameFields.foldLeft(result9) {
+      case (data, name) =>
+        data.replaceAll(s""""$name": ".+"""", s""""$name": "$randomFilename"""")
+    }
+    val result11 = ipFields.foldLeft(result10) {
+      case (data, name) =>
+        data.replaceAll(s""""$name": ".+"""", s""""$name": "1.1.1.1"""")
+    }
+    println(result11)
   }
 
   private val FirstNames = Source.fromResource("firstNames.csv").getLines().toVector
   private val LastNames = Source.fromResource("lastNames.csv").getLines().toVector
 
-  private def randomName = Option(FirstNames(Random.nextInt(FirstNames.length)), LastNames(Random.nextInt(LastNames.length)))
+  private def randomName = Option(FirstNames(rand.nextInt(FirstNames.length)), LastNames(rand.nextInt(LastNames.length)))
 
   private def randomFullName = randomName.map(x => s"${x._1} ${x._2}").get
 
   private def randomEmail = randomName.map(x => s"${x._1}.${x._2}@koszmail.com".toLowerCase).get
 
-  private def randomSha = Random.alphanumeric.filter(x => (x >= 'a' && x <= 'f') || (x >= '0' && x <= '9')).take(50).mkString
+  private def randomSha = rand.alphanumeric.filter(x => (x >= 'a' && x <= 'f') || (x >= '0' && x <= '9')).take(50).mkString
 
   private def randomUsername = randomName.map(x => s"${x._1.head}${x._2}".toLowerCase).get
+
+  val branchNameChars = "abcdefghijklmnoprstuvwzABCDEFGHIJKLMNOPRSTUWVZ-1234567890"
+
+  private def randomBranch = {
+    val p1 = Vector.fill(5)(branchNameChars.apply(rand.nextInt(branchNameChars.length))).mkString
+    val p2 = Vector.fill(15)(branchNameChars.apply(rand.nextInt(branchNameChars.length))).mkString
+    s"$p1/$p2"
+  }
+
+  private def randomFilename = {
+    val p1 = Vector.fill(20)(branchNameChars.apply(rand.nextInt(branchNameChars.length))).mkString
+    val p2 = Vector.fill(3)(branchNameChars.apply(rand.nextInt(branchNameChars.length))).mkString
+    s"$p1.$p2"
+  }
 }
