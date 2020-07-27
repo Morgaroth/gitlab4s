@@ -82,7 +82,7 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with
   }
 
   it should "return merge request discussions" in {
-//    val result = client.getMergeRequestDiscussions(14415, 74).value.futureValue
+    //    val result = client.getMergeRequestDiscussions(14415, 74).value.futureValue
     val result = client.getMergeRequestDiscussions(13605, 539).value.futureValue
     result shouldBe Symbol("right")
     val result2 = result.rightValue
@@ -221,6 +221,11 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with
     val result = client.getEvents(startTime, action = ActionTypes.Commented).exec()
 
     result.foreach(println)
+  }
+
+  it should "fetch artifact" in {
+    val data = client.downloadJobArtifacts(16568, 3065480).exec()
+    println(data.filename)
   }
 
   //  var mrsChecked: Set[(BigInt, BigInt)] = Fi.readFile("checked-prs.log")

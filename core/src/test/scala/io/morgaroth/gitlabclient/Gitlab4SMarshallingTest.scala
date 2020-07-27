@@ -130,5 +130,4 @@ class Gitlab4SMarshallingTest extends FlatSpec with Matchers with Gitlab4SMarsha
       result shouldBe Symbol("right")
     }
   }
-
 }
