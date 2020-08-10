@@ -35,6 +35,8 @@ object ParamQuery {
 
     def eqParam(value: LocalDate): ParamQuery = new StringKVParam(paramName, CustomDateTimeFormatter.toDate(value))
 
+    def eqParam(value: Boolean): ParamQuery = new StringKVParam(paramName, value.toString)
+
     def eqParam(value: MergeRequestState): ParamQuery = new StringKVParam(paramName, value.name)
   }
 

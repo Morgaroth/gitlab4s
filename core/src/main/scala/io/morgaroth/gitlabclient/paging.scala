@@ -69,6 +69,24 @@ object DeploymentsSort {
 
 }
 
+sealed class PipelinesSort(value: String) extends SortingFamily {
+  override def property = value
+}
+
+object PipelinesSort {
+
+  case object Id extends PipelinesSort("id")
+
+  case object Status extends PipelinesSort("status")
+
+  case object Ref extends PipelinesSort("ref")
+
+  case object UpdatedAt extends PipelinesSort("updated_at")
+
+  case object UserId  extends PipelinesSort("user_id")
+
+}
+
 sealed trait ProjectsSort extends SortingFamily
 
 object ProjectsSort {

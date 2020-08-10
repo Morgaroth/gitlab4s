@@ -212,7 +212,7 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with
     //    val data = client.getProjectDeployments(14903).exec()
     //    val data = client.getProjectDeployments(14285).exec()
     val data = client.getProjectDeployments(16568, "E2E_Api_Tests").exec()
-    data should not be empty
+    data.length should not be 0
   }
 
   it should "read events" in {
@@ -221,6 +221,15 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with
     val result = client.getEvents(startTime, action = ActionTypes.Commented).exec()
 
     result.foreach(println)
+  }
+
+  it should "return jobs of a pipeline" in {
+    val result2 = client.getProjectPipelines(14414).exec()
+    result2.foreach { pipeline =>
+      client.getPipelineJobs(14414, pipeline.id).exec()
+      client.getPipeline(14414, pipeline.id).exec()
+    }
+    val result = client.getPipelineJobs(16568,846230).exec()
   }
 
   it should "fetch artifact" in {
