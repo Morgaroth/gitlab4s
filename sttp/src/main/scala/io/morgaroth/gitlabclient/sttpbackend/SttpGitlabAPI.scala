@@ -6,6 +6,7 @@ import cats.instances.future.catsStdInstancesForFuture
 import cats.syntax.either._
 import com.typesafe.scalalogging.{LazyLogging, Logger}
 import io.morgaroth.gitlabclient._
+import io.morgaroth.gitlabclient.query.Methods.Get
 import io.morgaroth.gitlabclient.query.{GitlabRequest, GitlabResponse}
 import org.slf4j.LoggerFactory
 import sttp.client._
@@ -34,8 +35,11 @@ class SttpGitlabAPI(val config: GitlabConfig, apiConfig: GitlabRestAPIConfig)(im
     }.getOrElse(requestWithoutPayload)
 
     if (apiConfig.debug) logger.debug(s"request to send: $request")
-    requestsLogger.info(s"Request ID {}, request: {}, payload:\n{}", requestId, request.body("removed for log"), request.body)
-
+    if (requestData.method == Get) {
+      requestsLogger.info(s"Request ID {}, request: {}", requestId, request)
+    } else {
+      requestsLogger.info(s"Request ID {}, request: {}, payload:\n{}", requestId, request.body("removed for log"), request.body)
+    }
     val response: Either[GitlabError, GitlabResponse] =
       request
         .send()
