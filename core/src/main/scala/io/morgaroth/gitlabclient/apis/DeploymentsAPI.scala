@@ -1,4 +1,4 @@
-package io.morgaroth.gitlabclient
+package io.morgaroth.gitlabclient.apis
 
 import java.time.ZonedDateTime
 
@@ -7,6 +7,7 @@ import io.circe.generic.auto._
 import io.morgaroth.gitlabclient.helpers.CustomDateTimeFormatter._
 import io.morgaroth.gitlabclient.models._
 import io.morgaroth.gitlabclient.query.ParamQuery._
+import io.morgaroth.gitlabclient._
 
 trait DeploymentsAPI[F[_]] {
   this: GitlabRestAPI[F] =>

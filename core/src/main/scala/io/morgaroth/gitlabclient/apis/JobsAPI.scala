@@ -1,9 +1,10 @@
-package io.morgaroth.gitlabclient
+package io.morgaroth.gitlabclient.apis
 
 import java.net.URLEncoder
 
 import cats.data.EitherT
 import io.morgaroth.gitlabclient.models._
+import io.morgaroth.gitlabclient.{EntityId, GitlabError, GitlabRestAPI, RequestId}
 
 trait JobsAPI[F[_]] {
   this: GitlabRestAPI[F] =>

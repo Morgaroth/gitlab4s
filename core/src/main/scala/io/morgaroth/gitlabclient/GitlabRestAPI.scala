@@ -9,6 +9,7 @@ import cats.syntax.traverse._
 import com.typesafe.scalalogging.LazyLogging
 import io.circe.Decoder
 import io.circe.generic.auto._
+import io.morgaroth.gitlabclient.apis._
 import io.morgaroth.gitlabclient.marshalling.Gitlab4SMarshalling
 import io.morgaroth.gitlabclient.models._
 import io.morgaroth.gitlabclient.query.ParamQuery._

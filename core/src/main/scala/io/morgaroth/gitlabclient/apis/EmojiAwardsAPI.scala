@@ -1,9 +1,10 @@
-package io.morgaroth.gitlabclient
+package io.morgaroth.gitlabclient.apis
 
 import cats.data.EitherT
 import io.circe.generic.auto._
 import io.morgaroth.gitlabclient.models._
 import io.morgaroth.gitlabclient.query.ParamQuery._
+import io.morgaroth.gitlabclient.{EntityId, GitlabError, GitlabRestAPI, RequestId}
 
 trait EmojiAwardsAPI[F[_]] {
   this: GitlabRestAPI[F] =>
