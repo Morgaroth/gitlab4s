@@ -2,6 +2,9 @@ package io.morgaroth.gitlabclient.models
 
 import java.time.ZonedDateTime
 
+import io.circe.Decoder
+import io.circe.generic.semiauto.deriveDecoder
+
 case class GitlabBranchInfo(
                              name: String,
                              merged: Boolean,
@@ -12,6 +15,10 @@ case class GitlabBranchInfo(
                              can_push: Boolean,
                              commit: GitlabCommitInfo
                            )
+
+object GitlabBranchInfo {
+  implicit val GitlabBranchInfoDecoder = deriveDecoder[GitlabBranchInfo]
+}
 
 case class GitlabCommitInfo(
                              author_email: String,
@@ -27,3 +34,7 @@ case class GitlabCommitInfo(
                              message: String,
                              parent_ids: Option[Vector[String]],
                            )
+
+object GitlabCommitInfo {
+  implicit val GitlabCommitInfoDecoder: Decoder[GitlabCommitInfo] = deriveDecoder[GitlabCommitInfo]
+}

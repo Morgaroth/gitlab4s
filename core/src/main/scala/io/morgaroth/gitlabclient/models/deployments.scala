@@ -2,7 +2,8 @@ package io.morgaroth.gitlabclient.models
 
 import java.time.ZonedDateTime
 
-import io.circe.Codec
+import io.circe.generic.semiauto.deriveDecoder
+import io.circe.{Codec, Decoder}
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
 sealed abstract class DeploymentStatus(val name: String) extends Product with Serializable
@@ -40,6 +41,9 @@ case class DeploymentInfo(
                            // if someone delete pipeline, deployment still exists, but deployable doesn't
                            deployable: Option[DeploymentDeployable],
                          )
+object DeploymentInfo {
+  implicit val DeploymentInfoDecoder: Decoder[DeploymentInfo] = deriveDecoder[DeploymentInfo]
+}
 
 case class EnvironmentInfo(
                             id: BigInt,
@@ -57,20 +61,26 @@ case class DeploymentDeployable(
                                  created_at: ZonedDateTime,
                                  started_at: Option[ZonedDateTime],
                                  finished_at: Option[ZonedDateTime],
-                                 duration: Option[BigDecimal],
+                                 duration: Option[Double],
                                  user: GitlabUser,
                                  commit: CommitSimple,
                                  pipeline: PipelineShort,
                                  web_url: String,
-                                 artifacts: Vector[PipelineArtifactSimple],
+                                 artifacts: List[PipelineArtifactSimple],
                                  artifacts_file: Option[ArtifactFile],
                                  artifacts_expire_at: Option[ZonedDateTime],
                                )
+object DeploymentDeployable {
+  implicit val DeploymentDeployableDecoder: Decoder[DeploymentDeployable] = deriveDecoder[DeploymentDeployable]
+}
 
 case class ArtifactFile(
                          filename: String,
                          size: Long,
                        )
+object ArtifactFile {
+  implicit val ArtifactFileDecoder: Decoder[ArtifactFile] = deriveDecoder[ArtifactFile]
+}
 
 case class PipelineArtifactSimple(
                                    file_type: String,
@@ -78,3 +88,6 @@ case class PipelineArtifactSimple(
                                    filename: String,
                                    file_format: Option[String],
                                  )
+object PipelineArtifactSimple {
+  implicit val PipelineArtifactSimpleDecoder: Decoder[PipelineArtifactSimple] = deriveDecoder[PipelineArtifactSimple]
+}

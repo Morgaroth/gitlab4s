@@ -2,6 +2,9 @@ package io.morgaroth.gitlabclient.models
 
 import java.time.ZonedDateTime
 
+import io.circe.Decoder
+import io.circe.generic.semiauto.deriveDecoder
+
 sealed trait NamespaceKind {
   def repr: String
 }
@@ -27,6 +30,10 @@ case class GitlabNamespace(
                             web_url: Option[String],
                           )
 
+object GitlabNamespace {
+  implicit val GitlabNamespaceDecoder = deriveDecoder[GitlabNamespace]
+}
+
 case class ProjectLinks(
                          self: String,
                          issues: Option[String],
@@ -36,6 +43,10 @@ case class ProjectLinks(
                          events: String,
                          members: String,
                        )
+
+object ProjectLinks {
+  implicit val ProjectLinksDecoder: Decoder[ProjectLinks] = deriveDecoder[ProjectLinks]
+}
 
 case class ProjectInfo(
                         id: BigInt,
@@ -78,3 +89,7 @@ case class ProjectInfo(
                         creator_id: BigInt,
                         merge_method: String,
                       )
+
+object ProjectInfo {
+  implicit val ProjectInfoDecoder = deriveDecoder[ProjectInfo]
+}

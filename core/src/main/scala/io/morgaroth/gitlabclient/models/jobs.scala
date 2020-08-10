@@ -2,7 +2,8 @@ package io.morgaroth.gitlabclient.models
 
 import java.time.ZonedDateTime
 
-import io.circe.Codec
+import io.circe.generic.semiauto.deriveDecoder
+import io.circe.{Codec, Decoder}
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
 
@@ -77,3 +78,6 @@ case class JobFullInfo(
                         // runner: ??
                         artifacts_expire_at: Option[ZonedDateTime],
                       )
+object JobFullInfo {
+  implicit val JobFullInfoDecoder: Decoder[JobFullInfo] = deriveDecoder[JobFullInfo]
+}

@@ -2,7 +2,8 @@ package io.morgaroth.gitlabclient.models
 
 import java.time.ZonedDateTime
 
-import io.circe.Codec
+import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
+import io.circe.{Codec, Decoder}
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
 sealed abstract class MergeRequestState(val name: String) extends Product with Serializable
@@ -56,8 +57,14 @@ object MergeStatus extends EnumMarshallingGlue[MergeStatus] {
 }
 
 case class TaskStatus(count: Int, completed_count: Int)
+object TaskStatus {
+  implicit val TaskStatusDecoder = deriveDecoder[TaskStatus]
+}
 
 case class ReferencesInfo(short: String, relative: String, full: String)
+object ReferencesInfo {
+  implicit val ReferencesInfoDecoder = deriveDecoder[ReferencesInfo]
+}
 
 case class MergeRequestInfo(
                              id: BigInt,
@@ -104,6 +111,9 @@ case class MergeRequestInfo(
                              web_url: String,
                              task_completion_status: TaskStatus
                            )
+object MergeRequestInfo {
+  implicit val MergeRequestInfoDecoder = deriveDecoder[MergeRequestInfo]
+}
 
 case class UpdateMRPayload(
                             target_branch: Option[String] = None,
@@ -122,6 +132,8 @@ case class UpdateMRPayload(
                           )
 
 object UpdateMRPayload {
+  implicit val updateMRPayloadEncoder = deriveEncoder[UpdateMRPayload]
+
   def description(newValue: String): UpdateMRPayload = new UpdateMRPayload(description = Some(newValue))
 }
 
@@ -188,10 +200,21 @@ case class MergeRequestFull(
                              user: UserMergeInfo,
                            )
 
+object MergeRequestFull {
+  implicit val MergeRequestFullDecoder: Decoder[MergeRequestFull] = deriveDecoder[MergeRequestFull]
+}
+
 case class UserMergeInfo(can_merge: Boolean)
+object UserMergeInfo {
+  implicit val UserMergeInfoDecoder: Decoder[UserMergeInfo] = deriveDecoder[UserMergeInfo]
+}
 
 case class DiffRefs(
                      base_sha: Option[String],
                      head_sha: Option[String],
                      start_sha: String,
                    )
+
+object DiffRefs {
+  implicit val DiffRefsDecoder: Decoder[DiffRefs] = deriveDecoder[DiffRefs]
+}

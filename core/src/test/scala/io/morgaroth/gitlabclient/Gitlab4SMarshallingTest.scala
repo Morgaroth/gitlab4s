@@ -1,6 +1,5 @@
 package io.morgaroth.gitlabclient
 
-import io.circe.generic.auto._
 import io.morgaroth.gitlabclient.marshalling.Gitlab4SMarshalling
 import io.morgaroth.gitlabclient.models._
 import org.scalatest.prop.TableDrivenPropertyChecks

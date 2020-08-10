@@ -1,7 +1,6 @@
 package io.morgaroth.gitlabclient.apis
 
 import cats.data.EitherT
-import io.circe.generic.auto._
 import io.morgaroth.gitlabclient._
 import io.morgaroth.gitlabclient.models._
 import io.morgaroth.gitlabclient.query.ParamQuery._

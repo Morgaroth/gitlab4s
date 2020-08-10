@@ -2,6 +2,9 @@ package io.morgaroth.gitlabclient.models
 
 import java.time.ZonedDateTime
 
+import io.circe.Decoder
+import io.circe.generic.semiauto.deriveDecoder
+
 case class GitlabUser(
                        id: Long,
                        name: String,
@@ -10,6 +13,9 @@ case class GitlabUser(
                        avatar_url: String,
                        web_url: String,
                      )
+object GitlabUser {
+  implicit val GitlabUserDecoder = deriveDecoder[GitlabUser]
+}
 
 case class GitlabFullUser(
                            id: BigInt,
@@ -25,6 +31,10 @@ case class GitlabFullUser(
                            email: String,
                          )
 
+object GitlabFullUser {
+  implicit val GitlabFullUserDecoder: Decoder[GitlabFullUser] = deriveDecoder[GitlabFullUser]
+}
+
 case class GitlabGroup(
                         id: BigInt,
                         web_url: String,
@@ -37,6 +47,9 @@ case class GitlabGroup(
                         full_name: String,
                         full_path: String,
                       )
+object GitlabGroup {
+  implicit val GitlabGroupDecoder: Decoder[GitlabGroup] = deriveDecoder[GitlabGroup]
+}
 
 case class PaginatedResponse[A](
                                  size: Option[Int],

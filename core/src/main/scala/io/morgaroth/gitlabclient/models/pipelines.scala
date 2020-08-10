@@ -2,7 +2,8 @@ package io.morgaroth.gitlabclient.models
 
 import java.time.ZonedDateTime
 
-import io.circe.Codec
+import io.circe.generic.semiauto.deriveDecoder
+import io.circe.{Codec, Decoder}
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
 
@@ -59,6 +60,10 @@ case class PipelineShort(
                           web_url: String,
                         )
 
+object PipelineShort {
+  implicit val PipelineShort: Decoder[PipelineShort] = deriveDecoder[PipelineShort]
+}
+
 case class PipelineFullInfo(
                              id: BigInt,
                              sha: String,
@@ -78,6 +83,9 @@ case class PipelineFullInfo(
                              coverage: Option[Boolean],
                              detailed_status: PipelineStatusInfo,
                            )
+object PipelineFullInfo {
+  implicit val PipelineFullInfoDecoder: Decoder[PipelineFullInfo] = deriveDecoder[PipelineFullInfo]
+}
 
 case class PipelineStatusInfo(
                                icon: String,
@@ -90,3 +98,6 @@ case class PipelineStatusInfo(
                                illustration: Option[String],
                                favicon: String,
                              )
+object PipelineStatusInfo {
+  implicit val PipelineStatusInfoDecoder: Decoder[PipelineStatusInfo] = deriveDecoder[PipelineStatusInfo]
+}

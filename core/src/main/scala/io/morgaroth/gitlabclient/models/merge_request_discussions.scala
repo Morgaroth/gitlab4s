@@ -2,7 +2,8 @@ package io.morgaroth.gitlabclient.models
 
 import java.time.ZonedDateTime
 
-import io.circe.Codec
+import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
+import io.circe.{Codec, Decoder}
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
 sealed abstract class NoteType(val name: String) extends Product with Serializable
@@ -54,6 +55,9 @@ case class NotePosition(
                          old_line: Option[Int],
                          new_line: Option[Int],
                        )
+object NotePosition {
+  implicit val NotePositionDecoder: Decoder[NotePosition] = deriveDecoder[NotePosition]
+}
 
 case class MergeRequestNote(
                              id: BigInt,
@@ -71,16 +75,25 @@ case class MergeRequestNote(
                              resolved: Option[Boolean], // not present for system "new commits added..." etc, present when MR comment
                              resolved_by: Option[GitlabUser],
                            )
+object MergeRequestNote {
+  implicit val MergeRequestNoteDecoder: Decoder[MergeRequestNote] = deriveDecoder[MergeRequestNote]
+}
 
 case class MergeRequestNoteCreate(
                                    body: String,
                                  )
+object MergeRequestNoteCreate {
+  implicit val MergeRequestNoteCreateEncoder = deriveEncoder[MergeRequestNoteCreate]
+}
 
 case class MergeRequestDiscussion(
                                    id: String,
                                    individual_note: Boolean,
                                    notes: Vector[MergeRequestNote]
                                  )
+object MergeRequestDiscussion {
+  implicit val MergeRequestDiscussionDecoder: Decoder[MergeRequestDiscussion] = deriveDecoder[MergeRequestDiscussion]
+}
 
 case class NewThreadPosition(
                               base_sha: String,
@@ -94,6 +107,8 @@ case class NewThreadPosition(
                             )
 
 object NewThreadPosition {
+  implicit val NewThreadPositionEncoder = deriveEncoder[NewThreadPosition]
+
   def apply(shaRefs: DiffRefs, change: FileDiff, newLine: Option[Int], oldLine: Option[Int]): NewThreadPosition =
     new NewThreadPosition(shaRefs.base_sha.get, shaRefs.start_sha, shaRefs.head_sha.get, "text", change.new_path, change.old_path, newLine, oldLine)
 }
@@ -104,6 +119,8 @@ case class CreateMRDiscussion(
                              )
 
 object CreateMRDiscussion {
+  implicit val createMRDiscussionEncoder = deriveEncoder[CreateMRDiscussion]
+
   def mrDiscussion(body: String): CreateMRDiscussion =
     CreateMRDiscussion(body, None)
 
@@ -120,6 +137,8 @@ case class MRDiscussionUpdate private(
                                      )
 
 object MRDiscussionUpdate {
+  implicit val MRDiscussionUpdateEncoder = deriveEncoder[MRDiscussionUpdate]
+
   def resolve(newValue: Boolean): MRDiscussionUpdate =
     MRDiscussionUpdate(None, Some(newValue))
 

@@ -2,7 +2,8 @@ package io.morgaroth.gitlabclient.models
 
 import java.time.ZonedDateTime
 
-import io.circe.Codec
+import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
+import io.circe.{Codec, Decoder}
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
 
@@ -10,6 +11,9 @@ case class ApprovedBy(
                        user: GitlabUser,
                        // group: GitlabGroup, but I couldn't find an example...
                      )
+object ApprovedBy {
+  implicit val ApprovedByDecoder: Decoder[ApprovedBy] = deriveDecoder[ApprovedBy]
+}
 
 sealed abstract class RuleType(val name: String) extends Product with Serializable
 
@@ -32,6 +36,9 @@ case class ApprovalRule(
                          name: String,
                          rule_type: RuleType,
                        )
+object ApprovalRule {
+  implicit val ApprovalRuleDecoder: Decoder[ApprovalRule] = deriveDecoder[ApprovalRule]
+}
 
 case class MergeRequestApprovals(
                                   id: BigInt,
@@ -56,9 +63,16 @@ case class MergeRequestApprovals(
                                   require_password_to_approve: Option[Boolean],
                                 )
 
+object MergeRequestApprovals {
+  implicit val MergeRequestApprovalsDecoder: Decoder[MergeRequestApprovals] = deriveDecoder[MergeRequestApprovals]
+}
+
 case class SourceApprovalRuleInfo(
                                    approvals_required: Int,
                                  )
+object SourceApprovalRuleInfo {
+  implicit val SourceApprovalRuleInfoDecoder: Decoder[SourceApprovalRuleInfo] = deriveDecoder[SourceApprovalRuleInfo]
+}
 
 case class MergeRequestApprovalRule(
                                      id: BigInt,
@@ -71,6 +85,9 @@ case class MergeRequestApprovalRule(
                                      groups: Vector[GitlabGroup],
                                      contains_hidden_groups: Boolean,
                                    )
+object MergeRequestApprovalRule {
+  implicit val MergeRequestApprovalRuleDecoder: Decoder[MergeRequestApprovalRule] = deriveDecoder[MergeRequestApprovalRule]
+}
 
 case class MergeRequestApprovalRules(
                                       approval_rules_overwritten: Boolean,
@@ -86,5 +103,6 @@ case class CreateMergeRequestApprovalRule(
                                          )
 
 object CreateMergeRequestApprovalRule {
+  implicit val CreateMergeRequestApprovalRuleEncoder = deriveEncoder[CreateMergeRequestApprovalRule]
   def oneOf(name: String, userId: BigInt*): CreateMergeRequestApprovalRule = new CreateMergeRequestApprovalRule(name, 1, None, Some(userId.toVector), None)
 }
