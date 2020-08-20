@@ -46,7 +46,9 @@ object JobStatus extends EnumMarshallingGlue[JobStatus] {
 
   case object Scheduled extends JobStatus("scheduled")
 
-  val all: Seq[JobStatus] = Seq(Created, Running, Success, Skipped, Failed, Canceled, Scheduled)
+  case object Manual extends JobStatus("manual")
+
+  val all: Seq[JobStatus] = Seq(Created, Running, Success, Skipped, Failed, Canceled, Scheduled, Manual)
   val byName: Map[String, JobStatus] = all.map(x => x.name -> x).toMap
 
   override def rawValue: JobStatus => String = _.name
