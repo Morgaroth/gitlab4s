@@ -64,7 +64,7 @@ case class MergeRequestInfo(
                              iid: BigInt,
                              project_id: BigInt,
                              title: String,
-                             description: String,
+                             description: Option[String],
                              state: MergeRequestState,
                              merged_by: Option[GitlabUser],
                              merged_at: Option[ZonedDateTime],
