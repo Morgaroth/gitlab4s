@@ -37,7 +37,8 @@ case class DeploymentInfo(
                            ref: String,
                            sha: String,
                            user: GitlabUser,
-                           deployable: DeploymentDeployable,
+                           // if someone delete pipeline, deployment still exists, but deployable doesn't
+                           deployable: Option[DeploymentDeployable],
                          )
 
 case class EnvironmentInfo(
