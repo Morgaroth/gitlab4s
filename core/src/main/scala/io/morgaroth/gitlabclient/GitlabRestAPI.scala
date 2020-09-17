@@ -39,7 +39,9 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling
     invokeRequestRaw(request).map(_.payload)
   }
 
-  protected def invokeRequestRaw(request: GitlabRequest)(implicit requestId: RequestId): EitherT[F, GitlabError, GitlabResponse]
+  protected def invokeRequestRaw(request: GitlabRequest)(implicit requestId: RequestId): EitherT[F, GitlabError, GitlabResponse[String]]
+
+  protected def byteRequest(request: GitlabRequest)(implicit requestId: RequestId): EitherT[F, GitlabError, GitlabResponse[Array[Byte]]]
 
   def getCurrentUser: GitlabResponseT[GitlabFullUser] = {
     implicit val rId: RequestId = RequestId.newOne("get-current-user")

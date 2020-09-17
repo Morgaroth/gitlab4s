@@ -38,7 +38,7 @@ trait Gitlab4SMarshalling {
       data.flatMap(MJson.readT[F, TargetType])
   }
 
-  implicit class unmarshallEitherGitlabT[F[_]](data: EitherT[F, GitlabError, GitlabResponse])(implicit m: Monad[F]) {
+  implicit class unmarshallEitherGitlabT[F[_]](data: EitherT[F, GitlabError, GitlabResponse[String]])(implicit m: Monad[F]) {
     def unmarshall[TargetType: Decoder](implicit rId: RequestId): EitherT[F, GitlabError, TargetType] =
       data.map(_.payload).flatMap(MJson.readT[F, TargetType])
   }

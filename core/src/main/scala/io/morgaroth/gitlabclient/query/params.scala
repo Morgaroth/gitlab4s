@@ -117,7 +117,4 @@ case class RequestGenerator(cfg: GitlabConfig) {
     GitlabRequest(cfg.server, Methods.Put, path, Vector.empty, Some(data))
 }
 
-case class GitlabResponse(
-                           headers: Map[String, String],
-                           payload: String,
-                         )
+case class GitlabResponse[T](headers: Map[String, String], payload: T)

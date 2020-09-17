@@ -229,11 +229,11 @@ class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with
       client.getPipelineJobs(14414, pipeline.id).exec()
       client.getPipeline(14414, pipeline.id).exec()
     }
-    val result = client.getPipelineJobs(16568,846230).exec()
+    val result = client.getPipelineJobs(16568, 846230).exec()
   }
 
   it should "fetch artifact" in {
-    val data = client.downloadJobArtifacts(16568, 3065480).exec()
+    val data = client.downloadJobArtifacts(16568, 3589070).exec()
     println(data.filename)
   }
 
