@@ -29,6 +29,16 @@ trait JobsAPI[F[_]] {
     byteRequest(req).map(RawResponse.from)
   }
 
+  // @see: https://docs.gitlab.com/ee/api/jobs.html#get-a-log-file
+  def downloadJobLog(
+                      projectId: EntityId,
+                      jobId: BigInt,
+                    ): EitherT[F, GitlabError, String] = {
+    implicit val rId: RequestId = RequestId.newOne("get-job-log")
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/jobs/$jobId/trace")
+    invokeRequest(req)
+  }
+
 }
 
 object RawResponse {
