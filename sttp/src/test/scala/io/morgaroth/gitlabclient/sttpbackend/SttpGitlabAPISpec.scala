@@ -2,11 +2,12 @@ package io.morgaroth.gitlabclient.sttpbackend
 
 import io.morgaroth.gitlabclient.{GitlabConfig, GitlabRestAPIConfig}
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class SttpGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures {
+class SttpGitlabAPISpec extends AnyFlatSpec with Matchers with ScalaFutures {
 
   private val maybeAccessToken = Option(System.getenv("gitlab-access-token"))
   assume(maybeAccessToken.isDefined, "gitlab-private-token env must be set for this test")

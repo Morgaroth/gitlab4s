@@ -7,11 +7,12 @@ import io.morgaroth.gitlabclient._
 import io.morgaroth.gitlabclient.models._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Minutes, Span}
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class PrivateGitlabAPISpec extends FlatSpec with Matchers with ScalaFutures with LazyLogging with HelperClasses {
+class PrivateGitlabAPISpec extends AnyFlatSpec with Matchers with ScalaFutures with LazyLogging with HelperClasses {
 
   override implicit def patienceConfig: PatienceConfig = PatienceConfig(Span(1, Minutes))
 

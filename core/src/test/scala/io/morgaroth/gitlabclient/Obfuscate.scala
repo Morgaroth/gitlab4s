@@ -1,13 +1,15 @@
 package io.morgaroth.gitlabclient
 
 import io.morgaroth.gitlabclient.marshalling.Gitlab4SMarshalling
-import org.scalatest.{DoNotDiscover, FlatSpec, Matchers}
+import org.scalatest.DoNotDiscover
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.io.Source
 import scala.util.Random
 
 @DoNotDiscover
-class Obfuscate extends FlatSpec with Matchers with Gitlab4SMarshalling {
+class Obfuscate extends AnyFlatSpec with Matchers with Gitlab4SMarshalling {
 
   behavior of "Obfuscate"
 

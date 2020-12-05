@@ -1,15 +1,15 @@
-val akkaV = "2.5.6"
-val akkaHttpVer = "10.0.9"
-val circeVersion = "0.12.2"
-val silencerVersion = "1.6.0"
+val circeVersion = "0.12.3"
+val circeExtVersion = "0.12.2"
+val silencerVersion = "1.7.1"
 
 val validate = Def.taskKey[Unit]("Validates entire project")
 
-val crossScalaVersionsValues = Seq("2.12.11", "2.13.2")
+val projectScalaVersion = "2.13.3"
+val crossScalaVersionsValues = Seq("2.12.12", projectScalaVersion)
 
 val commonSettings = Seq(
   organization := "io.morgaroth",
-  scalaVersion := "2.13.2",
+  scalaVersion := projectScalaVersion,
   crossScalaVersions := crossScalaVersionsValues,
   resolvers ++= Seq(
     ("Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/").withAllowInsecureProtocol(true),
@@ -45,16 +45,16 @@ val core = project
   .settings(
     name := "gitlab4s-core",
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-core" % "2.0.0",
+      "org.typelevel" %% "cats-core" % "2.2.0",
       "io.circe" %% "circe-core" % circeVersion,
       "io.circe" %% "circe-generic" % circeVersion,
       "io.circe" %% "circe-parser" % circeVersion,
-      "io.circe" %% "circe-generic-extras" % circeVersion,
-      "com.typesafe" % "config" % "1.3.3",
+      "io.circe" %% "circe-generic-extras" % circeExtVersion,
+      "com.typesafe" % "config" % "1.4.1",
       "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
-      "org.wickedsource" % "diffparser" % "1.0",
-      "io.github.java-diff-utils" % "java-diff-utils" % "4.5",
-      "org.scalatest" %% "scalatest" % "3.0.8" % Test,
+//      "org.wickedsource" % "diffparser" % "1.0",
+//      "io.github.java-diff-utils" % "java-diff-utils" % "4.5",
+      "org.scalatest" %% "scalatest" % "3.2.2" % Test,
     )
   )
 
@@ -64,7 +64,7 @@ val sttp = project.in(file("sttp")).dependsOn(core)
     name := "gitlab4s-sttp",
     libraryDependencies ++= Seq(
       "com.softwaremill.sttp.client" %% "core" % "2.0.0-RC6",
-      "org.scalatest" %% "scalatest" % "3.0.8" % Test,
+      "org.scalatest" %% "scalatest" % "3.2.2" % Test,
       "ch.qos.logback" % "logback-classic" % "1.2.3" % Test,
     )
   )

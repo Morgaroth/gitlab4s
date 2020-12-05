@@ -2,12 +2,13 @@ package io.morgaroth.gitlabclient
 
 import io.morgaroth.gitlabclient.marshalling.Gitlab4SMarshalling
 import io.morgaroth.gitlabclient.models._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.{FlatSpec, Matchers}
 
 import scala.io.Source
 
-class Gitlab4SMarshallingTest extends FlatSpec with Matchers with Gitlab4SMarshalling with TableDrivenPropertyChecks {
+class Gitlab4SMarshallingTest extends AnyFlatSpec with Matchers with Gitlab4SMarshalling with TableDrivenPropertyChecks {
 
   behavior of "Gitlab4sMarshalling"
 
