@@ -1,7 +1,5 @@
 package io.morgaroth.gitlabclient
 
-import java.time.ZonedDateTime
-
 import cats.Monad
 import cats.data.EitherT
 import cats.instances.vector._
@@ -13,6 +11,8 @@ import io.morgaroth.gitlabclient.marshalling.Gitlab4SMarshalling
 import io.morgaroth.gitlabclient.models._
 import io.morgaroth.gitlabclient.query.ParamQuery._
 import io.morgaroth.gitlabclient.query._
+
+import java.time.ZonedDateTime
 
 trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling
   with EmojiAwardsAPI[F]

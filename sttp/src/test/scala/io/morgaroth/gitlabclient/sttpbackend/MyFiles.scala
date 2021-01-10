@@ -1,7 +1,6 @@
 package io.morgaroth.gitlabclient.sttpbackend
 
 import java.io.{BufferedWriter, File, FileNotFoundException, FileWriter}
-
 import scala.io.Source
 
 object MyFiles {

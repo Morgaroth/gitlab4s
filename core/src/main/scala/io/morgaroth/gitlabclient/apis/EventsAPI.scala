@@ -4,6 +4,7 @@ import cats.data.EitherT
 import io.morgaroth.gitlabclient._
 import io.morgaroth.gitlabclient.models.{ActionType, EventInfo, TargetType}
 import io.morgaroth.gitlabclient.query.ParamQuery._
+
 trait EventsAPI[F[_]] {
   this: GitlabRestAPI[F] =>
 

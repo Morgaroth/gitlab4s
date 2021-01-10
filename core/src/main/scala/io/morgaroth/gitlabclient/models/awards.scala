@@ -1,10 +1,10 @@
 package io.morgaroth.gitlabclient.models
 
-import java.time.ZonedDateTime
-
 import io.circe.generic.semiauto.deriveDecoder
 import io.circe.{Codec, Decoder}
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
+
+import java.time.ZonedDateTime
 
 sealed abstract class AwardableScope(val name: String) extends Product with Serializable {
   override def toString: String = name
@@ -57,6 +57,7 @@ case class EmojiAward(
                        awardable_id: Int,
                        awardable_type: AwardableType
                      )
+
 object EmojiAward {
   implicit val EmojiAwardDecoder: Decoder[EmojiAward] = deriveDecoder[EmojiAward]
 }

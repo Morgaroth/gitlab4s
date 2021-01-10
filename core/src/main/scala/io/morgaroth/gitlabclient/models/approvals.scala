@@ -1,16 +1,17 @@
 package io.morgaroth.gitlabclient.models
 
-import java.time.ZonedDateTime
-
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
-import io.circe.{Codec, Decoder}
+import io.circe.{Codec, Decoder, Encoder}
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
+
+import java.time.ZonedDateTime
 
 
 case class ApprovedBy(
                        user: GitlabUser,
                        // group: GitlabGroup, but I couldn't find an example...
                      )
+
 object ApprovedBy {
   implicit val ApprovedByDecoder: Decoder[ApprovedBy] = deriveDecoder[ApprovedBy]
 }
@@ -36,6 +37,7 @@ case class ApprovalRule(
                          name: String,
                          rule_type: RuleType,
                        )
+
 object ApprovalRule {
   implicit val ApprovalRuleDecoder: Decoder[ApprovalRule] = deriveDecoder[ApprovalRule]
 }
@@ -70,6 +72,7 @@ object MergeRequestApprovals {
 case class SourceApprovalRuleInfo(
                                    approvals_required: Int,
                                  )
+
 object SourceApprovalRuleInfo {
   implicit val SourceApprovalRuleInfoDecoder: Decoder[SourceApprovalRuleInfo] = deriveDecoder[SourceApprovalRuleInfo]
 }
@@ -85,6 +88,7 @@ case class MergeRequestApprovalRule(
                                      groups: Vector[GitlabGroup],
                                      contains_hidden_groups: Boolean,
                                    )
+
 object MergeRequestApprovalRule {
   implicit val MergeRequestApprovalRuleDecoder: Decoder[MergeRequestApprovalRule] = deriveDecoder[MergeRequestApprovalRule]
 }
@@ -103,6 +107,7 @@ case class CreateMergeRequestApprovalRule(
                                          )
 
 object CreateMergeRequestApprovalRule {
-  implicit val CreateMergeRequestApprovalRuleEncoder = deriveEncoder[CreateMergeRequestApprovalRule]
+  implicit val CreateMergeRequestApprovalRuleEncoder: Encoder[CreateMergeRequestApprovalRule] = deriveEncoder[CreateMergeRequestApprovalRule]
+
   def oneOf(name: String, userId: BigInt*): CreateMergeRequestApprovalRule = new CreateMergeRequestApprovalRule(name, 1, None, Some(userId.toVector), None)
 }

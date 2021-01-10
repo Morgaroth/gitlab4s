@@ -1,7 +1,5 @@
 package io.morgaroth.gitlabclient.apis
 
-import java.time.ZonedDateTime
-
 import cats.data.EitherT
 import cats.instances.vector._
 import cats.syntax.traverse._
@@ -9,6 +7,8 @@ import io.morgaroth.gitlabclient._
 import io.morgaroth.gitlabclient.models._
 import io.morgaroth.gitlabclient.query.ParamQuery._
 import io.morgaroth.gitlabclient.query._
+
+import java.time.ZonedDateTime
 
 trait MergeRequestsAPI[F[_]] {
   this: GitlabRestAPI[F] =>

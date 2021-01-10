@@ -1,12 +1,12 @@
 package io.morgaroth.gitlabclient.apis
 
-import java.time.ZonedDateTime
-
 import cats.data.EitherT
 import io.morgaroth.gitlabclient._
 import io.morgaroth.gitlabclient.helpers.CustomDateTimeFormatter._
 import io.morgaroth.gitlabclient.models._
 import io.morgaroth.gitlabclient.query.ParamQuery._
+
+import java.time.ZonedDateTime
 
 trait DeploymentsAPI[F[_]] {
   this: GitlabRestAPI[F] =>

@@ -1,7 +1,5 @@
 package io.morgaroth.gitlabclient.marshalling
 
-import java.time.ZonedDateTime
-
 import cats.Monad
 import cats.data.EitherT
 import cats.syntax.either._
@@ -10,6 +8,8 @@ import io.circe.parser.decode
 import io.circe.syntax.EncoderOps
 import io.morgaroth.gitlabclient._
 import io.morgaroth.gitlabclient.query.GitlabResponse
+
+import java.time.ZonedDateTime
 
 trait Gitlab4SMarshalling {
 

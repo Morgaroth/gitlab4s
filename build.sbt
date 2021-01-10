@@ -52,8 +52,8 @@ val core = project
       "io.circe" %% "circe-generic-extras" % circeExtVersion,
       "com.typesafe" % "config" % "1.4.1",
       "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
-//      "org.wickedsource" % "diffparser" % "1.0",
-//      "io.github.java-diff-utils" % "java-diff-utils" % "4.5",
+      //      "org.wickedsource" % "diffparser" % "1.0",
+      //      "io.github.java-diff-utils" % "java-diff-utils" % "4.5",
       "org.scalatest" %% "scalatest" % "3.2.2" % Test,
     )
   )

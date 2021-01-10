@@ -1,10 +1,10 @@
 package io.morgaroth.gitlabclient.models
 
-import java.time.ZonedDateTime
-
 import io.circe.generic.semiauto.deriveDecoder
 import io.circe.{Codec, Decoder}
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
+
+import java.time.ZonedDateTime
 
 sealed abstract class DeploymentStatus(val name: String) extends Product with Serializable
 
@@ -41,6 +41,7 @@ case class DeploymentInfo(
                            // if someone delete pipeline, deployment still exists, but deployable doesn't
                            deployable: Option[DeploymentDeployable],
                          )
+
 object DeploymentInfo {
   implicit val DeploymentInfoDecoder: Decoder[DeploymentInfo] = deriveDecoder[DeploymentInfo]
 }
@@ -70,6 +71,7 @@ case class DeploymentDeployable(
                                  artifacts_file: Option[ArtifactFile],
                                  artifacts_expire_at: Option[ZonedDateTime],
                                )
+
 object DeploymentDeployable {
   implicit val DeploymentDeployableDecoder: Decoder[DeploymentDeployable] = deriveDecoder[DeploymentDeployable]
 }
@@ -78,6 +80,7 @@ case class ArtifactFile(
                          filename: String,
                          size: Long,
                        )
+
 object ArtifactFile {
   implicit val ArtifactFileDecoder: Decoder[ArtifactFile] = deriveDecoder[ArtifactFile]
 }
@@ -88,6 +91,7 @@ case class PipelineArtifactSimple(
                                    filename: String,
                                    file_format: Option[String],
                                  )
+
 object PipelineArtifactSimple {
   implicit val PipelineArtifactSimpleDecoder: Decoder[PipelineArtifactSimple] = deriveDecoder[PipelineArtifactSimple]
 }

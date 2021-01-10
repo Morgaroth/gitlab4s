@@ -1,8 +1,8 @@
 package io.morgaroth.gitlabclient
 
-import java.time.{LocalDate, ZoneId, ZoneOffset, ZonedDateTime}
-
 import io.morgaroth.gitlabclient.helpers.CustomDateTimeFormatter
+
+import java.time.{LocalDate, ZoneId, ZoneOffset, ZonedDateTime}
 
 class UtcDate(date: LocalDate) {
   def toDateStr = CustomDateTimeFormatter.toDate(date)

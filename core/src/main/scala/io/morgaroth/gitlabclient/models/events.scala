@@ -1,12 +1,12 @@
 package io.morgaroth.gitlabclient.models
 
-import java.time.ZonedDateTime
-
 import cats.syntax.either._
 import io.circe.{Codec, Decoder, DecodingFailure}
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 import io.morgaroth.gitlabclient.models.ActionName.{Accepted, Closed, CommentedOn, Created, Deleted, Joined, Leaved, Opened, PushedNew, PushedTo, RemovedDueToExpiry}
 import io.morgaroth.gitlabclient.models.ResponseTargetType.{DiffNote, DiscussionNote, Issue, MergeRequest, Note}
+
+import java.time.ZonedDateTime
 
 sealed abstract class TargetType(val name: String) extends Product with Serializable
 

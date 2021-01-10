@@ -1,15 +1,14 @@
 package io.morgaroth.gitlabclient.sttpbackend
 
-import java.time.{ZoneOffset, ZonedDateTime}
-
 import com.typesafe.scalalogging.LazyLogging
 import io.morgaroth.gitlabclient._
 import io.morgaroth.gitlabclient.models._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.time.{Minutes, Span}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.time.{Minutes, Span}
 
+import java.time.{ZoneOffset, ZonedDateTime}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class PrivateGitlabAPISpec extends AnyFlatSpec with Matchers with ScalaFutures with LazyLogging with HelperClasses {

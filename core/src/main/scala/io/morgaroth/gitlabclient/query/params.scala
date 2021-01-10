@@ -1,11 +1,11 @@
 package io.morgaroth.gitlabclient.query
 
-import java.net.URLEncoder
-import java.time.{LocalDate, ZonedDateTime}
-
 import io.morgaroth.gitlabclient.helpers.CustomDateTimeFormatter
 import io.morgaroth.gitlabclient.models.{MergeRequestState, SearchScope}
 import io.morgaroth.gitlabclient.{GitlabConfig, Sorting, SortingFamily}
+
+import java.net.URLEncoder
+import java.time.{LocalDate, ZonedDateTime}
 
 sealed trait ParamQuery {
   def render: String

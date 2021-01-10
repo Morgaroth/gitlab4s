@@ -1,10 +1,10 @@
 package io.morgaroth.gitlabclient.models
 
-import java.time.ZonedDateTime
-
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
-import io.circe.{Codec, Decoder}
+import io.circe.{Codec, Decoder, Encoder}
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
+
+import java.time.ZonedDateTime
 
 sealed abstract class MergeRequestState(val name: String) extends Product with Serializable
 
@@ -57,13 +57,15 @@ object MergeStatus extends EnumMarshallingGlue[MergeStatus] {
 }
 
 case class TaskStatus(count: Int, completed_count: Int)
+
 object TaskStatus {
-  implicit val TaskStatusDecoder = deriveDecoder[TaskStatus]
+  implicit val TaskStatusDecoder: Decoder[TaskStatus] = deriveDecoder[TaskStatus]
 }
 
 case class ReferencesInfo(short: String, relative: String, full: String)
+
 object ReferencesInfo {
-  implicit val ReferencesInfoDecoder = deriveDecoder[ReferencesInfo]
+  implicit val ReferencesInfoDecoder: Decoder[ReferencesInfo] = deriveDecoder[ReferencesInfo]
 }
 
 case class MergeRequestInfo(
@@ -111,8 +113,9 @@ case class MergeRequestInfo(
                              web_url: String,
                              task_completion_status: TaskStatus
                            )
+
 object MergeRequestInfo {
-  implicit val MergeRequestInfoDecoder = deriveDecoder[MergeRequestInfo]
+  implicit val MergeRequestInfoDecoder: Decoder[MergeRequestInfo] = deriveDecoder[MergeRequestInfo]
 }
 
 case class UpdateMRPayload(
@@ -132,7 +135,7 @@ case class UpdateMRPayload(
                           )
 
 object UpdateMRPayload {
-  implicit val updateMRPayloadEncoder = deriveEncoder[UpdateMRPayload]
+  implicit val updateMRPayloadEncoder: Encoder[UpdateMRPayload] = deriveEncoder[UpdateMRPayload]
 
   def description(newValue: String): UpdateMRPayload = new UpdateMRPayload(description = Some(newValue))
 }
@@ -205,6 +208,7 @@ object MergeRequestFull {
 }
 
 case class UserMergeInfo(can_merge: Boolean)
+
 object UserMergeInfo {
   implicit val UserMergeInfoDecoder: Decoder[UserMergeInfo] = deriveDecoder[UserMergeInfo]
 }

@@ -83,7 +83,7 @@ object PipelinesSort {
 
   case object UpdatedAt extends PipelinesSort("updated_at")
 
-  case object UserId  extends PipelinesSort("user_id")
+  case object UserId extends PipelinesSort("user_id")
 
 }
 
@@ -116,6 +116,7 @@ object ProjectsSort {
   }
 
 }
+
 sealed trait EventsSort extends SortingFamily
 
 object EventsSort {
@@ -123,4 +124,5 @@ object EventsSort {
   case object CreatedAt extends EventsSort {
     override val property: String = "created_at"
   }
+
 }

@@ -1,11 +1,11 @@
 package io.morgaroth.gitlabclient.models
 
-import java.time.ZonedDateTime
-
 import io.circe.generic.extras._
 import io.circe.generic.semiauto.deriveDecoder
 import io.circe.{Codec, Decoder}
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
+
+import java.time.ZonedDateTime
 
 sealed abstract class ReferenceType(val name: String) extends Product with Serializable
 
@@ -38,6 +38,7 @@ case class CommitSimple(
                          message: String,
                          parent_ids: Vector[String],
                        )
+
 object CommitSimple {
   implicit val CommitSimpleDecoder: Decoder[CommitSimple] = deriveDecoder[CommitSimple]
 }
@@ -47,8 +48,9 @@ case class CommitStats(
                         deletions: Int,
                         total: Int,
                       )
+
 object CommitStats {
-  implicit val CommitStatsDecoder = deriveDecoder[CommitStats]
+  implicit val CommitStatsDecoder: Decoder[CommitStats] = deriveDecoder[CommitStats]
 }
 
 case class LastPipelineInfo(
@@ -57,8 +59,9 @@ case class LastPipelineInfo(
                              sha: String,
                              status: String,
                            )
+
 object LastPipelineInfo {
-  implicit val LastPipelineInfoDecoder = deriveDecoder[LastPipelineInfo]
+  implicit val LastPipelineInfoDecoder: Decoder[LastPipelineInfo] = deriveDecoder[LastPipelineInfo]
 }
 
 case class Commit(
@@ -79,8 +82,9 @@ case class Commit(
                    last_pipeline: Option[LastPipelineInfo],
                    status: Option[String],
                  )
+
 object Commit {
-  implicit val CommitDecoder = deriveDecoder[Commit]
+  implicit val CommitDecoder: Decoder[Commit] = deriveDecoder[Commit]
 }
 
 @ConfiguredJsonCodec
@@ -99,6 +103,7 @@ case class FileDiff(
                      renamed_file: Boolean,
                      deleted_file: Boolean,
                    )
+
 object FileDiff {
   implicit val FileDiffDecoder: Decoder[FileDiff] = deriveDecoder[FileDiff]
 }
@@ -107,6 +112,7 @@ case class CommitReference(
                             `type`: ReferenceType,
                             name: String,
                           )
+
 object CommitReference {
   implicit val CommitReferenceDecoder: Decoder[CommitReference] = deriveDecoder[CommitReference]
 }

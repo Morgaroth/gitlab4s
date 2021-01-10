@@ -1,9 +1,9 @@
 package io.morgaroth.gitlabclient.helpers
 
-import java.time.{ZoneOffset, ZonedDateTime}
-
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+
+import java.time.{ZoneOffset, ZonedDateTime}
 
 class CustomDateTimeFormatterTest extends AnyFlatSpec with Matchers {
 

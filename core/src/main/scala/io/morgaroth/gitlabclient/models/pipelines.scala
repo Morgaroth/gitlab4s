@@ -1,10 +1,10 @@
 package io.morgaroth.gitlabclient.models
 
-import java.time.ZonedDateTime
-
 import io.circe.generic.semiauto.deriveDecoder
 import io.circe.{Codec, Decoder}
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
+
+import java.time.ZonedDateTime
 
 
 sealed abstract class PipelineStatus(val name: String) extends Product with Serializable
@@ -25,7 +25,7 @@ object PipelineStatus extends EnumMarshallingGlue[PipelineStatus] {
 
   case object Manual extends PipelineStatus("manual")
 
-  val all   : Seq[PipelineStatus]         = Seq(Success, Skipped, Failed, Canceled, Running, Scheduled, Manual)
+  val all: Seq[PipelineStatus] = Seq(Success, Skipped, Failed, Canceled, Running, Scheduled, Manual)
   val byName: Map[String, PipelineStatus] = all.map(x => x.name -> x).toMap
 
   override def rawValue: PipelineStatus => String = _.name
@@ -83,6 +83,7 @@ case class PipelineFullInfo(
                              coverage: Option[Boolean],
                              detailed_status: PipelineStatusInfo,
                            )
+
 object PipelineFullInfo {
   implicit val PipelineFullInfoDecoder: Decoder[PipelineFullInfo] = deriveDecoder[PipelineFullInfo]
 }
@@ -98,6 +99,7 @@ case class PipelineStatusInfo(
                                illustration: Option[String],
                                favicon: String,
                              )
+
 object PipelineStatusInfo {
   implicit val PipelineStatusInfoDecoder: Decoder[PipelineStatusInfo] = deriveDecoder[PipelineStatusInfo]
 }

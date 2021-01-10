@@ -1,9 +1,9 @@
 package io.morgaroth.gitlabclient.models
 
-import java.time.ZonedDateTime
-
 import io.circe.Decoder
 import io.circe.generic.semiauto.deriveDecoder
+
+import java.time.ZonedDateTime
 
 case class GitlabUser(
                        id: Long,
@@ -13,8 +13,9 @@ case class GitlabUser(
                        avatar_url: String,
                        web_url: String,
                      )
+
 object GitlabUser {
-  implicit val GitlabUserDecoder = deriveDecoder[GitlabUser]
+  implicit val GitlabUserDecoder: Decoder[GitlabUser] = deriveDecoder[GitlabUser]
 }
 
 case class GitlabFullUser(
@@ -47,6 +48,7 @@ case class GitlabGroup(
                         full_name: String,
                         full_path: String,
                       )
+
 object GitlabGroup {
   implicit val GitlabGroupDecoder: Decoder[GitlabGroup] = deriveDecoder[GitlabGroup]
 }

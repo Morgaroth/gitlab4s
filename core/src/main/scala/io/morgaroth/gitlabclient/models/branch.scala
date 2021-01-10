@@ -1,9 +1,9 @@
 package io.morgaroth.gitlabclient.models
 
-import java.time.ZonedDateTime
-
 import io.circe.Decoder
 import io.circe.generic.semiauto.deriveDecoder
+
+import java.time.ZonedDateTime
 
 case class GitlabBranchInfo(
                              name: String,
@@ -17,7 +17,7 @@ case class GitlabBranchInfo(
                            )
 
 object GitlabBranchInfo {
-  implicit val GitlabBranchInfoDecoder = deriveDecoder[GitlabBranchInfo]
+  implicit val GitlabBranchInfoDecoder: Decoder[GitlabBranchInfo] = deriveDecoder[GitlabBranchInfo]
 }
 
 case class GitlabCommitInfo(

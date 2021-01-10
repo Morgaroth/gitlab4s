@@ -2,8 +2,7 @@ package io.morgaroth.gitlabclient.sttpbackend
 
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
-
-import javax.net.ssl.{HostnameVerifier, HttpsURLConnection, SSLContext, SSLSession, TrustManager, X509TrustManager}
+import javax.net.ssl._
 
 object TrustAllCerts {
   def configure(): Unit = {

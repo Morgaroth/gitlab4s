@@ -1,9 +1,9 @@
 package io.morgaroth.gitlabclient.models
 
-import java.time.ZonedDateTime
-
 import io.circe.Decoder
 import io.circe.generic.semiauto.deriveDecoder
+
+import java.time.ZonedDateTime
 
 sealed trait NamespaceKind {
   def repr: String
@@ -31,7 +31,7 @@ case class GitlabNamespace(
                           )
 
 object GitlabNamespace {
-  implicit val GitlabNamespaceDecoder = deriveDecoder[GitlabNamespace]
+  implicit val GitlabNamespaceDecoder: Decoder[GitlabNamespace] = deriveDecoder[GitlabNamespace]
 }
 
 case class ProjectLinks(
@@ -91,5 +91,5 @@ case class ProjectInfo(
                       )
 
 object ProjectInfo {
-  implicit val ProjectInfoDecoder = deriveDecoder[ProjectInfo]
+  implicit val ProjectInfoDecoder: Decoder[ProjectInfo] = deriveDecoder[ProjectInfo]
 }

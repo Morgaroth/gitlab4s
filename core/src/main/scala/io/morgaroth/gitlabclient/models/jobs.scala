@@ -1,10 +1,10 @@
 package io.morgaroth.gitlabclient.models
 
-import java.time.ZonedDateTime
-
 import io.circe.generic.semiauto.deriveDecoder
 import io.circe.{Codec, Decoder}
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
+
+import java.time.ZonedDateTime
 
 
 sealed abstract class JobScope(val name: String) extends Product with Serializable
@@ -29,7 +29,7 @@ object JobScope {
 
 }
 
-sealed abstract class JobStatus(val name : String) extends Product with Serializable
+sealed abstract class JobStatus(val name: String) extends Product with Serializable
 
 object JobStatus extends EnumMarshallingGlue[JobStatus] {
 
@@ -78,6 +78,7 @@ case class JobFullInfo(
                         // runner: ??
                         artifacts_expire_at: Option[ZonedDateTime],
                       )
+
 object JobFullInfo {
   implicit val JobFullInfoDecoder: Decoder[JobFullInfo] = deriveDecoder[JobFullInfo]
 }

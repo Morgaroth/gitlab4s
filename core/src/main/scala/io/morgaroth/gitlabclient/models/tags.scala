@@ -7,6 +7,7 @@ case class ReleaseShort(
                          tag_name: String,
                          description: String,
                        )
+
 object ReleaseShort {
   implicit val ReleaseShortDecoder: Decoder[ReleaseShort] = deriveDecoder[ReleaseShort]
 }
@@ -19,6 +20,7 @@ case class TagInfo(
                     message: Option[String],
                     `protected`: Boolean,
                   )
+
 object TagInfo {
   implicit val TagInfoDecoder: Decoder[TagInfo] = deriveDecoder[TagInfo]
 }

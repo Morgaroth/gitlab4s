@@ -1,12 +1,12 @@
 package io.morgaroth.gitlabclient.apis
 
-import java.time.ZonedDateTime
-
 import cats.data.EitherT
 import io.morgaroth.gitlabclient._
 import io.morgaroth.gitlabclient.helpers.CustomDateTimeFormatter._
 import io.morgaroth.gitlabclient.models._
 import io.morgaroth.gitlabclient.query.ParamQuery._
+
+import java.time.ZonedDateTime
 
 trait PipelinesAPI[F[_]] {
   this: GitlabRestAPI[F] =>
@@ -54,7 +54,7 @@ trait PipelinesAPI[F[_]] {
   def getPipelineJobs(projectId: EntityId, pipelineId: BigInt, scope: Set[JobScope] = null): EitherT[F, GitlabError, Vector[JobFullInfo]] = {
     implicit val rId: RequestId = RequestId.newOne("get-pipeline-jobs")
     val params = wrap(scope).flatMap(_.map(sc => "scope[]".eqParam(sc.name)))
-    val req= reqGen.get(s"$API/projects/${projectId.toStringId}/pipelines/$pipelineId/jobs", params)
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/pipelines/$pipelineId/jobs", params)
     invokeRequest(req).unmarshall[Vector[JobFullInfo]]
   }
 }
