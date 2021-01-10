@@ -237,18 +237,30 @@ class PrivateGitlabAPISpec extends AnyFlatSpec with Matchers with ScalaFutures w
     println(data.filename)
   }
 
-  //  var mrsChecked: Set[(BigInt, BigInt)] = Fi.readFile("checked-prs.log")
-  //  it should "get full merge request info for all MRs" in {
-  //    try {
-  //      client.getGroupMergeRequests(1905, paging = AllPages)
-  //        .exec()
-  //        .filterNot { mr => mrsChecked.contains(mr.project_id -> mr.iid) }
-  //        .foreach { mr =>
-  //          client.getMergeRequest(mr.project_id, mr.iid).exec()
-  //          mrsChecked += (mr.project_id -> mr.iid)
-  //        }
-  //    } finally {
-  //      Fi.writeFile("checked.log", mrsChecked)
-  //    }
-  //  }
+  it should "load push rules" in {
+    //    val data = client.getPushRules(14414).exec() // b
+    val data = client.getPushRules(14413).exec() // a
+    println(data)
+  }
+
+  it should "change push rules" in {
+    val data = client.getProject(14417).exec() // n
+    println(data)
+    //    client.editPushRules(14417, EditPushRuleRequest.Builder.withCommitMessageRegex("[a-z]+")).exec()
+  }
+
+//  var mrsChecked: Set[(BigInt, BigInt)] = Fi.readFile("checked-prs.log")
+//  it should "get full merge request info for all MRs" in {
+//    try {
+//      client.getGroupMergeRequests(1905, paging = AllPages)
+//        .exec()
+//        .map(_.project_id)
+//        .distinct
+//        .foreach { mr =>
+//          client.getProject(mr).exec()
+//        }
+//    } finally {
+//      Fi.writeFile("checked.log", mrsChecked)
+//    }
+//  }
 }

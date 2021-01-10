@@ -2,8 +2,6 @@ package io.morgaroth.gitlabclient
 
 import cats.Monad
 import cats.data.EitherT
-import cats.instances.vector._
-import cats.syntax.traverse._
 import com.typesafe.scalalogging.LazyLogging
 import io.circe.Decoder
 import io.morgaroth.gitlabclient.apis._
@@ -22,6 +20,7 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling
   with DeploymentsAPI[F]
   with JobsAPI[F]
   with PipelinesAPI[F]
+  with ProjectsAPI[F]
   with CommitsAPI[F] {
 
   type GitlabResponseT[A] = EitherT[F, GitlabError, A]
@@ -84,28 +83,6 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling
   def groupSearchCommits(groupId: EntityId, phrase: String): GitlabResponseT[String] = {
     implicit val rId: RequestId = RequestId.newOne("group-search-mr")
     groupGlobalSearch(groupId, SearchScope.Commits, Some(phrase))
-  }
-
-  // @see: https://docs.gitlab.com/ee/api/projects.html#get-single-project
-  def getProject(projectId: EntityId): GitlabResponseT[ProjectInfo] = {
-    implicit val rId: RequestId = RequestId.newOne("get-project-by-id")
-    val req = reqGen.get(API + s"/projects/${projectId.toStringId}")
-    invokeRequest(req).unmarshall[ProjectInfo]
-  }
-
-  def getProjects(ids: Iterable[BigInt]): GitlabResponseT[Vector[ProjectInfo]] = {
-    ids.toVector.traverse(x => getProject(x))
-  }
-
-  // @see: https://docs.gitlab.com/ee/api/projects.html#list-all-projects
-  def getProjects(paging: Paging = AllPages, sort: Sorting[ProjectsSort] = null): GitlabResponseT[Vector[ProjectInfo]] = {
-    implicit val rId: RequestId = RequestId.newOne("get-all-projects")
-    val q = Vector(
-      wrap(sort).flatMap(_.toParams),
-      Vector("min_access_level".eqParam("40")),
-    ).flatten
-    val req = reqGen.get(API + s"/projects", q: _*)
-    getAllPaginatedResponse(req, "get-all-projects", paging)
   }
 
   // @see: https://docs.gitlab.com/ee/api/branches.html#list-repository-branches

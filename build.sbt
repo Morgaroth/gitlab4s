@@ -1,10 +1,12 @@
 val circeVersion = "0.12.3"
+//val circeVersion = "0.14.3-M3"
 val circeExtVersion = "0.12.2"
 val silencerVersion = "1.7.1"
 
 val validate = Def.taskKey[Unit]("Validates entire project")
 
-val projectScalaVersion = "2.13.3"
+val projectScalaVersion = "2.13.4"
+//val projectScalaVersion = "3.0.0-M3"
 val crossScalaVersionsValues = Seq("2.12.12", projectScalaVersion)
 
 val commonSettings = Seq(
@@ -45,7 +47,7 @@ val core = project
   .settings(
     name := "gitlab4s-core",
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-core" % "2.2.0",
+      "org.typelevel" %% "cats-core" % "2.3.1",
       "io.circe" %% "circe-core" % circeVersion,
       "io.circe" %% "circe-generic" % circeVersion,
       "io.circe" %% "circe-parser" % circeVersion,

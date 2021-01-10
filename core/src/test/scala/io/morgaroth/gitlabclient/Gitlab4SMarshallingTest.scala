@@ -22,18 +22,6 @@ class Gitlab4SMarshallingTest extends AnyFlatSpec with Matchers with Gitlab4SMar
     }
   }
 
-  val projectInfos = Table("project info") ++ Seq(
-    "other_project_info.json",
-    "own_project_info.json",
-    "own_project_info_2.json",
-  )
-  it should "parse project info" in {
-    forAll(projectInfos) { resourceName =>
-      val result = MJson.read[ProjectInfo](Source.fromResource(resourceName).mkString)
-      result shouldBe Symbol("right")
-    }
-  }
-
   val mergeRequests = Table("merge requests list") ++ Seq(
     "merge_requests_list_1.json",
     "merge_requests_list_2.json",
