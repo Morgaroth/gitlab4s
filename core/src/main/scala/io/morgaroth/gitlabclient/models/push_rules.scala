@@ -1,5 +1,6 @@
 package io.morgaroth.gitlabclient.models
 
+import io.circe.Json.JString
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 import io.circe.{Decoder, Encoder}
 
@@ -64,8 +65,11 @@ case class EditPushRuleRequest private(
   override def toString: String = {
     import io.circe.syntax._
     this.asJson.asObject.get
-      .filter(!_._2.isNull)
-      .toMap.map { case (k, v) => k -> v.toString() }
+      .filter(!_._2.isNull).toMap
+      .map {
+        case (k, JString(v)) => k -> v
+        case (k, v) => k -> v.toString()
+      }
       .mkString("PushRulesUpdates(", ", ", ")")
   }
 }
