@@ -1,6 +1,5 @@
 package io.morgaroth.gitlabclient.models
 
-import io.circe.Json.JString
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 import io.circe.{Decoder, Encoder}
 
@@ -11,7 +10,7 @@ case class PushRules(
                       project_id: BigInt,
                       commit_message_regex: String,
                       commit_message_negative_regex: Option[String],
-                      branch_name_regex: String,
+                      branch_name_regex: Option[String],
                       deny_delete_tag: Boolean,
                       created_at: ZonedDateTime,
                       member_check: Boolean,
@@ -67,8 +66,7 @@ case class EditPushRuleRequest private(
     this.asJson.asObject.get
       .filter(!_._2.isNull).toMap
       .map {
-        case (k, JString(v)) => k -> v
-        case (k, v) => k -> v.toString()
+        case (k, v) => k -> v.asString.getOrElse(v.toString())
       }
       .mkString("PushRulesUpdates(", ", ", ")")
   }

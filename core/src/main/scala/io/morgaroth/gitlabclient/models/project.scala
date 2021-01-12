@@ -1,6 +1,5 @@
 package io.morgaroth.gitlabclient.models
 
-import io.circe.Json.JString
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 import io.circe.{Codec, Decoder, Encoder}
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
@@ -337,8 +336,7 @@ case class EditProjectRequest private(
     this.asJson.asObject.get
       .filter(!_._2.isNull).toMap
       .map {
-        case (k, JString(v)) => k -> v
-        case (k, v) => k -> v.toString()
+        case (k, v) => k -> v.asString.getOrElse(v.toString())
       }
       .mkString("ProjectUpdates(", ", ", ")")
   }
