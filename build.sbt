@@ -1,6 +1,6 @@
-val circeVersion = "0.12.3"
+val circeVersion = "0.13.0"
 //val circeVersion = "0.14.3-M3"
-val circeExtVersion = "0.12.2"
+val circeExtVersion = "0.13.0"
 val silencerVersion = "1.7.1"
 
 val validate = Def.taskKey[Unit]("Validates entire project")
@@ -56,7 +56,7 @@ val core = project
       "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
       //      "org.wickedsource" % "diffparser" % "1.0",
       //      "io.github.java-diff-utils" % "java-diff-utils" % "4.5",
-      "org.scalatest" %% "scalatest" % "3.2.2" % Test,
+      "org.scalatest" %% "scalatest" % "3.2.3" % Test,
     )
   )
 
@@ -66,7 +66,7 @@ val sttp = project.in(file("sttp")).dependsOn(core)
     name := "gitlab4s-sttp",
     libraryDependencies ++= Seq(
       "com.softwaremill.sttp.client" %% "core" % "2.0.0-RC6",
-      "org.scalatest" %% "scalatest" % "3.2.2" % Test,
+      "org.scalatest" %% "scalatest" % "3.2.3" % Test,
       "ch.qos.logback" % "logback-classic" % "1.2.3" % Test,
     )
   )
