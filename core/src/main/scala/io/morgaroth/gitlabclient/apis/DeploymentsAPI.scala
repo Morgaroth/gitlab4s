@@ -12,14 +12,15 @@ trait DeploymentsAPI[F[_]] {
   this: GitlabRestAPI[F] =>
 
   // @see: https://docs.gitlab.com/ee/api/deployments.html#list-project-deployments
-  def getProjectDeployments(projectId: EntityId,
-                            environment: String = null,
-                            updatedAfter: ZonedDateTime = null,
-                            updatedBefore: ZonedDateTime = null,
-                            status: String = null,
-                            paging: Paging = AllPages,
-                            sort: Sorting[DeploymentsSort] = null,
-                           ): EitherT[F, GitlabError, Vector[DeploymentInfo]] = {
+  def getProjectDeployments(
+      projectId: EntityId,
+      environment: String = null,
+      updatedAfter: ZonedDateTime = null,
+      updatedBefore: ZonedDateTime = null,
+      status: String = null,
+      paging: Paging = AllPages,
+      sort: Sorting[DeploymentsSort] = null,
+  ): EitherT[F, GitlabError, Vector[DeploymentInfo]] = {
 
     val params = Vector(
       wrap(environment).map("environment".eqParam(_)),

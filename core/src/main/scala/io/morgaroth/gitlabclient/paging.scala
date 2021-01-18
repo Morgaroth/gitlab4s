@@ -8,7 +8,6 @@ case class PageCount(pagesCount: Int, pageSize: Int) extends Paging
 
 case class EntitiesCount(expectedEntitiesCount: Int) extends Paging
 
-
 sealed trait SortDirection
 
 case object Desc extends SortDirection {

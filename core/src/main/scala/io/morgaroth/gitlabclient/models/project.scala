@@ -13,10 +13,10 @@ sealed trait NamespaceKind {
 class NamespaceKindBase(val repr: String) extends NamespaceKind
 
 object NamespaceKind {
-  val Group = new NamespaceKindBase("group")
-  val User = new NamespaceKindBase("user")
-  val allValues: Seq[NamespaceKind] = Seq(Group, User)
-  val all: Map[String, NamespaceKind] = allValues.map(x => x.repr -> x).toMap
+  val Group                                   = new NamespaceKindBase("group")
+  val User                                    = new NamespaceKindBase("user")
+  val allValues: Seq[NamespaceKind]           = Seq(Group, User)
+  val all: Map[String, NamespaceKind]         = allValues.map(x => x.repr -> x).toMap
   val byName: String => Option[NamespaceKind] = all.get
 }
 
@@ -30,121 +30,120 @@ object MergeStrategy extends EnumMarshallingGlue[MergeStrategy] {
 
   final case object MergeCommit extends MergeStrategy("merge")
 
-  val all: Seq[MergeStrategy] = Seq(MergeCommit, RebaseMerge, FastForward)
+  val all: Seq[MergeStrategy]            = Seq(MergeCommit, RebaseMerge, FastForward)
   val byName: Map[String, MergeStrategy] = all.map(x => x.name -> x).toMap
-  val rawValue: MergeStrategy => String = _.name
+  val rawValue: MergeStrategy => String  = _.name
 
   implicit val MergeRequestStateCirceCodec: Codec[MergeStrategy] = EnumMarshalling.stringEnumCodecOf(MergeStrategy)
 
 }
 
-
 case class GitlabNamespace(
-                            id: BigInt,
-                            name: String,
-                            path: String,
-                            kind: String,
-                            full_path: String,
-                            parent_id: Option[Long],
-                            avatar_url: Option[String],
-                            web_url: Option[String],
-                          )
+    id: BigInt,
+    name: String,
+    path: String,
+    kind: String,
+    full_path: String,
+    parent_id: Option[Long],
+    avatar_url: Option[String],
+    web_url: Option[String],
+)
 
 object GitlabNamespace {
   implicit val GitlabNamespaceDecoder: Decoder[GitlabNamespace] = deriveDecoder[GitlabNamespace]
 }
 
 case class ProjectLinks(
-                         self: String,
-                         issues: Option[String],
-                         merge_requests: Option[String],
-                         repo_branches: String,
-                         labels: String,
-                         events: String,
-                         members: String,
-                       )
+    self: String,
+    issues: Option[String],
+    merge_requests: Option[String],
+    repo_branches: String,
+    labels: String,
+    events: String,
+    members: String,
+)
 
 object ProjectLinks {
   implicit val ProjectLinksDecoder: Decoder[ProjectLinks] = deriveDecoder[ProjectLinks]
 }
 
 case class ProjectInfo(
-                        id: BigInt,
-                        description: Option[String],
-                        name: String,
-                        name_with_namespace: String,
-                        path: String,
-                        path_with_namespace: String,
-                        created_at: ZonedDateTime,
-                        default_branch: Option[String],
-                        tag_list: Vector[String],
-                        ssh_url_to_repo: String,
-                        http_url_to_repo: String,
-                        web_url: String,
-                        readme_url: Option[String],
-                        avatar_url: Option[String],
-                        star_count: Int,
-                        forks_count: Int,
-                        last_activity_at: ZonedDateTime,
-                        namespace: GitlabNamespace,
-                        _links: ProjectLinks,
-                        empty_repo: Option[Boolean],
-                        archived: Boolean,
-                        visibility: String,
-                        owner: Option[GitlabUser],
-                        container_registry_enabled: Option[Boolean],
-                        issues_enabled: Boolean,
-                        merge_requests_enabled: Boolean,
-                        wiki_enabled: Boolean,
-                        jobs_enabled: Boolean,
-                        snippets_enabled: Boolean,
-                        issues_access_level: Option[String],
-                        repository_access_level: Option[String],
-                        merge_requests_access_level: Option[String],
-                        wiki_access_level: Option[String],
-                        builds_access_level: Option[String],
-                        snippets_access_level: Option[String],
-                        shared_runners_enabled: Boolean,
-                        lfs_enabled: Boolean,
-                        creator_id: BigInt,
-                        merge_method: MergeStrategy,
-                        packages_enabled: Option[Boolean],
-                        resolve_outdated_diff_discussions: Boolean,
-                        service_desk_enabled: Boolean,
-                        service_desk_address: Option[String],
-                        can_create_merge_request_in: Boolean,
-                        forking_access_level: String,
-                        pages_access_level: String,
-                        emails_disabled: Option[Boolean],
-                        import_status: String,
-                        import_error: Option[String],
-                        open_issues_count: Int,
-                        runners_token: String,
-                        ci_default_git_depth: Option[Int],
-                        public_jobs: Boolean,
-                        build_git_strategy: String,
-                        build_timeout: Int,
-                        auto_cancel_pending_pipelines: String,
-                        build_coverage_regex: Option[String],
-                        ci_config_path: Option[String],
-                        shared_with_groups: Vector[String],
-                        only_allow_merge_if_pipeline_succeeds: Boolean,
-                        allow_merge_on_skipped_pipeline: Option[Boolean],
-                        request_access_enabled: Boolean,
-                        only_allow_merge_if_all_discussions_are_resolved: Boolean,
-                        remove_source_branch_after_merge: Option[Boolean],
-                        printing_merge_request_link_enabled: Boolean,
-                        suggestion_commit_message: Option[String],
-                        auto_devops_enabled: Boolean,
-                        auto_devops_deploy_strategy: String,
-                        autoclose_referenced_issues: Boolean,
-                        approvals_before_merge: Int,
-                        mirror: Boolean,
-                        external_authorization_classification_label: Option[String],
-                        marked_for_deletion_at: Option[ZonedDateTime],
-                        marked_for_deletion_on: Option[ZonedDateTime],
-                        compliance_frameworks: Vector[String],
-                      )
+    id: BigInt,
+    description: Option[String],
+    name: String,
+    name_with_namespace: String,
+    path: String,
+    path_with_namespace: String,
+    created_at: ZonedDateTime,
+    default_branch: Option[String],
+    tag_list: Vector[String],
+    ssh_url_to_repo: String,
+    http_url_to_repo: String,
+    web_url: String,
+    readme_url: Option[String],
+    avatar_url: Option[String],
+    star_count: Int,
+    forks_count: Int,
+    last_activity_at: ZonedDateTime,
+    namespace: GitlabNamespace,
+    _links: ProjectLinks,
+    empty_repo: Option[Boolean],
+    archived: Boolean,
+    visibility: String,
+    owner: Option[GitlabUser],
+    container_registry_enabled: Option[Boolean],
+    issues_enabled: Boolean,
+    merge_requests_enabled: Boolean,
+    wiki_enabled: Boolean,
+    jobs_enabled: Boolean,
+    snippets_enabled: Boolean,
+    issues_access_level: Option[String],
+    repository_access_level: Option[String],
+    merge_requests_access_level: Option[String],
+    wiki_access_level: Option[String],
+    builds_access_level: Option[String],
+    snippets_access_level: Option[String],
+    shared_runners_enabled: Boolean,
+    lfs_enabled: Boolean,
+    creator_id: BigInt,
+    merge_method: MergeStrategy,
+    packages_enabled: Option[Boolean],
+    resolve_outdated_diff_discussions: Boolean,
+    service_desk_enabled: Boolean,
+    service_desk_address: Option[String],
+    can_create_merge_request_in: Boolean,
+    forking_access_level: String,
+    pages_access_level: String,
+    emails_disabled: Option[Boolean],
+    import_status: String,
+    import_error: Option[String],
+    open_issues_count: Int,
+    runners_token: String,
+    ci_default_git_depth: Option[Int],
+    public_jobs: Boolean,
+    build_git_strategy: String,
+    build_timeout: Int,
+    auto_cancel_pending_pipelines: String,
+    build_coverage_regex: Option[String],
+    ci_config_path: Option[String],
+    shared_with_groups: Vector[String],
+    only_allow_merge_if_pipeline_succeeds: Boolean,
+    allow_merge_on_skipped_pipeline: Option[Boolean],
+    request_access_enabled: Boolean,
+    only_allow_merge_if_all_discussions_are_resolved: Boolean,
+    remove_source_branch_after_merge: Option[Boolean],
+    printing_merge_request_link_enabled: Boolean,
+    suggestion_commit_message: Option[String],
+    auto_devops_enabled: Boolean,
+    auto_devops_deploy_strategy: String,
+    autoclose_referenced_issues: Boolean,
+    approvals_before_merge: Int,
+    mirror: Boolean,
+    external_authorization_classification_label: Option[String],
+    marked_for_deletion_at: Option[ZonedDateTime],
+    marked_for_deletion_on: Option[ZonedDateTime],
+    compliance_frameworks: Vector[String],
+)
 
 object ProjectInfo {
   implicit val ProjectInfoDecoder: Decoder[ProjectInfo] = deriveDecoder[ProjectInfo]
@@ -156,67 +155,67 @@ object EditProjectRequest {
   val Builder = new EditProjectRequest()
 }
 
-case class EditProjectRequest private(
-                                       allow_merge_on_skipped_pipeline: Option[Boolean] = None,
-                                       analytics_access_level: Option[String] = None,
-                                       approvals_before_merge: Option[Int] = None,
-                                       auto_cancel_pending_pipelines: Option[String] = None,
-                                       auto_devops_deploy_strategy: Option[String] = None,
-                                       auto_devops_enabled: Option[Boolean] = None,
-                                       autoclose_referenced_issues: Option[Boolean] = None,
-                                       // avatar: Option[mixed],  // problematic
-                                       build_coverage_regex: Option[String] = None,
-                                       build_git_strategy: Option[String] = None,
-                                       build_timeout: Option[Int] = None,
-                                       builds_access_level: Option[String] = None,
-                                       ci_config_path: Option[String] = None,
-                                       ci_default_git_depth: Option[Int] = None,
-                                       ci_forward_deployment_enabled: Option[Boolean] = None,
-                                       // container_expiration_policy_attributes: Option[hash], // problematic
-                                       container_registry_enabled: Option[Boolean] = None,
-                                       default_branch: Option[String] = None,
-                                       description: Option[String] = None,
-                                       emails_disabled: Option[Boolean] = None,
-                                       external_authorization_classification_label: Option[String] = None,
-                                       forking_access_level: Option[String] = None,
-                                       import_url: Option[String] = None,
-                                       issues_access_level: Option[String] = None,
-                                       issues_enabled: Option[Boolean] = None,
-                                       jobs_enabled: Option[Boolean] = None,
-                                       lfs_enabled: Option[Boolean] = None,
-                                       merge_method: Option[MergeStrategy] = None,
-                                       merge_requests_access_level: Option[String] = None,
-                                       merge_requests_enabled: Option[Boolean] = None,
-                                       mirror_overwrites_diverged_branches: Option[Boolean] = None,
-                                       mirror_trigger_builds: Option[Boolean] = None,
-                                       mirror_user_id: Option[Int] = None,
-                                       mirror: Option[Boolean] = None,
-                                       name: Option[String] = None,
-                                       operations_access_level: Option[String] = None,
-                                       only_allow_merge_if_all_discussions_are_resolved: Option[Boolean] = None,
-                                       only_allow_merge_if_pipeline_succeeds: Option[Boolean] = None,
-                                       only_mirror_protected_branches: Option[Boolean] = None,
-                                       packages_enabled: Option[Boolean] = None,
-                                       pages_access_level: Option[String] = None,
-                                       requirements_access_level: Option[String] = None,
-                                       path: Option[String] = None,
-                                       public_builds: Option[Boolean] = None,
-                                       remove_source_branch_after_merge: Option[Boolean] = None,
-                                       repository_access_level: Option[String] = None,
-                                       repository_storage: Option[String] = None,
-                                       request_access_enabled: Option[Boolean] = None,
-                                       resolve_outdated_diff_discussions: Option[Boolean] = None,
-                                       service_desk_enabled: Option[Boolean] = None,
-                                       shared_runners_enabled: Option[Boolean] = None,
-                                       show_default_award_emojis: Option[Boolean] = None,
-                                       snippets_access_level: Option[String] = None,
-                                       snippets_enabled: Option[Boolean] = None,
-                                       suggestion_commit_message: Option[String] = None,
-                                       tag_list: Option[Set[String]] = None,
-                                       visibility: Option[String] = None,
-                                       wiki_access_level: Option[String] = None,
-                                       wiki_enabled: Option[Boolean] = None,
-                                     ) {
+case class EditProjectRequest private (
+    allow_merge_on_skipped_pipeline: Option[Boolean] = None,
+    analytics_access_level: Option[String] = None,
+    approvals_before_merge: Option[Int] = None,
+    auto_cancel_pending_pipelines: Option[String] = None,
+    auto_devops_deploy_strategy: Option[String] = None,
+    auto_devops_enabled: Option[Boolean] = None,
+    autoclose_referenced_issues: Option[Boolean] = None,
+    // avatar: Option[mixed],  // problematic
+    build_coverage_regex: Option[String] = None,
+    build_git_strategy: Option[String] = None,
+    build_timeout: Option[Int] = None,
+    builds_access_level: Option[String] = None,
+    ci_config_path: Option[String] = None,
+    ci_default_git_depth: Option[Int] = None,
+    ci_forward_deployment_enabled: Option[Boolean] = None,
+    // container_expiration_policy_attributes: Option[hash], // problematic
+    container_registry_enabled: Option[Boolean] = None,
+    default_branch: Option[String] = None,
+    description: Option[String] = None,
+    emails_disabled: Option[Boolean] = None,
+    external_authorization_classification_label: Option[String] = None,
+    forking_access_level: Option[String] = None,
+    import_url: Option[String] = None,
+    issues_access_level: Option[String] = None,
+    issues_enabled: Option[Boolean] = None,
+    jobs_enabled: Option[Boolean] = None,
+    lfs_enabled: Option[Boolean] = None,
+    merge_method: Option[MergeStrategy] = None,
+    merge_requests_access_level: Option[String] = None,
+    merge_requests_enabled: Option[Boolean] = None,
+    mirror_overwrites_diverged_branches: Option[Boolean] = None,
+    mirror_trigger_builds: Option[Boolean] = None,
+    mirror_user_id: Option[Int] = None,
+    mirror: Option[Boolean] = None,
+    name: Option[String] = None,
+    operations_access_level: Option[String] = None,
+    only_allow_merge_if_all_discussions_are_resolved: Option[Boolean] = None,
+    only_allow_merge_if_pipeline_succeeds: Option[Boolean] = None,
+    only_mirror_protected_branches: Option[Boolean] = None,
+    packages_enabled: Option[Boolean] = None,
+    pages_access_level: Option[String] = None,
+    requirements_access_level: Option[String] = None,
+    path: Option[String] = None,
+    public_builds: Option[Boolean] = None,
+    remove_source_branch_after_merge: Option[Boolean] = None,
+    repository_access_level: Option[String] = None,
+    repository_storage: Option[String] = None,
+    request_access_enabled: Option[Boolean] = None,
+    resolve_outdated_diff_discussions: Option[Boolean] = None,
+    service_desk_enabled: Option[Boolean] = None,
+    shared_runners_enabled: Option[Boolean] = None,
+    show_default_award_emojis: Option[Boolean] = None,
+    snippets_access_level: Option[String] = None,
+    snippets_enabled: Option[Boolean] = None,
+    suggestion_commit_message: Option[String] = None,
+    tag_list: Option[Set[String]] = None,
+    visibility: Option[String] = None,
+    wiki_access_level: Option[String] = None,
+    wiki_enabled: Option[Boolean] = None,
+) {
   def withAllowMergeOnSkippedPipeline(value: Boolean) = copy(allow_merge_on_skipped_pipeline = Some(value))
 
   def withAnalyticsAccessLevel(value: String) = copy(analytics_access_level = Some(value))
@@ -334,10 +333,9 @@ case class EditProjectRequest private(
   override def toString: String = {
     import io.circe.syntax._
     this.asJson.asObject.get
-      .filter(!_._2.isNull).toMap
-      .map {
-        case (k, v) => k -> v.asString.getOrElse(v.toString())
-      }
+      .filter(!_._2.isNull)
+      .toMap
+      .map { case (k, v) => k -> v.asString.getOrElse(v.toString()) }
       .mkString("ProjectUpdates(", ", ", ")")
   }
 }

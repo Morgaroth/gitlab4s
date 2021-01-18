@@ -13,15 +13,15 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class PrivateGitlabAPISpec extends AnyFlatSpec with Matchers with ScalaFutures with LazyLogging with HelperClasses {
 
-  override implicit def patienceConfig: PatienceConfig = PatienceConfig(Span(1, Minutes))
+  implicit override def patienceConfig: PatienceConfig = PatienceConfig(Span(1, Minutes))
 
   private val maybeAccessToken = Option(System.getenv("gitlab-access-token"))
-  private val maybeAddress = Option(System.getenv("gitlab-address"))
+  private val maybeAddress     = Option(System.getenv("gitlab-address"))
   assume(maybeAccessToken.isDefined, "gitlab-access-token env must be set for this test")
   assume(maybeAddress.isDefined, "gitlab-address env must be set for this test")
 
   private val cfg = GitlabConfig(maybeAccessToken.get, maybeAddress.get, ignoreSslErrors = true)
-  val client = new SttpGitlabAPI(cfg, GitlabRestAPIConfig(true))
+  val client      = new SttpGitlabAPI(cfg, GitlabRestAPIConfig(true))
 
   behavior of "SttpGitlabAPI"
 
@@ -106,8 +106,8 @@ class PrivateGitlabAPISpec extends AnyFlatSpec with Matchers with ScalaFutures w
 
   it should "return commits from given period" in {
     val startTime = ZonedDateTime.of(2019, 8, 1, 0, 0, 0, 0, ZoneOffset.ofHours(2))
-    val endTime = ZonedDateTime.of(2020, 2, 1, 0, 0, 0, 0, ZoneOffset.ofHours(2))
-    val result = client.getCommits(14415, since = startTime, until = endTime).exec()
+    val endTime   = ZonedDateTime.of(2020, 2, 1, 0, 0, 0, 0, ZoneOffset.ofHours(2))
+    val result    = client.getCommits(14415, since = startTime, until = endTime).exec()
     result.size shouldBe 120
   }
 
@@ -119,7 +119,10 @@ class PrivateGitlabAPISpec extends AnyFlatSpec with Matchers with ScalaFutures w
   }
 
   it should "create & delete approval rules" ignore { // ignored, as it is unsafe to run at any time
-    val result2 = client.createApprovalRule(14413, 28, CreateMergeRequestApprovalRule.oneOf("TEST_APPROVAL_RULE_CREATED_BY_BOT", 1789, 754)).value.futureValue // a
+    val result2 = client
+      .createApprovalRule(14413, 28, CreateMergeRequestApprovalRule.oneOf("TEST_APPROVAL_RULE_CREATED_BY_BOT", 1789, 754))
+      .value
+      .futureValue // a
     result2 shouldBe Symbol("right")
     val result3 = client.deleteApprovalRule(14413, 28, result2.rightValue).value.futureValue
     result3 shouldBe Symbol("right")
@@ -137,8 +140,9 @@ class PrivateGitlabAPISpec extends AnyFlatSpec with Matchers with ScalaFutures w
 
   it should "return merge requests for requested creation times" in {
     val startTime = ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(2))
-    val endTime = ZonedDateTime.of(2020, 1, 10, 0, 0, 0, 0, ZoneOffset.ofHours(2))
-    val result = client.getGroupMergeRequests(1905, MergeRequestStates.All, createdAfter = startTime, createdBefore = endTime).exec() // global
+    val endTime   = ZonedDateTime.of(2020, 1, 10, 0, 0, 0, 0, ZoneOffset.ofHours(2))
+    val result =
+      client.getGroupMergeRequests(1905, MergeRequestStates.All, createdAfter = startTime, createdBefore = endTime).exec() // global
     result should have size 51
     result.foreach { entry =>
       entry.created_at.isBefore(endTime) shouldBe true
@@ -148,7 +152,8 @@ class PrivateGitlabAPISpec extends AnyFlatSpec with Matchers with ScalaFutures w
 
   it should "return merge requests for requested emoji" in {
     val timeBarrier = ZonedDateTime.of(2020, 3, 12, 0, 0, 0, 0, ZoneOffset.ofHours(2))
-    val result = client.getGroupMergeRequests(1905, MergeRequestStates.All, myReaction = "eyes", createdBefore = timeBarrier).exec() // global
+    val result =
+      client.getGroupMergeRequests(1905, MergeRequestStates.All, myReaction = "eyes", createdBefore = timeBarrier).exec() // global
     result should have size 9
   }
 
@@ -162,26 +167,31 @@ class PrivateGitlabAPISpec extends AnyFlatSpec with Matchers with ScalaFutures w
   }
 
   it should "post merge thread" in {
-    val mrIIdForTest = 4
-    val mr = client.getMergeRequestDiff(16395, mrIIdForTest).exec()
+    val mrIIdForTest  = 4
+    val mr            = client.getMergeRequestDiff(16395, mrIIdForTest).exec()
     val diffToComment = mr.changes.get.head
-    val payload = CreateMRDiscussion.threadOnNewLine(mr.diff_refs, diffToComment, 7, "some comment")
-    val thread = client.createMergeRequestDiscussion(16395, mrIIdForTest, payload).exec()
+    val payload       = CreateMRDiscussion.threadOnNewLine(mr.diff_refs, diffToComment, 7, "some comment")
+    val thread        = client.createMergeRequestDiscussion(16395, mrIIdForTest, payload).exec()
     client.getMergeRequestDiscussions(16395, mrIIdForTest).exec() should contain(thread)
     val replyNote = client.createMergeRequestDiscussionNote(16395, mrIIdForTest, thread.id, "no no no").exec()
 
     val notesAfterCreation = client.getMergeRequestDiscussions(16395, mrIIdForTest).exec()
     notesAfterCreation.find(_.id == thread.id).get.notes should have size 2
 
-    val updatedHead = client.updateMergeRequestDiscussionNote(16395, mrIIdForTest, thread.id, thread.notes.head.id, MRDiscussionUpdate.body("updated problem")).exec()
-    val updatedReply = client.updateMergeRequestDiscussionNote(16395, mrIIdForTest, thread.id, replyNote.id, MRDiscussionUpdate.body("updated no no no")).exec()
+    val updatedHead = client
+      .updateMergeRequestDiscussionNote(16395, mrIIdForTest, thread.id, thread.notes.head.id, MRDiscussionUpdate.body("updated problem"))
+      .exec()
+    val updatedReply = client
+      .updateMergeRequestDiscussionNote(16395, mrIIdForTest, thread.id, replyNote.id, MRDiscussionUpdate.body("updated no no no"))
+      .exec()
 
     val notesAfterUpdates = client.getMergeRequestDiscussion(16395, mrIIdForTest, thread.id).exec()
     notesAfterUpdates.notes should contain theSameElementsAs Vector(updatedHead, updatedReply)
 
     client.updateMergeRequestNote(16395, mrIIdForTest, replyNote.id, "another update no no").exec()
     client.updateMergeRequestNote(16395, mrIIdForTest, thread.notes.head.id, "another head update").exec()
-    val reUpdatedNote = client.updateMergeRequestDiscussionNote(16395, mrIIdForTest, thread.id, replyNote.id, MRDiscussionUpdate.resolve(true)).exec()
+    val reUpdatedNote =
+      client.updateMergeRequestDiscussionNote(16395, mrIIdForTest, thread.id, replyNote.id, MRDiscussionUpdate.resolve(true)).exec()
 
     val currentThread = client.resolveMergeRequestDiscussion(16395, mrIIdForTest, thread.id, resolved = true).exec()
 
@@ -192,7 +202,7 @@ class PrivateGitlabAPISpec extends AnyFlatSpec with Matchers with ScalaFutures w
   }
 
   it should "return merge request diff" in {
-    client.getMergeRequestDiff(14415, 74).exec() // t
+    client.getMergeRequestDiff(14415, 74).exec()  // t
     client.getMergeRequestDiff(14414, 187).exec() // b
   }
 

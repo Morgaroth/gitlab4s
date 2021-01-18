@@ -1,6 +1,5 @@
 package io.morgaroth.gitlabclient.models
 
-
 sealed abstract class SearchScope(val name: String)
 
 object SearchScope {
@@ -21,6 +20,6 @@ object SearchScope {
 
   case object Users extends SearchScope("users")
 
-  val all: Seq[SearchScope] = Seq(MergeRequests, WikiBlobs, Milestones, Issues, Projects, Commits, Blobs, Users)
+  val all: Seq[SearchScope]            = Seq(MergeRequests, WikiBlobs, Milestones, Issues, Projects, Commits, Blobs, Users)
   val byName: Map[String, SearchScope] = all.map(x => x.name -> x).toMap
 }

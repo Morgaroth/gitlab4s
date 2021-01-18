@@ -18,13 +18,13 @@ object AwardableScope {
 
   final case object Snippets extends AwardableScope("snippets")
 
-  val all: Seq[AwardableScope] = Seq(MergeRequests, Issues, Snippets)
+  val all: Seq[AwardableScope]            = Seq(MergeRequests, Issues, Snippets)
   val byName: Map[String, AwardableScope] = all.map(x => x.name -> x).toMap
 
   val awardableTypeToScope = Map(
     AwardableType.MergeRequest -> AwardableScope.MergeRequests,
-    AwardableType.Issue -> AwardableScope.Issues,
-    AwardableType.Snippet -> AwardableScope.Snippets,
+    AwardableType.Issue        -> AwardableScope.Issues,
+    AwardableType.Snippet      -> AwardableScope.Snippets,
   )
 
   def fromAwardableType(awardableType: AwardableType): AwardableScope = awardableTypeToScope(awardableType)
@@ -40,7 +40,7 @@ object AwardableType extends EnumMarshallingGlue[AwardableType] {
 
   final case object Snippet extends AwardableType("Snippet")
 
-  val all: Seq[AwardableType] = Seq(MergeRequest, Issue, Snippet)
+  val all: Seq[AwardableType]            = Seq(MergeRequest, Issue, Snippet)
   val byName: Map[String, AwardableType] = all.map(x => x.name -> x).toMap
 
   override def rawValue: AwardableType => String = _.name
@@ -49,14 +49,14 @@ object AwardableType extends EnumMarshallingGlue[AwardableType] {
 }
 
 case class EmojiAward(
-                       id: BigInt,
-                       name: String,
-                       user: GitlabUser,
-                       created_at: ZonedDateTime,
-                       updated_at: ZonedDateTime,
-                       awardable_id: Int,
-                       awardable_type: AwardableType
-                     )
+    id: BigInt,
+    name: String,
+    user: GitlabUser,
+    created_at: ZonedDateTime,
+    updated_at: ZonedDateTime,
+    awardable_id: Int,
+    awardable_type: AwardableType,
+)
 
 object EmojiAward {
   implicit val EmojiAwardDecoder: Decoder[EmojiAward] = deriveDecoder[EmojiAward]

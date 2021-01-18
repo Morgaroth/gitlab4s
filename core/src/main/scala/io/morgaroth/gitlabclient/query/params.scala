@@ -23,9 +23,8 @@ object ParamQuery {
   }
 
   implicit class fromSorting[A <: SortingFamily](sc: Sorting[A]) {
-    def toParams: List[ParamQuery] = {
+    def toParams: List[ParamQuery] =
       List("order_by".eqParam(sc.field.property), "sort".eqParam(sc.direction.toString))
-    }
   }
 
   implicit class fromString(paramName: String) {
@@ -74,12 +73,7 @@ object Methods {
 
 }
 
-case class GitlabRequest(server: String,
-                         method: Method,
-                         path: String,
-                         query: Vector[ParamQuery],
-                         payload: Option[String],
-                        ) {
+case class GitlabRequest(server: String, method: Method, path: String, query: Vector[ParamQuery], payload: Option[String]) {
   def withParams(params: ParamQuery*): GitlabRequest =
     copy(query = query ++ params.toList.filterNot(_ == NoParam))
 

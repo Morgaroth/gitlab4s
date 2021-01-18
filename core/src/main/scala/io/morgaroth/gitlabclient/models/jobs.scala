@@ -6,7 +6,6 @@ import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGl
 
 import java.time.ZonedDateTime
 
-
 sealed abstract class JobScope(val name: String) extends Product with Serializable
 
 object JobScope {
@@ -49,7 +48,7 @@ object JobStatus extends EnumMarshallingGlue[JobStatus] {
 
   case object Manual extends JobStatus("manual")
 
-  val all: Seq[JobStatus] = Seq(Created, Running, Success, Skipped, Failed, Canceled, Scheduled, Manual)
+  val all: Seq[JobStatus]            = Seq(Created, Running, Success, Skipped, Failed, Canceled, Scheduled, Manual)
   val byName: Map[String, JobStatus] = all.map(x => x.name -> x).toMap
 
   override def rawValue: JobStatus => String = _.name
@@ -58,26 +57,26 @@ object JobStatus extends EnumMarshallingGlue[JobStatus] {
 }
 
 case class JobFullInfo(
-                        id: BigInt,
-                        status: JobStatus,
-                        stage: String,
-                        name: String,
-                        ref: String,
-                        tag: Boolean,
-                        //coverage ??
-                        allow_failure: Boolean,
-                        created_at: ZonedDateTime,
-                        started_at: Option[ZonedDateTime],
-                        finished_at: Option[ZonedDateTime],
-                        duration: Double,
-                        user: GitlabUser,
-                        commit: CommitSimple,
-                        pipeline: PipelineShort,
-                        web_url: String,
-                        artifacts: Vector[PipelineArtifactSimple],
-                        // runner: ??
-                        artifacts_expire_at: Option[ZonedDateTime],
-                      )
+    id: BigInt,
+    status: JobStatus,
+    stage: String,
+    name: String,
+    ref: String,
+    tag: Boolean,
+    //coverage ??
+    allow_failure: Boolean,
+    created_at: ZonedDateTime,
+    started_at: Option[ZonedDateTime],
+    finished_at: Option[ZonedDateTime],
+    duration: Double,
+    user: GitlabUser,
+    commit: CommitSimple,
+    pipeline: PipelineShort,
+    web_url: String,
+    artifacts: Vector[PipelineArtifactSimple],
+    // runner: ??
+    artifacts_expire_at: Option[ZonedDateTime],
+)
 
 object JobFullInfo {
   implicit val JobFullInfoDecoder: Decoder[JobFullInfo] = deriveDecoder[JobFullInfo]

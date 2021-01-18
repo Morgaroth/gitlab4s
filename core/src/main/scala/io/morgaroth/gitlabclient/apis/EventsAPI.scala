@@ -10,13 +10,13 @@ trait EventsAPI[F[_]] {
 
   // @see: https://docs.gitlab.com/ee/api/events.html#list-currently-authenticated-users-events
   def getEvents(
-                 since: UtcDate = null,
-                 until: UtcDate = null,
-                 targetType: TargetType = null,
-                 action: ActionType = null,
-                 paging: Paging = AllPages,
-                 sort: Sorting[EventsSort] = null,
-               ): EitherT[F, GitlabError, Vector[EventInfo]] = {
+      since: UtcDate = null,
+      until: UtcDate = null,
+      targetType: TargetType = null,
+      action: ActionType = null,
+      paging: Paging = AllPages,
+      sort: Sorting[EventsSort] = null,
+  ): EitherT[F, GitlabError, Vector[EventInfo]] = {
     val params = Vector(
       wrap(since).map(_.toDateStr).map("after".eqParam(_)),
       wrap(until).map(_.toDateStr).map("before".eqParam(_)),
@@ -31,14 +31,14 @@ trait EventsAPI[F[_]] {
 
   // @see: https://docs.gitlab.com/ee/api/events.html#get-user-contribution-events
   def getUserContributionEvents(
-                                 userId: BigInt,
-                                 since: UtcDate = null,
-                                 until: UtcDate = null,
-                                 targetType: TargetType = null,
-                                 action: ActionType = null,
-                                 paging: Paging = AllPages,
-                                 sort: Sorting[EventsSort] = null,
-                               ): EitherT[F, GitlabError, Vector[EventInfo]] = {
+      userId: BigInt,
+      since: UtcDate = null,
+      until: UtcDate = null,
+      targetType: TargetType = null,
+      action: ActionType = null,
+      paging: Paging = AllPages,
+      sort: Sorting[EventsSort] = null,
+  ): EitherT[F, GitlabError, Vector[EventInfo]] = {
     val params = Vector(
       wrap(since).map(_.toDateStr).map("after".eqParam(_)),
       wrap(until).map(_.toDateStr).map("before".eqParam(_)),

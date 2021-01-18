@@ -18,8 +18,15 @@ val commonSettings = Seq(
     Resolver.bintrayRepo("morgaroth", "maven"),
   ),
   scalacOptions ++= Seq(
-    "-unchecked", "-deprecation", "-encoding", "utf8", "-Xfatal-warnings", "-feature",
-    "-language:higherKinds", "-language:postfixOps", "-language:implicitConversions",
+    "-unchecked",
+    "-deprecation",
+    "-encoding",
+    "utf8",
+    "-Xfatal-warnings",
+    "-feature",
+    "-language:higherKinds",
+    "-language:postfixOps",
+    "-language:implicitConversions",
     "-Ywarn-unused:imports",
     "-P:silencer:checkUnused",
   ) ++ {
@@ -27,15 +34,13 @@ val commonSettings = Seq(
   },
   libraryDependencies ++= Seq(
     compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
-    "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
+    "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full,
   ) ++ {
-    if (scalaVersion.value.startsWith("2.12")) Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)) else Seq.empty
+    if (scalaVersion.value.startsWith("2.12")) Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full))
+    else Seq.empty
   },
-
   logBuffered := false,
-
   testOptions in Test += Tests.Filter(suiteName => !suiteName.endsWith("ISpec")),
-
   sources in doc := Seq.empty,
   // Bintray
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
@@ -47,51 +52,54 @@ val core = project
   .settings(
     name := "gitlab4s-core",
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-core" % "2.3.1",
-      "io.circe" %% "circe-core" % circeVersion,
-      "io.circe" %% "circe-generic" % circeVersion,
-      "io.circe" %% "circe-parser" % circeVersion,
-      "io.circe" %% "circe-generic-extras" % circeExtVersion,
-      "com.typesafe" % "config" % "1.4.1",
-      "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
+      "org.typelevel"              %% "cats-core"            % "2.3.1",
+      "io.circe"                   %% "circe-core"           % circeVersion,
+      "io.circe"                   %% "circe-generic"        % circeVersion,
+      "io.circe"                   %% "circe-parser"         % circeVersion,
+      "io.circe"                   %% "circe-generic-extras" % circeExtVersion,
+      "com.typesafe"                % "config"               % "1.4.1",
+      "com.typesafe.scala-logging" %% "scala-logging"        % "3.9.2",
       //      "org.wickedsource" % "diffparser" % "1.0",
       //      "io.github.java-diff-utils" % "java-diff-utils" % "4.5",
       "org.scalatest" %% "scalatest" % "3.2.3" % Test,
-    )
+    ),
   )
 
-val sttp = project.in(file("sttp")).dependsOn(core)
+val sttp = project
+  .in(file("sttp"))
+  .dependsOn(core)
   .settings(commonSettings: _*)
   .settings(
     name := "gitlab4s-sttp",
     libraryDependencies ++= Seq(
-      "com.softwaremill.sttp.client" %% "core" % "2.0.0-RC6",
-      "org.scalatest" %% "scalatest" % "3.2.3" % Test,
-      "ch.qos.logback" % "logback-classic" % "1.2.3" % Test,
-    )
+      "com.softwaremill.sttp.client" %% "core"            % "2.0.0-RC6",
+      "org.scalatest"                %% "scalatest"       % "3.2.3" % Test,
+      "ch.qos.logback"                % "logback-classic" % "1.2.3" % Test,
+    ),
   )
 
-val akka = project.in(file("akka-http")).dependsOn(core)
+val akka = project
+  .in(file("akka-http"))
+  .dependsOn(core)
   .settings(commonSettings: _*)
   .settings(
     name := "gitlab4s-akka-http",
     libraryDependencies ++= Seq(
-
-    )
+    ),
   )
 
-val gitlab4s = project.in(file(".")).aggregate(core, sttp, akka)
+val gitlab4s = project
+  .in(file("."))
+  .aggregate(core, sttp, akka)
   .settings(
     name := "gitlab4s",
     publish := {},
     publishLocal := {},
     crossScalaVersions := crossScalaVersionsValues,
-
     validate := Def.sequential {
       Test / test
       // tut.value
     }.value,
-
     // Release
     releaseTagComment := s"Releasing ${(version in ThisBuild).value} [skip ci]",
     releaseCommitMessage := s"Setting version to ${(version in ThisBuild).value} [skip ci]",

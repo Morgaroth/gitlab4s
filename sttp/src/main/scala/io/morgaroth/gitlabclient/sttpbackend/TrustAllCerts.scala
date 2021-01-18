@@ -20,7 +20,6 @@ object TrustAllCerts {
     sc.init(null, trustManagers, new SecureRandom)
     HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory)
 
-
     // Create all-trusting host name verifier
     val allHostsValid = new HostnameVerifier {
       def verify(hostname: String, session: SSLSession) = true

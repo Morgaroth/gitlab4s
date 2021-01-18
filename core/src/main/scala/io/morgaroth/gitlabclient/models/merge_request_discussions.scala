@@ -18,7 +18,7 @@ object NoteTypes extends EnumMarshallingGlue[NoteType] {
 
   case object DiscussionNote extends NoteType("DiscussionNote")
 
-  val all: Seq[NoteType] = Seq(DiffNote, DiscussionNote)
+  val all: Seq[NoteType]            = Seq(DiffNote, DiscussionNote)
   val byName: Map[String, NoteType] = all.map(x => x.name -> x).toMap
 
   override def rawValue: NoteType => String = _.name
@@ -39,88 +39,97 @@ object NoteableTypes extends EnumMarshallingGlue[NoteableType] {
 
   case object Issue extends NoteableType("Issue")
 
-  val all: Seq[NoteableType] = Seq(MergeRequest, Commit, Issue)
+  val all: Seq[NoteableType]            = Seq(MergeRequest, Commit, Issue)
   val byName: Map[String, NoteableType] = all.map(x => x.name -> x).toMap
 
   override def rawValue: NoteableType => String = _.name
 }
 
 case class NotePosition(
-                         base_sha: Option[String], // not sure in what case
-                         start_sha: String,
-                         head_sha: String,
-                         old_path: String,
-                         new_path: String,
-                         position_type: String,
-                         old_line: Option[Int],
-                         new_line: Option[Int],
-                       )
+    base_sha: Option[String], // not sure in what case
+    start_sha: String,
+    head_sha: String,
+    old_path: String,
+    new_path: String,
+    position_type: String,
+    old_line: Option[Int],
+    new_line: Option[Int],
+)
 
 object NotePosition {
   implicit val NotePositionDecoder: Decoder[NotePosition] = deriveDecoder[NotePosition]
 }
 
 case class MergeRequestNote(
-                             id: BigInt,
-                             `type`: Option[NoteType], // not present for system "new commits added..." etc, DiffNote when MR comment
-                             body: String,
-                             author: GitlabUser,
-                             created_at: ZonedDateTime,
-                             updated_at: ZonedDateTime,
-                             system: Boolean,
-                             noteable_type: NoteableType,
-                             noteable_id: Option[BigInt], // when noteable_type is commit
-                             noteable_iid: Option[BigInt], // when noteable_type is commit
-                             position: Option[NotePosition], // not present for system "new commits added..." etc, present when MR comment
-                             resolvable: Boolean,
-                             resolved: Option[Boolean], // not present for system "new commits added..." etc, present when MR comment
-                             resolved_by: Option[GitlabUser],
-                           )
+    id: BigInt,
+    `type`: Option[NoteType], // not present for system "new commits added..." etc, DiffNote when MR comment
+    body: String,
+    author: GitlabUser,
+    created_at: ZonedDateTime,
+    updated_at: ZonedDateTime,
+    system: Boolean,
+    noteable_type: NoteableType,
+    noteable_id: Option[BigInt],    // when noteable_type is commit
+    noteable_iid: Option[BigInt],   // when noteable_type is commit
+    position: Option[NotePosition], // not present for system "new commits added..." etc, present when MR comment
+    resolvable: Boolean,
+    resolved: Option[Boolean], // not present for system "new commits added..." etc, present when MR comment
+    resolved_by: Option[GitlabUser],
+)
 
 object MergeRequestNote {
   implicit val MergeRequestNoteDecoder: Decoder[MergeRequestNote] = deriveDecoder[MergeRequestNote]
 }
 
 case class MergeRequestNoteCreate(
-                                   body: String,
-                                 )
+    body: String,
+)
 
 object MergeRequestNoteCreate {
   implicit val MergeRequestNoteCreateEncoder: Encoder[MergeRequestNoteCreate] = deriveEncoder[MergeRequestNoteCreate]
 }
 
 case class MergeRequestDiscussion(
-                                   id: String,
-                                   individual_note: Boolean,
-                                   notes: Vector[MergeRequestNote]
-                                 )
+    id: String,
+    individual_note: Boolean,
+    notes: Vector[MergeRequestNote],
+)
 
 object MergeRequestDiscussion {
   implicit val MergeRequestDiscussionDecoder: Decoder[MergeRequestDiscussion] = deriveDecoder[MergeRequestDiscussion]
 }
 
 case class NewThreadPosition(
-                              base_sha: String,
-                              start_sha: String,
-                              head_sha: String,
-                              position_type: String,
-                              new_path: String,
-                              old_path: String,
-                              new_line: Option[Int],
-                              old_line: Option[Int],
-                            )
+    base_sha: String,
+    start_sha: String,
+    head_sha: String,
+    position_type: String,
+    new_path: String,
+    old_path: String,
+    new_line: Option[Int],
+    old_line: Option[Int],
+)
 
 object NewThreadPosition {
   implicit val NewThreadPositionEncoder: Encoder[NewThreadPosition] = deriveEncoder[NewThreadPosition]
 
   def apply(shaRefs: DiffRefs, change: FileDiff, newLine: Option[Int], oldLine: Option[Int]): NewThreadPosition =
-    new NewThreadPosition(shaRefs.base_sha.get, shaRefs.start_sha, shaRefs.head_sha.get, "text", change.new_path, change.old_path, newLine, oldLine)
+    new NewThreadPosition(
+      shaRefs.base_sha.get,
+      shaRefs.start_sha,
+      shaRefs.head_sha.get,
+      "text",
+      change.new_path,
+      change.old_path,
+      newLine,
+      oldLine,
+    )
 }
 
 case class CreateMRDiscussion(
-                               body: String,
-                               position: Option[NewThreadPosition],
-                             )
+    body: String,
+    position: Option[NewThreadPosition],
+)
 
 object CreateMRDiscussion {
   implicit val createMRDiscussionEncoder: Encoder[CreateMRDiscussion] = deriveEncoder[CreateMRDiscussion]
@@ -135,10 +144,10 @@ object CreateMRDiscussion {
     CreateMRDiscussion(body, Some(NewThreadPosition(diff, change, None, Some(line))))
 }
 
-case class MRDiscussionUpdate private(
-                                       body: Option[String],
-                                       resolved: Option[Boolean],
-                                     )
+case class MRDiscussionUpdate private (
+    body: Option[String],
+    resolved: Option[Boolean],
+)
 
 object MRDiscussionUpdate {
   implicit val MRDiscussionUpdateEncoder: Encoder[MRDiscussionUpdate] = deriveEncoder[MRDiscussionUpdate]

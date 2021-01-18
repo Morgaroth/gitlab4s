@@ -12,20 +12,17 @@ trait HelperClasses {
   this: ScalaFutures =>
 
   implicit class RightValueable[E, V](either: Either[E, V]) {
-    def rightValue: V = {
+    def rightValue: V =
       either.valueOr(_ => fail(s"either is $either"))
-    }
   }
 
   implicit class execable[E, V](either: EitherT[Future, E, V]) {
 
-    def exec(): V = {
+    def exec(): V =
       either.value.futureValue.rightValue
-    }
 
-    def exec(t: Timeout): V = {
+    def exec(t: Timeout): V =
       either.value.futureValue(t).rightValue
-    }
   }
 
 }

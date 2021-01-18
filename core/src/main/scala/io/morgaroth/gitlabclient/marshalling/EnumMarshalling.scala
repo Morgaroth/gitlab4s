@@ -15,13 +15,11 @@ object EnumMarshalling {
     Codec.from(decoder, encoder)
   }
 
-  def stringEnumCodecFor[A: ClassTag](possibleValues: Seq[A])(encode: A => String): Codec[A] = {
+  def stringEnumCodecFor[A: ClassTag](possibleValues: Seq[A])(encode: A => String): Codec[A] =
     stringEnumCodecFor[A](possibleValues.map(x => encode(x) -> x).toMap)(encode)
-  }
 
-  def stringEnumCodecOf[A: ClassTag](handler: EnumMarshallingGlue[A]): Codec[A] = {
+  def stringEnumCodecOf[A: ClassTag](handler: EnumMarshallingGlue[A]): Codec[A] =
     stringEnumCodecFor[A](handler.byName)(handler.rawValue)
-  }
 }
 
 trait EnumMarshallingGlue[T] {

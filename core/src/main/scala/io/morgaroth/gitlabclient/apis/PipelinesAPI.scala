@@ -13,19 +13,19 @@ trait PipelinesAPI[F[_]] {
 
   // @see: https://docs.gitlab.com/ee/api/pipelines.html#list-project-pipelines
   def getProjectPipelines(
-                           projectId: EntityId,
-                           ref: String = null,
-                           sha: String = null,
-                           scope: PipelineScope = null,
-                           status: PipelineStatus = null,
-                           yamlErrors: Option[Boolean] = None,
-                           name: String = null,
-                           username: String = null,
-                           updatedAfter: ZonedDateTime = null,
-                           updatedBefore: ZonedDateTime = null,
-                           sort: Sorting[PipelinesSort] = null,
-                           paging: Paging = AllPages,
-                         ): EitherT[F, GitlabError, Vector[PipelineShort]] = {
+      projectId: EntityId,
+      ref: String = null,
+      sha: String = null,
+      scope: PipelineScope = null,
+      status: PipelineStatus = null,
+      yamlErrors: Option[Boolean] = None,
+      name: String = null,
+      username: String = null,
+      updatedAfter: ZonedDateTime = null,
+      updatedBefore: ZonedDateTime = null,
+      sort: Sorting[PipelinesSort] = null,
+      paging: Paging = AllPages,
+  ): EitherT[F, GitlabError, Vector[PipelineShort]] = {
 
     val params = Vector(
       wrap(ref).map("ref".eqParam(_)),
@@ -46,15 +46,19 @@ trait PipelinesAPI[F[_]] {
   // @see: https://docs.gitlab.com/ee/api/pipelines.html#get-a-single-pipeline
   def getPipeline(projectId: EntityId, pipelineId: BigInt): EitherT[F, GitlabError, PipelineFullInfo] = {
     implicit val rId: RequestId = RequestId.newOne("get-pipeline-by-id")
-    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/pipelines/$pipelineId")
+    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/pipelines/$pipelineId")
     invokeRequest(req).unmarshall[PipelineFullInfo]
   }
 
   // @see: https://docs.gitlab.com/ee/api/jobs.html#list-pipeline-jobs
-  def getPipelineJobs(projectId: EntityId, pipelineId: BigInt, scope: Set[JobScope] = null): EitherT[F, GitlabError, Vector[JobFullInfo]] = {
+  def getPipelineJobs(
+      projectId: EntityId,
+      pipelineId: BigInt,
+      scope: Set[JobScope] = null,
+  ): EitherT[F, GitlabError, Vector[JobFullInfo]] = {
     implicit val rId: RequestId = RequestId.newOne("get-pipeline-jobs")
-    val params = wrap(scope).flatMap(_.map(sc => "scope[]".eqParam(sc.name)))
-    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/pipelines/$pipelineId/jobs", params)
+    val params                  = wrap(scope).flatMap(_.map(sc => "scope[]".eqParam(sc.name)))
+    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/pipelines/$pipelineId/jobs", params)
     invokeRequest(req).unmarshall[Vector[JobFullInfo]]
   }
 }

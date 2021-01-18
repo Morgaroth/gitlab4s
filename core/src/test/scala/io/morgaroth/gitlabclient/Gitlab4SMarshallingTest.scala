@@ -36,7 +36,7 @@ class Gitlab4SMarshallingTest extends AnyFlatSpec with Matchers with Gitlab4SMar
   }
 
   val mergeRequestsSearch = Table("merge requests search") ++ Seq(
-    "global-mr-search-result-1.json"
+    "global-mr-search-result-1.json",
   )
   it should "parse merge requests search" in {
     forAll(mergeRequestsSearch) { resourceName =>

@@ -12,16 +12,18 @@ import io.morgaroth.gitlabclient.query._
 
 import java.time.ZonedDateTime
 
-trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling
-  with EmojiAwardsAPI[F]
-  with TagsAPI[F]
-  with MergeRequestsAPI[F]
-  with EventsAPI[F]
-  with DeploymentsAPI[F]
-  with JobsAPI[F]
-  with PipelinesAPI[F]
-  with ProjectsAPI[F]
-  with CommitsAPI[F] {
+trait GitlabRestAPI[F[_]]
+    extends LazyLogging
+    with Gitlab4SMarshalling
+    with EmojiAwardsAPI[F]
+    with TagsAPI[F]
+    with MergeRequestsAPI[F]
+    with EventsAPI[F]
+    with DeploymentsAPI[F]
+    with JobsAPI[F]
+    with PipelinesAPI[F]
+    with ProjectsAPI[F]
+    with CommitsAPI[F] {
 
   type GitlabResponseT[A] = EitherT[F, GitlabError, A]
 
@@ -33,9 +35,8 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling
 
   protected val reqGen = RequestGenerator(config)
 
-  protected def invokeRequest(request: GitlabRequest)(implicit requestId: RequestId): EitherT[F, GitlabError, String] = {
+  protected def invokeRequest(request: GitlabRequest)(implicit requestId: RequestId): EitherT[F, GitlabError, String] =
     invokeRequestRaw(request).map(_.payload)
-  }
 
   protected def invokeRequestRaw(request: GitlabRequest)(implicit requestId: RequestId): EitherT[F, GitlabError, GitlabResponse[String]]
 
@@ -43,7 +44,7 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling
 
   def getCurrentUser: GitlabResponseT[GitlabFullUser] = {
     implicit val rId: RequestId = RequestId.newOne("get-current-user")
-    val req = reqGen.get(API + "/user")
+    val req                     = reqGen.get(API + "/user")
     invokeRequest(req).unmarshall[GitlabFullUser]
   }
 
@@ -54,18 +55,21 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling
   }
 
   // @see: https://docs.gitlab.com/ee/api/search.html#scope-merge_requests-1
-  private def groupGlobalSearch(groupId: EntityId, scope: SearchScope, phrase: Option[String])
-                               (implicit rId: RequestId) = {
+  private def groupGlobalSearch(groupId: EntityId, scope: SearchScope, phrase: Option[String])(implicit rId: RequestId) = {
     val req = reqGen.get(s"$API/groups/${groupId.toStringId}/search", scope.toParam, phrase.map(Search).getOrElse(NoParam))
     invokeRequest(req)
   }
 
   protected def renderParams(
-                              myReaction: String, search: String, state: MergeRequestState,
-                              updatedBefore: ZonedDateTime, updatedAfter: ZonedDateTime,
-                              createdBefore: ZonedDateTime, createdAfter: ZonedDateTime,
-                              sort: Sorting[MergeRequestsSort],
-                            ): Vector[ParamQuery] = {
+      myReaction: String,
+      search: String,
+      state: MergeRequestState,
+      updatedBefore: ZonedDateTime,
+      updatedAfter: ZonedDateTime,
+      createdBefore: ZonedDateTime,
+      createdAfter: ZonedDateTime,
+      sort: Sorting[MergeRequestsSort],
+  ): Vector[ParamQuery] = {
     Vector(
       wrap(sort).flatMap(s => List("order_by".eqParam(s.field.property), "sort".eqParam(s.direction.toString))),
       wrap(myReaction).map("my_reaction_emoji".eqParam),
@@ -87,24 +91,26 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling
 
   // @see: https://docs.gitlab.com/ee/api/branches.html#list-repository-branches
   def getBranches(projectID: EntityId, searchTerm: Option[String]): GitlabResponseT[Vector[GitlabBranchInfo]] = {
-    val req = reqGen.get(s"$API/projects/${projectID.toStringId}/repository/branches",
-      searchTerm.map(ParamQuery.search).getOrElse(NoParam)
-    )
+    val req = reqGen.get(s"$API/projects/${projectID.toStringId}/repository/branches", searchTerm.map(ParamQuery.search).getOrElse(NoParam))
     getAllPaginatedResponse[GitlabBranchInfo](req, "merge-requests-per-project", AllPages)
   }
 
-  protected def getAllPaginatedResponse[A: Decoder](req: GitlabRequest, kind: String, paging: Paging): EitherT[F, GitlabError, Vector[A]] = {
+  protected def getAllPaginatedResponse[A: Decoder](
+      req: GitlabRequest,
+      kind: String,
+      paging: Paging,
+  ): EitherT[F, GitlabError, Vector[A]] = {
 
     val pageSize = paging match {
-      case PageCount(_, pageSize) => pageSize
+      case PageCount(_, pageSize)              => pageSize
       case EntitiesCount(count) if count < 100 => count
-      case _ => 100
+      case _                                   => 100
     }
 
     val entitiesLimit = paging match {
-      case PageCount(pagesCount, pageSize) => pageSize * pagesCount
+      case PageCount(pagesCount, pageSize)      => pageSize * pagesCount
       case EntitiesCount(expectedEntitiesCount) => expectedEntitiesCount
-      case _ => Int.MaxValue
+      case _                                    => Int.MaxValue
     }
 
     def getAll(pageNo: Int, pageSizeEff: Int, acc: Vector[A]): EitherT[F, GitlabError, Vector[A]] = {
@@ -114,14 +120,14 @@ trait GitlabRestAPI[F[_]] extends LazyLogging with Gitlab4SMarshalling
 
       def nextPageHeaders(headers: Map[String, String]): Option[(Int, Int)] = for {
         nextPageNum <- headers.get("X-Next-Page").filter(_.nonEmpty).map(_.toInt)
-        perPage <- headers.get("X-Per-Page").filter(_.nonEmpty).map(_.toInt)
+        perPage     <- headers.get("X-Per-Page").filter(_.nonEmpty).map(_.toInt)
       } yield (nextPageNum, perPage)
 
       for {
-        result <- resp.unmarshall[Vector[A]]
+        result      <- resp.unmarshall[Vector[A]]
         respHeaders <- resp.map(_.headers)
         currentResult = acc ++ result
-        nextPageInfo = nextPageHeaders(respHeaders).map(x => x._1 -> math.min(x._2, entitiesLimit - currentResult.length)).filter(_._2 > 0)
+        nextPageInfo  = nextPageHeaders(respHeaders).map(x => x._1 -> math.min(x._2, entitiesLimit - currentResult.length)).filter(_._2 > 0)
         res <- nextPageInfo.map(p => getAll(p._1, p._2, currentResult)).getOrElse(EitherT.pure[F, GitlabError](currentResult))
       } yield res
     }
