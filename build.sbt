@@ -82,9 +82,22 @@ val sttpsync = project
     ) ++ testDeps
   )
 
+val sttpzio = project
+  .in(file("sttp-zio"))
+  .dependsOn(core)
+  .settings(commonSettings: _*)
+  .settings(
+    name := "gitlab4s-sttp-zio",
+    libraryDependencies ++= Seq(
+      "com.softwaremill.sttp.client3" %% "core" % "3.0.0",
+      "com.softwaremill.sttp.client3" %% "httpclient-backend-zio" % "3.0.0",
+      "dev.zio" %% "zio-interop-cats" % "2.2.0.1",
+    ) ++ testDeps
+  )
+
 val gitlab4s = project
   .in(file("."))
-  .aggregate(core, sttpsync)
+  .aggregate(core, sttpsync, sttpzio)
   .settings(
     name := "gitlab4s",
     publish := {},

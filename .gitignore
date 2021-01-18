@@ -4,6 +4,7 @@
 /project/target
 /core/target
 /sttp-sync/target
+/sttp-zio/target
 /.ivy2
 /.sbt
 /.ssh
