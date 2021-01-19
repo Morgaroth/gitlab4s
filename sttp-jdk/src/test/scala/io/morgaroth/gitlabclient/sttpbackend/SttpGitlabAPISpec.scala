@@ -11,7 +11,7 @@ class SttpGitlabAPISpec extends AnyFlatSpec with Matchers {
 
   val apiToken = maybeAccessToken.get
   val cfg      = GitlabConfig(apiToken, "https://gitlab.com")
-  val client   = new SttpGitlabAPI(cfg, GitlabRestAPIConfig())
+  val client   = new SttpGitlabAPISync(cfg, GitlabRestAPIConfig())
 
   "SttpGitlabAPI" should "fetch current user" in {
     val result = client.getCurrentUser.value

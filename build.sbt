@@ -70,12 +70,12 @@ val core = project
     ) ++ testDeps
   )
 
-val sttpsync = project
-  .in(file("sttp-sync"))
+val sttpjdk = project
+  .in(file("sttp-jdk"))
   .dependsOn(core)
   .settings(commonSettings: _*)
   .settings(
-    name := "gitlab4s-sttp-sync",
+    name := "gitlab4s-sttp",
     libraryDependencies ++= Seq(
       "com.softwaremill.sttp.client3" %% "core" % "3.0.0",
       "com.softwaremill.sttp.client3" %% "httpclient-backend" % "3.0.0"
@@ -84,7 +84,7 @@ val sttpsync = project
 
 val gitlab4s = project
   .in(file("."))
-  .aggregate(core, sttpsync)
+  .aggregate(core, sttpjdk)
   .settings(
     name := "gitlab4s",
     publish := {},
