@@ -7,7 +7,7 @@ val validate = Def.taskKey[Unit]("Validates entire project")
 
 val projectScalaVersion = "2.13.4"
 //val projectScalaVersion = "3.0.0-M3"
-val crossScalaVersionsValues = Seq("2.12.12", projectScalaVersion)
+val crossScalaVersionsValues = Seq(projectScalaVersion, "2.12.12")
 
 val commonSettings = Seq(
   organization := "io.morgaroth",
@@ -47,6 +47,12 @@ val commonSettings = Seq(
   bintrayVcsUrl := Some("https://gitlab.com/morgaroth/gitlab4s.git"),
 )
 
+val testDeps = Seq(
+  "org.scalatest" %% "scalatest-flatspec" % "3.2.3" % Test,
+  "org.scalatest" %% "scalatest-shouldmatchers" % "3.2.3" % Test,
+  "ch.qos.logback" % "logback-classic" % "1.2.3" % Test,
+)
+
 val core = project
   .settings(commonSettings: _*)
   .settings(
@@ -61,36 +67,24 @@ val core = project
       "com.typesafe.scala-logging" %% "scala-logging"        % "3.9.2",
       //      "org.wickedsource" % "diffparser" % "1.0",
       //      "io.github.java-diff-utils" % "java-diff-utils" % "4.5",
-      "org.scalatest" %% "scalatest" % "3.2.3" % Test,
-    ),
+    ) ++ testDeps
   )
 
-val sttp = project
-  .in(file("sttp"))
+val sttpsync = project
+  .in(file("sttp-sync"))
   .dependsOn(core)
   .settings(commonSettings: _*)
   .settings(
-    name := "gitlab4s-sttp",
+    name := "gitlab4s-sttp-sync",
     libraryDependencies ++= Seq(
-      "com.softwaremill.sttp.client" %% "core"            % "2.0.0-RC6",
-      "org.scalatest"                %% "scalatest"       % "3.2.3" % Test,
-      "ch.qos.logback"                % "logback-classic" % "1.2.3" % Test,
-    ),
-  )
-
-val akka = project
-  .in(file("akka-http"))
-  .dependsOn(core)
-  .settings(commonSettings: _*)
-  .settings(
-    name := "gitlab4s-akka-http",
-    libraryDependencies ++= Seq(
-    ),
+      "com.softwaremill.sttp.client3" %% "core" % "3.0.0",
+      "com.softwaremill.sttp.client3" %% "httpclient-backend" % "3.0.0"
+    ) ++ testDeps
   )
 
 val gitlab4s = project
   .in(file("."))
-  .aggregate(core, sttp, akka)
+  .aggregate(core, sttpsync)
   .settings(
     name := "gitlab4s",
     publish := {},

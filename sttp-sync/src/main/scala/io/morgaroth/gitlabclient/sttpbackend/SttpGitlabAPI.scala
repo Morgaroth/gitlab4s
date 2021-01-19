@@ -2,29 +2,26 @@ package io.morgaroth.gitlabclient.sttpbackend
 
 import cats.Monad
 import cats.data.EitherT
-import cats.instances.future.catsStdInstancesForFuture
 import cats.syntax.either._
 import com.typesafe.scalalogging.{LazyLogging, Logger}
 import io.morgaroth.gitlabclient._
 import io.morgaroth.gitlabclient.query.Methods.Get
 import io.morgaroth.gitlabclient.query.{GitlabRequest, GitlabResponse}
 import org.slf4j.LoggerFactory
-import sttp.client._
+import sttp.client3._
+import sttp.client3.httpclient.HttpClientSyncBackend
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-class SttpGitlabAPI(val config: GitlabConfig, apiConfig: GitlabRestAPIConfig)(implicit ex: ExecutionContext)
-    extends GitlabRestAPI[Future]
-    with LazyLogging {
+class SttpGitlabAPI(val config: GitlabConfig, apiConfig: GitlabRestAPIConfig) extends GitlabRestAPI[cats.Id] with LazyLogging {
 
-  override val m: Monad[Future] = implicitly[Monad[Future]]
+  override val m: Monad[cats.Id] = cats.catsInstancesForId
   if (config.ignoreSslErrors) {
     TrustAllCerts.configure()
   }
 
-  implicit val backend: SttpBackend[Try, Nothing, NothingT] = TryHttpURLConnectionBackend()
-  private val requestsLogger                                = Logger(LoggerFactory.getLogger(getClass.getPackage.getName + ".requests"))
+  val backend: SttpBackend[Identity, Any] = HttpClientSyncBackend()
+  private val requestsLogger              = Logger(LoggerFactory.getLogger(getClass.getPackage.getName + ".requests"))
 
   private def logRequest[T](request: RequestT[Identity, Either[String, T], Nothing], requestData: GitlabRequest)(implicit
       requestId: RequestId,
@@ -38,11 +35,9 @@ class SttpGitlabAPI(val config: GitlabConfig, apiConfig: GitlabRestAPIConfig)(im
   }
 
   private def execReq[T](
-      request: RequestT[Identity, Either[String, T], Nothing],
+      request: RequestT[Identity, Either[String, T], Any],
   )(implicit requestId: RequestId): Either[GitlabError, (Map[String, String], T)] = {
-    request
-      .send()
-      .toEither
+    Try(request.send(backend)).toEither
       .leftMap[GitlabError](GitlabRequestingError("try-http-backend-left", requestId.id, _))
       .flatMap { response =>
         if (apiConfig.debug) logger.debug(s"received response: $response")
@@ -76,22 +71,22 @@ class SttpGitlabAPI(val config: GitlabConfig, apiConfig: GitlabRestAPIConfig)(im
 
   override def byteRequest(
       requestData: GitlabRequest,
-  )(implicit requestId: RequestId): EitherT[Future, GitlabError, GitlabResponse[Array[Byte]]] = {
+  )(implicit requestId: RequestId): EitherT[cats.Id, GitlabError, GitlabResponse[Array[Byte]]] = {
     val request = createReq(requestData).response(asByteArray)
     logRequest(request, requestData)
     val response = execReq(request).map(x => GitlabResponse(x._1, x._2))
-    EitherT.fromEither[Future](response)
+    EitherT.fromEither[Identity](response)
   }
 
   override def invokeRequestRaw(
       requestData: GitlabRequest,
-  )(implicit requestId: RequestId): EitherT[Future, GitlabError, GitlabResponse[String]] = {
+  )(implicit requestId: RequestId): EitherT[cats.Id, GitlabError, GitlabResponse[String]] = {
     val request = createReq(requestData)
       .header("Accept", "application/json")
 
     logRequest(request, requestData)
 
     val response = execReq(request).map(x => GitlabResponse(x._1, x._2))
-    EitherT.fromEither[Future](response)
+    EitherT.fromEither[cats.Id](response)
   }
 }
