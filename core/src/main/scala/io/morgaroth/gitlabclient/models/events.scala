@@ -3,19 +3,6 @@ package io.morgaroth.gitlabclient.models
 import cats.syntax.either._
 import io.circe.{Codec, Decoder, DecodingFailure}
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
-import io.morgaroth.gitlabclient.models.ActionName.{
-  Accepted,
-  Closed,
-  CommentedOn,
-  Created,
-  Deleted,
-  Joined,
-  Leaved,
-  Opened,
-  PushedNew,
-  PushedTo,
-  RemovedDueToExpiry,
-}
 import io.morgaroth.gitlabclient.models.ResponseTargetType.{DiffNote, DiscussionNote, Issue, MergeRequest, Note}
 
 import java.time.ZonedDateTime
@@ -72,6 +59,8 @@ sealed abstract class ActionName(val name: String) extends Product with Serializ
 
 object ActionName extends EnumMarshallingGlue[ActionName] {
 
+  case object Approved extends ActionName("approved")
+
   case object Created extends ActionName("created")
 
   case object Joined extends ActionName("joined")
@@ -94,8 +83,8 @@ object ActionName extends EnumMarshallingGlue[ActionName] {
 
   case object RemovedDueToExpiry extends ActionName("removed due to membership expiration from")
 
-  val all                             = Seq(Created, Joined, Leaved, PushedTo, PushedNew, Opened, CommentedOn, Accepted, Closed, Deleted, RemovedDueToExpiry)
-  val byName: Map[String, ActionName] = all.map(x => x.name -> x).toMap
+  val all    = Seq(Approved, Created, Joined, Leaved, PushedTo, PushedNew, Opened, CommentedOn, Accepted, Closed, Deleted, RemovedDueToExpiry)
+  val byName = all.map(x => x.name -> x).toMap
 
   override def rawValue: ActionName => String = _.name
 
@@ -116,8 +105,8 @@ object ResponseTargetType extends EnumMarshallingGlue[ResponseTargetType] {
 
   final case object Issue extends ResponseTargetType("Issue")
 
-  val all                                     = Seq(MergeRequest, DiffNote, DiscussionNote, Note, Issue)
-  val byName: Map[String, ResponseTargetType] = all.map(x => x.name -> x).toMap
+  val all    = Seq(MergeRequest, DiffNote, DiscussionNote, Note, Issue)
+  val byName = all.map(x => x.name -> x).toMap
 
   override def rawValue: ResponseTargetType => String = _.name
 
@@ -130,9 +119,9 @@ object PushData {
 
   import io.circe.generic.semiauto._
 
-  implicit val BranchPushDataCirceCodec: Decoder[BranchPushData] = deriveDecoder[BranchPushData]
-  implicit val BranchTagCreatedCirceCodec: Decoder[RefCreated]   = deriveDecoder[RefCreated]
-  implicit val RefRemovedCirceCodec: Decoder[RefRemoved]         = deriveDecoder[RefRemoved]
+  implicit val BranchPushDataCirceCodec: Decoder[RefPushData]  = deriveDecoder[RefPushData]
+  implicit val BranchTagCreatedCirceCodec: Decoder[RefCreated] = deriveDecoder[RefCreated]
+  implicit val RefRemovedCirceCodec: Decoder[RefRemoved]       = deriveDecoder[RefRemoved]
 
   implicit val buildCauseDecoder: Decoder[PushData] = Decoder.instance { cursor =>
     val actionField  = cursor.downField("action").as[String]
@@ -140,7 +129,8 @@ object PushData {
     actionField.flatMap(a => refTypeField.map(a -> _)).flatMap {
       case ("created", "branch") => cursor.as[RefCreated]
       case ("created", "tag")    => cursor.as[RefCreated]
-      case ("pushed", "branch")  => cursor.as[BranchPushData]
+      case ("pushed", "branch")  => cursor.as[RefPushData]
+      case ("pushed", "tag")     => cursor.as[RefPushData]
       case ("removed", "branch") => cursor.as[RefRemoved]
       case ("removed", "tag")    => cursor.as[RefRemoved]
       case unknown =>
@@ -149,7 +139,7 @@ object PushData {
   }
 }
 
-case class BranchPushData(
+case class RefPushData(
     commit_count: Int,
     action: String,
     ref_type: String,
@@ -262,8 +252,8 @@ case class IssueEvent(
 ) extends EventInfo
 
 object EventInfo {
-
   import io.circe.generic.semiauto._
+  import io.morgaroth.gitlabclient.models.ActionName._
 
   implicit val GitlabUserCirceCodec: Decoder[GitlabUser]                   = deriveDecoder[GitlabUser]
   implicit val PushedEventInfoCirceCodec: Decoder[PushedEventInfo]         = deriveDecoder[PushedEventInfo]
@@ -278,11 +268,11 @@ object EventInfo {
     val actionField = cursor.downField("action_name").as[ActionName]
     val targetType  = cursor.downField("target_type").as[Option[ResponseTargetType]]
     actionField.flatMap(a => targetType.map(a -> _)).flatMap {
-      case (Created | Joined | Leaved | RemovedDueToExpiry, None) => cursor.as[ProjectCreatedEvent]
-      case (PushedTo | PushedNew | Deleted, None)                 => cursor.as[PushedEventInfo]
-      case (Opened | Accepted | Closed, Some(MergeRequest))       => cursor.as[MREventInfo]
-      case (Opened | Closed, Some(Issue))                         => cursor.as[IssueEvent]
-      case (CommentedOn, Some(DiffNote | Note | DiscussionNote))  => cursor.as[DiffNoteEvent]
+      case (Created | Joined | Leaved | RemovedDueToExpiry, None)      => cursor.as[ProjectCreatedEvent]
+      case (PushedTo | PushedNew | Deleted, None)                      => cursor.as[PushedEventInfo]
+      case (Approved | Opened | Accepted | Closed, Some(MergeRequest)) => cursor.as[MREventInfo]
+      case (Opened | Closed, Some(Issue))                              => cursor.as[IssueEvent]
+      case (CommentedOn, Some(DiffNote | Note | DiscussionNote))       => cursor.as[DiffNoteEvent]
       case unknown =>
         DecodingFailure(s"unknown mapping for action_name & target_type: $unknown for EventInfo object", cursor.history).asLeft
     }

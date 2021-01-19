@@ -226,9 +226,9 @@ class PrivateGitlabAPISpec extends AnyFlatSpec with Matchers with ScalaFutures w
   }
 
   it should "read events" in {
-    val startTime = UtcDate.of(ZonedDateTime.of(2020, 5, 1, 12, 0, 0, 0, ZoneOffset.ofHours(1)))
+    val startTime = UtcDate.of(ZonedDateTime.of(2020, 10, 1, 12, 0, 0, 0, ZoneOffset.ofHours(1)))
     //    val endTime   = ZonedDateTime.of(2020, 7, 3, 17, 0, 0, 0, ZoneOffset.ofHours(2))
-    val result = client.getEvents(startTime, action = ActionTypes.Commented).exec()
+    val result = client.getEvents(startTime, sort = Sorting(EventsSort.CreatedAt, Desc)).exec()
 
     result.foreach(println)
   }
