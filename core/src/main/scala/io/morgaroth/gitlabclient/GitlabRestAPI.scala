@@ -118,10 +118,13 @@ trait GitlabRestAPI[F[_]]
 
       val resp = invokeRequestRaw(req.withParams(pageSizeEff.pageSizeParam, pageNo.pageNumParam))
 
-      def nextPageHeaders(headers: Map[String, String]): Option[(Int, Int)] = for {
-        nextPageNum <- headers.get("X-Next-Page").filter(_.nonEmpty).map(_.toInt)
-        perPage     <- headers.get("X-Per-Page").filter(_.nonEmpty).map(_.toInt)
-      } yield (nextPageNum, perPage)
+      def nextPageHeaders(headers: Map[String, String]): Option[(Int, Int)] = {
+        val lowercased = headers.map(x => x._1.toLowerCase -> x._2)
+        for {
+          nextPageNum <- lowercased.get("x-next-page").filter(_.nonEmpty).map(_.toInt)
+          perPage     <- lowercased.get("x-per-page").filter(_.nonEmpty).map(_.toInt)
+        } yield (nextPageNum, perPage)
+      }
 
       for {
         result      <- resp.unmarshall[Vector[A]]
