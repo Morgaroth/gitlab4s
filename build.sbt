@@ -48,9 +48,9 @@ val commonSettings = Seq(
 )
 
 val testDeps = Seq(
-  "org.scalatest" %% "scalatest-flatspec" % "3.2.3" % Test,
+  "org.scalatest" %% "scalatest-flatspec"       % "3.2.3" % Test,
   "org.scalatest" %% "scalatest-shouldmatchers" % "3.2.3" % Test,
-  "ch.qos.logback" % "logback-classic" % "1.2.3" % Test,
+  "ch.qos.logback" % "logback-classic"          % "1.2.3" % Test,
 )
 
 val core = project
@@ -67,7 +67,7 @@ val core = project
       "com.typesafe.scala-logging" %% "scala-logging"        % "3.9.2",
       //      "org.wickedsource" % "diffparser" % "1.0",
       //      "io.github.java-diff-utils" % "java-diff-utils" % "4.5",
-    ) ++ testDeps
+    ) ++ testDeps,
   )
 
 val sttpjdk = project
@@ -77,14 +77,25 @@ val sttpjdk = project
   .settings(
     name := "gitlab4s-sttp",
     libraryDependencies ++= Seq(
+      "com.softwaremill.sttp.client3" %% "core"               % "3.0.0",
+      "com.softwaremill.sttp.client3" %% "httpclient-backend" % "3.0.0",
+    ) ++ testDeps,
+  )
+
+val sttptry = project
+  .in(file("sttp-try"))
+  .dependsOn(core)
+  .settings(commonSettings: _*)
+  .settings(
+    name := "gitlab4s-sttp-try",
+    libraryDependencies ++= Seq(
       "com.softwaremill.sttp.client3" %% "core" % "3.0.0",
-      "com.softwaremill.sttp.client3" %% "httpclient-backend" % "3.0.0"
-    ) ++ testDeps
+    ) ++ testDeps,
   )
 
 val gitlab4s = project
   .in(file("."))
-  .aggregate(core, sttpjdk)
+  .aggregate(core, sttpjdk, sttptry)
   .settings(
     name := "gitlab4s",
     publish := {},
