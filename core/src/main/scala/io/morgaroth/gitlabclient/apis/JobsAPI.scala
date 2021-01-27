@@ -2,11 +2,33 @@ package io.morgaroth.gitlabclient.apis
 
 import cats.data.EitherT
 import io.morgaroth.gitlabclient.apis.RawResponse.stringContentTypes
+import io.morgaroth.gitlabclient.models.JobFullInfo
 import io.morgaroth.gitlabclient.query.GitlabResponse
 import io.morgaroth.gitlabclient.{EntityId, GitlabError, GitlabRestAPI, RequestId}
 
 trait JobsAPI[F[_]] {
   this: GitlabRestAPI[F] =>
+
+  // @see: https://docs.gitlab.com/ee/api/jobs.html#get-a-single-job
+  def getJob(projectId: EntityId, jobId: BigInt): EitherT[F, GitlabError, JobFullInfo] = {
+    implicit val rId: RequestId = RequestId.newOne("get-pipeline-job-by-id")
+    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/jobs/$jobId")
+    invokeRequest(req).unmarshall[JobFullInfo]
+  }
+
+  // @see: https://docs.gitlab.com/ee/api/jobs.html#cancel-a-job
+  def cancelJob(projectId: EntityId, jobId: BigInt): EitherT[F, GitlabError, JobFullInfo] = {
+    implicit val rId: RequestId = RequestId.newOne("cancel-pipeline-job")
+    val req                     = reqGen.post(s"$API/projects/${projectId.toStringId}/jobs/$jobId/cancel")
+    invokeRequest(req).unmarshall[JobFullInfo]
+  }
+
+  // @see: https://docs.gitlab.com/ee/api/jobs.html#cancel-a-job
+  def retryJob(projectId: EntityId, jobId: BigInt): EitherT[F, GitlabError, JobFullInfo] = {
+    implicit val rId: RequestId = RequestId.newOne("retry-pipeline-job")
+    val req                     = reqGen.post(s"$API/projects/${projectId.toStringId}/jobs/$jobId/retry")
+    invokeRequest(req).unmarshall[JobFullInfo]
+  }
 
   // @see: https://docs.gitlab.com/ee/api/jobs.html#download-a-single-artifact-file-by-job-id
   def downloadSingleFileFromJobArtifact(

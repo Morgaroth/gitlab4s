@@ -237,6 +237,15 @@ class PrivateGitlabAPISpec extends AnyFlatSpec with Matchers with LazyLogging wi
     val result = client.getPipelineJobs(16568, 846230).exec()
   }
 
+  it should "return jobs by id" in {
+    val pipelines = client.getProjectPipelines(16568, paging = EntitiesCount(200)).exec()
+    pipelines
+      .foreach { x =>
+        val pipelineJobs = client.getPipelineJobs(16568, x.id).exec()
+        pipelineJobs.foreach(y => client.getJob(16568, y.id).exec())
+      }
+  }
+
   it should "fetch artifact" in {
     val data = client.downloadJobArtifacts(16568, 3589070).exec()
     println(data.filename)

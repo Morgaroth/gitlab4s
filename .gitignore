@@ -4,6 +4,7 @@
 /project/target
 /core/target
 /sttp-jdk/target
+/sttp-try/target
 /.ivy2
 /.sbt
 /.ssh

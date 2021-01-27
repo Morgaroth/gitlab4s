@@ -74,10 +74,25 @@ case class JobFullInfo(
     pipeline: PipelineShort,
     web_url: String,
     artifacts: Vector[PipelineArtifactSimple],
-    // runner: ??
+    runner: Option[JobRunner],
     artifacts_expire_at: Option[ZonedDateTime],
 )
 
 object JobFullInfo {
   implicit val JobFullInfoDecoder: Decoder[JobFullInfo] = deriveDecoder[JobFullInfo]
+}
+
+case class JobRunner(
+    id: BigInt,
+    description: String,
+    ip_address: String,
+    active: Boolean,
+    is_shared: Boolean,
+    name: String,
+    online: Boolean,
+    status: String,
+)
+
+object JobRunner {
+  implicit val JobRunnerDecoder: Decoder[JobRunner] = deriveDecoder[JobRunner]
 }
