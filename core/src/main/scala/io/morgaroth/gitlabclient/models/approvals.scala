@@ -111,4 +111,5 @@ object CreateMergeRequestApprovalRule {
 
   def oneOf(name: String, userId: BigInt*): CreateMergeRequestApprovalRule =
     new CreateMergeRequestApprovalRule(name, 1, None, Some(userId.toVector), None)
+
 }

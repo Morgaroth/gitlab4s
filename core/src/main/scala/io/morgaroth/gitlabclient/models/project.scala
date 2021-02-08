@@ -338,4 +338,5 @@ case class EditProjectRequest private (
       .map { case (k, v) => k -> v.asString.getOrElse(v.toString()) }
       .mkString("ProjectUpdates(", ", ", ")")
   }
+
 }

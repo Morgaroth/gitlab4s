@@ -92,4 +92,5 @@ class SttpGitlabAPIFuture(val config: GitlabConfig, apiConfig: GitlabRestAPIConf
     val response = execReq(request).map(x => GitlabResponse(x._1, x._2))
     response
   }
+
 }

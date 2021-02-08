@@ -27,4 +27,5 @@ class SttpGitlabAPITryFuture(val config: GitlabConfig, apiConfig: GitlabRestAPIC
       requestData: GitlabRequest,
   )(implicit requestId: RequestId): EitherT[Future, GitlabError, GitlabResponse[String]] =
     EitherT(Try(tryBackend.invokeRequestRaw(requestData).value).toEither.fold(Future.failed, Future.successful))
+
 }

@@ -90,4 +90,5 @@ class SttpGitlabAPITry(val config: GitlabConfig, apiConfig: GitlabRestAPIConfig)
     val response = execReq(request).map(x => GitlabResponse(x._1, x._2))
     EitherT.fromEither[cats.Id](response)
   }
+
 }

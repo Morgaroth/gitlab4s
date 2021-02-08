@@ -32,6 +32,7 @@ class Obfuscate extends AnyFlatSpec with Matchers with Gitlab4SMarshalling {
     "deletions",
     "total",
   ).map(x => s""""$x"""")
+
   val staticOverrides = Set(
     """"project_id": 111""",
     """"target_id": 111""",
@@ -69,6 +70,7 @@ class Obfuscate extends AnyFlatSpec with Matchers with Gitlab4SMarshalling {
     "commit_title",
     "target_title",
   )
+
   val branchFields = Set("ref", "source_branch", "target_branch", "reference")
   val numberFields = Set(
     "id",
@@ -82,6 +84,7 @@ class Obfuscate extends AnyFlatSpec with Matchers with Gitlab4SMarshalling {
     "target_iid",
     "author_id",
   )
+
   val dateFields         = Set("created_at", "updated_at", "authored_date", "committed_date", "created_at", "started_at", "finished_at")
   val shaFields          = Set("base_sha", "sha", "start_sha", "head_sha", "id", "short_id", "commit_from", "commit_to")
   val urlFields          = Set("avatar_url", "web_url")
@@ -180,4 +183,5 @@ class Obfuscate extends AnyFlatSpec with Matchers with Gitlab4SMarshalling {
     val p2 = Vector.fill(3)(branchNameChars.apply(rand.nextInt(branchNameChars.length))).mkString
     s"$p1.$p2"
   }
+
 }

@@ -25,6 +25,7 @@ object ParamQuery {
   implicit class fromSorting[A <: SortingFamily](sc: Sorting[A]) {
     def toParams: List[ParamQuery] =
       List("order_by".eqParam(sc.field.property), "sort".eqParam(sc.direction.toString))
+
   }
 
   implicit class fromString(paramName: String) {
@@ -83,6 +84,7 @@ case class GitlabRequest(server: String, method: Method, path: String, query: Ve
       s"$base?${query.map(_.render).mkString("&")}"
     } else base
   }
+
 }
 
 case class RequestGenerator(cfg: GitlabConfig) {
@@ -109,6 +111,7 @@ case class RequestGenerator(cfg: GitlabConfig) {
 
   def put(path: String, data: String): GitlabRequest =
     GitlabRequest(cfg.server, Methods.Put, path, Vector.empty, Some(data))
+
 }
 
 case class GitlabResponse[T](headers: Map[String, String], payload: T)

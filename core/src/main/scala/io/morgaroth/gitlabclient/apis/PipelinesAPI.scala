@@ -61,4 +61,5 @@ trait PipelinesAPI[F[_]] {
     val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/pipelines/$pipelineId/jobs", params)
     invokeRequest(req).unmarshall[Vector[JobFullInfo]]
   }
+
 }

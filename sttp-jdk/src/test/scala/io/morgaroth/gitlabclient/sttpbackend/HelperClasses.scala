@@ -10,6 +10,7 @@ trait HelperClasses {
   implicit class RightValueable[E, V](either: Either[E, V]) {
     def rightValue: V =
       either.valueOr(_ => fail(s"either is $either"))
+
   }
 
   implicit class execable[E, V](either: EitherT[cats.Id, E, V]) {
@@ -19,6 +20,7 @@ trait HelperClasses {
 
     def exec(t: Timeout): V =
       either.value.rightValue
+
   }
 
 }

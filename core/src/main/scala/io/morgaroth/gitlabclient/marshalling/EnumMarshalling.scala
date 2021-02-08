@@ -20,6 +20,7 @@ object EnumMarshalling {
 
   def stringEnumCodecOf[A: ClassTag](handler: EnumMarshallingGlue[A]): Codec[A] =
     stringEnumCodecFor[A](handler.byName)(handler.rawValue)
+
 }
 
 trait EnumMarshallingGlue[T] {

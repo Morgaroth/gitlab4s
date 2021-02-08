@@ -13,4 +13,5 @@ package object sttptrybackend {
       case _              => ???
     }
   }
+
 }

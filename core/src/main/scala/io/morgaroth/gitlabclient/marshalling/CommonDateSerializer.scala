@@ -12,6 +12,7 @@ trait CommonDateSerializer {
   implicit def datetimePrinter(d: ZonedDateTime): {} = new {
     def dateString: String = print(d)
   }
+
 }
 
 object CommonDateSerializer extends CommonDateSerializer

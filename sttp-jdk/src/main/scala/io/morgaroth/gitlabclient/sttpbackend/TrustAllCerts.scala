@@ -27,4 +27,5 @@ object TrustAllCerts {
     // Install the all-trusting host verifier
     HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid)
   }
+
 }

@@ -63,4 +63,5 @@ trait CommitsAPI[F[_]] {
     val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$commitSha/refs")
     invokeRequest(req).unmarshall[Vector[CommitReference]]
   }
+
 }

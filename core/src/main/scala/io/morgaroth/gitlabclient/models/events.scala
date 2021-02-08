@@ -137,6 +137,7 @@ object PushData {
         DecodingFailure(s"unknown combination of push_data.action&ref_type: $unknown for push data object", cursor.history).asLeft
     }
   }
+
 }
 
 case class RefPushData(
@@ -277,4 +278,5 @@ object EventInfo {
         DecodingFailure(s"unknown mapping for action_name & target_type: $unknown for EventInfo object", cursor.history).asLeft
     }
   }
+
 }

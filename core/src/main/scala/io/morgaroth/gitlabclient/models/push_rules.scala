@@ -69,6 +69,7 @@ case class EditPushRuleRequest private (
       .map { case (k, v) => k -> v.asString.getOrElse(v.toString()) }
       .mkString("PushRulesUpdates(", ", ", ")")
   }
+
 }
 
 object EditPushRuleRequest {

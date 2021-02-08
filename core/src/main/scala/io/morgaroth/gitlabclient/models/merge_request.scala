@@ -51,6 +51,7 @@ object MergeStatus extends EnumMarshallingGlue[MergeStatus] {
     Unchecked,
     CannotBeMergedRecheck,
   )
+
   val byName: Map[String, MergeStatus] = all.map(x => x.name -> x).toMap
 
   override def rawValue: MergeStatus => String = _.name

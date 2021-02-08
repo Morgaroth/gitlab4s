@@ -18,4 +18,5 @@ object GitlabConfig {
     config.getString("server"),
     Try(config.getBoolean("ignore-ssl-errors")).getOrElse(false),
   )
+
 }

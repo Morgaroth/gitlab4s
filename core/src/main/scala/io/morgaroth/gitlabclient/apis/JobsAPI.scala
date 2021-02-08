@@ -77,6 +77,7 @@ object RawResponse {
       )
     RawResponse(contentType, contentEncoding, resp.payload, fileName)
   }
+
 }
 
 case class RawResponse(contentType: String, contentEncoding: Option[String], payload: Array[Byte], filename: Option[String]) {
@@ -86,4 +87,5 @@ case class RawResponse(contentType: String, contentEncoding: Option[String], pay
       new String(payload, contentEncoding.getOrElse("utf-8")),
       new IllegalArgumentException(s"$contentType is not a string one"),
     )
+
 }

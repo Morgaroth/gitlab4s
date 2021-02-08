@@ -124,6 +124,7 @@ object NewThreadPosition {
       newLine,
       oldLine,
     )
+
 }
 
 case class CreateMRDiscussion(
@@ -142,6 +143,7 @@ object CreateMRDiscussion {
 
   def threadOnOldLine(diff: DiffRefs, change: FileDiff, line: Int, body: String): CreateMRDiscussion =
     CreateMRDiscussion(body, Some(NewThreadPosition(diff, change, None, Some(line))))
+
 }
 
 case class MRDiscussionUpdate private (
@@ -157,4 +159,5 @@ object MRDiscussionUpdate {
 
   def body(newValue: String): MRDiscussionUpdate =
     MRDiscussionUpdate(Some(newValue), None)
+
 }

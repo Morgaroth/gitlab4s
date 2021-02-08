@@ -15,6 +15,7 @@ class Gitlab4SMarshallingTest extends AnyFlatSpec with Matchers with Gitlab4SMar
   val currentUserInfoTable = Table(heading = "current_user_info") ++ Seq(
     "current_user_info.json",
   )
+
   it should "parse full user info" in {
     forAll(currentUserInfoTable) { resourceName =>
       val result = MJson.read[GitlabFullUser](Source.fromResource(resourceName).mkString)
@@ -28,6 +29,7 @@ class Gitlab4SMarshallingTest extends AnyFlatSpec with Matchers with Gitlab4SMar
     "merge_requests_list_3.json",
     "merge_requests_list_4.json",
   )
+
   it should "parse merge requests list" in {
     forAll(mergeRequests) { resourceName =>
       val result = MJson.read[Vector[MergeRequestInfo]](Source.fromResource(resourceName).mkString)
@@ -38,6 +40,7 @@ class Gitlab4SMarshallingTest extends AnyFlatSpec with Matchers with Gitlab4SMar
   val mergeRequestsSearch = Table("merge requests search") ++ Seq(
     "global-mr-search-result-1.json",
   )
+
   it should "parse merge requests search" in {
     forAll(mergeRequestsSearch) { resourceName =>
       val result = MJson.read[Vector[MergeRequestInfo]](Source.fromResource(resourceName).mkString)
@@ -67,6 +70,7 @@ class Gitlab4SMarshallingTest extends AnyFlatSpec with Matchers with Gitlab4SMar
     "approvals_of_mr_1.json",
     "approvals_of_mr_2.json",
   )
+
   it should "parse approvals list" in {
     forAll(approvalsListTable) { resourceName =>
       val result = MJson.read[MergeRequestApprovals](Source.fromResource(resourceName).mkString)
@@ -78,6 +82,7 @@ class Gitlab4SMarshallingTest extends AnyFlatSpec with Matchers with Gitlab4SMar
     "merge_request_notes_list_1.json",
     "merge_request_notes_list_2.json",
   )
+
   it should "parse merge request's notes list" in {
     forAll(mergeRequestNotesListTable) { resourceName =>
       val result = MJson.read[Vector[MergeRequestNote]](Source.fromResource(resourceName).mkString)
@@ -89,6 +94,7 @@ class Gitlab4SMarshallingTest extends AnyFlatSpec with Matchers with Gitlab4SMar
     "approval_rules_of_mr_1.json",
     "approval_rules_of_mr_2.json",
   )
+
   it should "parse merge request's approval rules" in {
     forAll(mergeRequestApprovalRules) { resourceName =>
       val result = MJson.read[Vector[MergeRequestApprovalRule]](Source.fromResource(resourceName).mkString)
@@ -99,6 +105,7 @@ class Gitlab4SMarshallingTest extends AnyFlatSpec with Matchers with Gitlab4SMar
     "project_deployments_1.json",
     "project_deployments_2.json",
   )
+
   it should "parse project's deployments list" in {
     forAll(deploymentsList) { resourceName =>
       val result = MJson.read[Vector[DeploymentInfo]](Source.fromResource(resourceName).mkString)
@@ -112,6 +119,7 @@ class Gitlab4SMarshallingTest extends AnyFlatSpec with Matchers with Gitlab4SMar
     "events_3.json",
     "events_4.json",
   )
+
   it should "parse events" in {
     forAll(events) { resourceName =>
       val result = MJson.read[Vector[EventInfo]](Source.fromResource(resourceName).mkString)
