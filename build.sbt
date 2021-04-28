@@ -1,5 +1,4 @@
-val circeVersion = "0.13.0"
-//val circeVersion = "0.14.3-M3"
+val circeVersion    = "0.13.0"
 val circeExtVersion = "0.13.0"
 val silencerVersion = "1.7.1"
 
@@ -12,6 +11,7 @@ val commonSettings = Seq(
   organization := "io.morgaroth",
   scalaVersion := projectScalaVersion,
   crossScalaVersions := crossScalaVersionsValues,
+  versionScheme := Some("semver-spec"),
   publishTo := Some("Mateusz Jaje JFrog Artifactory" at "https://mateuszjajedev.jfrog.io/artifactory/maven"),
   credentials += Credentials(file(sys.env.getOrElse("JFROG_CREDENTIALS_FILE", ".credentials"))),
   resolvers += "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/",
@@ -38,8 +38,8 @@ val commonSettings = Seq(
     else Seq.empty
   },
   logBuffered := false,
-  testOptions in Test += Tests.Filter(suiteName => !suiteName.endsWith("ISpec")),
-  sources in doc := Seq.empty,
+  Test / testOptions += Tests.Filter(suiteName => !suiteName.endsWith("ISpec")),
+  doc / sources := Seq.empty,
   publishMavenStyle := false,
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
 )
@@ -103,8 +103,8 @@ val gitlab4s = project
       // tut.value
     }.value,
     // Release
-    releaseTagComment := s"Releasing ${(version in ThisBuild).value} [skip ci]",
-    releaseCommitMessage := s"Setting version to ${(version in ThisBuild).value} [skip ci]",
-    releaseNextCommitMessage := s"Setting version to ${(version in ThisBuild).value} [skip ci]",
+    releaseTagComment := s"Releasing ${(ThisBuild / version).value} [skip ci]",
+    releaseCommitMessage := s"Setting version to ${(ThisBuild / version).value} [skip ci]",
+    releaseNextCommitMessage := s"Setting version to ${(ThisBuild / version).value} [skip ci]",
     releaseCrossBuild := true,
   )
