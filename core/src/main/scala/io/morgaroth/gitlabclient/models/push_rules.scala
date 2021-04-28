@@ -1,29 +1,30 @@
 package io.morgaroth.gitlabclient.models
 
-import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
-import io.circe.{Decoder, Encoder}
+import io.circe.generic.semiauto.{deriveCodec, deriveEncoder}
+import io.circe.{Codec, Encoder}
+import io.morgaroth.gitlabclient.maintenance.MissingPropertiesLogger
 
 import java.time.ZonedDateTime
 
 case class PushRules(
     id: BigInt,
     project_id: BigInt,
-    commit_message_regex: String,
+    commit_message_regex: Option[String],
     commit_message_negative_regex: Option[String],
     branch_name_regex: Option[String],
-    deny_delete_tag: Boolean,
+    deny_delete_tag: Option[Boolean],
     created_at: ZonedDateTime,
     member_check: Boolean,
     prevent_secrets: Boolean,
-    author_email_regex: String,
-    file_name_regex: String,
+    author_email_regex: Option[String],
+    file_name_regex: Option[String],
     max_file_size: Int,
     commit_committer_check: Option[Boolean], // premium gitlab users
     reject_unsigned_commits: Option[Boolean],// premium gitlab users
 )
 
 object PushRules {
-  implicit val PushRulesDecoder: Decoder[PushRules] = deriveDecoder[PushRules]
+  implicit val PushRulesCodec: Codec[PushRules] = MissingPropertiesLogger.loggingCodec(deriveCodec[PushRules])
 }
 
 case class EditPushRuleRequest private (

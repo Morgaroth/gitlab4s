@@ -4,26 +4,36 @@ import cats.Monad
 import cats.data.EitherT
 import cats.syntax.either._
 import io.circe._
-import io.circe.parser.decode
+import io.circe.parser.{decode, parse}
 import io.circe.syntax.EncoderOps
 import io.morgaroth.gitlabclient._
+import io.morgaroth.gitlabclient.maintenance.MissingPropertiesLogger
 import io.morgaroth.gitlabclient.query.GitlabResponse
 
 import java.time.ZonedDateTime
 
 trait Gitlab4SMarshalling {
 
-  implicit class Extractable(value: JsonObject) {
-    def extract[T](implicit decoder: Decoder[T]): Either[Error, T] = decode[T](value.toString)
-  }
-
   implicit val zonedDateTimeCodec: Codec[ZonedDateTime] = Codec.from(Decoder.decodeZonedDateTime, Encoder.encodeZonedDateTime)
 
   object MJson {
     def read[T: Decoder](str: String): Either[Error, T] = decode[T](str)
 
+    def loggingDecode[A](input: String, id: RequestId)(implicit decoder: Decoder[A]): Either[Error, A] =
+      parse(input)
+        .leftMap(_.asInstanceOf[Error])
+        .flatMap { data =>
+          val cursor: HCursor = HCursor.fromJson(data)
+          decoder match {
+            case loggingDecoder: MissingPropertiesLogger[A] => loggingDecoder.apply(cursor, id)
+            case _                                          => decoder.apply(cursor)
+          }
+        }
+
     def readT[F[_]: Monad, T: Decoder](str: String)(implicit requestId: RequestId): EitherT[F, GitlabError, T] =
-      EitherT.fromEither(read[T](str).leftMap[GitlabError](e => GitlabUnmarshallingError(e.getMessage, requestId.id, e)))
+      EitherT.fromEither(
+        loggingDecode[T](str, requestId).leftMap[GitlabError](e => GitlabUnmarshallingError(e.getMessage, requestId.id, e)),
+      )
 
     def write[T: Encoder](value: T): String       = Printer.noSpaces.copy(dropNullValues = true).print(value.asJson)
     def encode[T: Encoder](value: T): Json        = value.asJson

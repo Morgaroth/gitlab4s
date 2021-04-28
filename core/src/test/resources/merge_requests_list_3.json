@@ -23,7 +23,7 @@
     "source_branch": "LANvvNA7tu4Cl4lCtNnxkXFnfJnjCOv5dBVHFYbI",
     "user_notes_count": 10,
     "upvotes": 0,
-    "downvotes": 0,
+    "downvotes": 0, "reviewers": [],
     "assignee": null,
     "author": {
       "id": 111,
@@ -90,7 +90,7 @@
     "source_branch": "LANvvNA7tu4Cl4lCtNnxkXFnfJnjCOv5dBVHFYbI",
     "user_notes_count": 117,
     "upvotes": 0,
-    "downvotes": 0,
+    "downvotes": 0, "reviewers": [],
     "assignee": {
       "id": 111,
       "name": "Niki McCoy",

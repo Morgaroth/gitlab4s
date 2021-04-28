@@ -31,6 +31,43 @@ class Obfuscate extends AnyFlatSpec with Matchers with Gitlab4SMarshalling {
     "additions",
     "deletions",
     "total",
+    "resolve_outdated_diff_discussions",
+    "container_registry_enabled",
+    "visibility",
+    "archived",
+    "merge_requests_enabled",
+    "wiki_enabled",
+    "jobs_enabled",
+    "snippets_enabled",
+    "service_desk_enabled",
+    "can_create_merge_request_in",
+    "issues_access_level",
+    "repository_access_level",
+    "merge_requests_access_level",
+    "forking_access_level",
+    "wiki_access_level",
+    "builds_access_level",
+    "pages_access_level",
+    "shared_runners_enabled",
+    "lfs_enabled",
+    "auto_devops_deploy_strategy",
+    "auto_devops_enabled",
+    "printing_merge_request_link_enabled",
+    "merge_method",
+    "packages_enabled",
+    "empty_repo",
+    "security_and_compliance_enabled",
+    "requirements_enabled",
+    "mirror",
+    "autoclose_referenced_issues",
+    "remove_source_branch_after_merge",
+    "restrict_user_defined_variables",
+    "only_allow_merge_if_pipeline_succeeds",
+    "analytics_access_level",
+    "operations_access_level",
+    "snippets_access_level",
+    "request_access_enabled",
+    "issues_enabled",
   ).map(x => s""""$x"""")
 
   val staticOverrides = Set(
@@ -38,11 +75,13 @@ class Obfuscate extends AnyFlatSpec with Matchers with Gitlab4SMarshalling {
     """"target_id": 111""",
     """"target_iid": 111""",
     """"author_id": 111""",
+    """"creator_id": 111""",
     """"id": 111""",
     """"noteable_id": 111""",
     """"noteable_iid": 111""",
     """"created_at": "1970-01-01T12:00:00.000+00:00"""",
     """"updated_at": "1970-01-01T12:00:00.000+00:00"""",
+    """"last_activity_at": "1970-01-01T12:00:00.000+00:00"""",
     """"commands_changes": {}""",
   )
 
@@ -69,9 +108,18 @@ class Obfuscate extends AnyFlatSpec with Matchers with Gitlab4SMarshalling {
     "organization",
     "commit_title",
     "target_title",
+    "name_with_namespace",
+    "path_with_namespace",
+    "build_coverage_regex",
+    "ci_config_path",
+    "auto_cancel_pending_pipelines",
+    "build_git_strategy",
+    "public_jobs",
+    "runners_token",
+    "import_status",
   )
 
-  val branchFields = Set("ref", "source_branch", "target_branch", "reference")
+  val branchFields = Set("ref", "source_branch", "target_branch", "reference", "default_branch")
   val numberFields = Set(
     "id",
     "project_id",
@@ -83,13 +131,15 @@ class Obfuscate extends AnyFlatSpec with Matchers with Gitlab4SMarshalling {
     "target_id",
     "target_iid",
     "author_id",
+    "forks_count",
+    "star_count",
   )
 
   val dateFields         = Set("created_at", "updated_at", "authored_date", "committed_date", "created_at", "started_at", "finished_at")
   val shaFields          = Set("base_sha", "sha", "start_sha", "head_sha", "id", "short_id", "commit_from", "commit_to")
-  val urlFields          = Set("avatar_url", "web_url")
-  val emailFields        = Set("author_email", "committer_email", "public_email")
-  val usernameFields     = Set("username", "author_username")
+  val urlFields          = Set("avatar_url", "web_url", "readme_url", "")
+  val emailFields        = Set("author_email", "committer_email", "public_email", "service_desk_address")
+  val usernameFields     = Set("username", "author_username", "http_url_to_repo", "ssh_url_to_repo")
   val fullUserNameFields = Set("author_name", "committer_name", "name")
   val filenameFields     = Set("filename")
   val ipFields           = Set("ip_address")
@@ -97,7 +147,7 @@ class Obfuscate extends AnyFlatSpec with Matchers with Gitlab4SMarshalling {
   val rand = new Random(new java.util.Random())
 
   it should "work" in {
-    val resourceName = "single_commit_1.json"
+    val resourceName = "project_info_1.json"
     val result       = Source.fromResource(resourceName).mkString
 
     val result1 = textFields.foldLeft(result) { case (data, name) =>

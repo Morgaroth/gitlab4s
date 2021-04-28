@@ -1,7 +1,7 @@
 package io.morgaroth.gitlabclient.models
 
-import io.circe.generic.semiauto.deriveDecoder
-import io.circe.{Codec, Decoder}
+import io.circe.Codec
+import io.circe.generic.semiauto.deriveCodec
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
 import java.time.ZonedDateTime
@@ -59,5 +59,5 @@ case class EmojiAward(
 )
 
 object EmojiAward {
-  implicit val EmojiAwardDecoder: Decoder[EmojiAward] = deriveDecoder[EmojiAward]
+  implicit val EmojiAwardCodec: Codec[EmojiAward] = deriveCodec[EmojiAward]
 }

@@ -1,7 +1,7 @@
 package io.morgaroth.gitlabclient.models
 
-import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
-import io.circe.{Codec, Decoder, Encoder}
+import io.circe.generic.semiauto.{deriveCodec, deriveEncoder}
+import io.circe.{Codec, Encoder}
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
 import java.time.ZonedDateTime
@@ -57,7 +57,7 @@ case class NotePosition(
 )
 
 object NotePosition {
-  implicit val NotePositionDecoder: Decoder[NotePosition] = deriveDecoder[NotePosition]
+  implicit val NotePositionCodec: Codec[NotePosition] = deriveCodec[NotePosition]
 }
 
 case class MergeRequestNote(
@@ -78,7 +78,7 @@ case class MergeRequestNote(
 )
 
 object MergeRequestNote {
-  implicit val MergeRequestNoteDecoder: Decoder[MergeRequestNote] = deriveDecoder[MergeRequestNote]
+  implicit val MergeRequestNoteCodec: Codec[MergeRequestNote] = deriveCodec[MergeRequestNote]
 }
 
 case class MergeRequestNoteCreate(
@@ -96,7 +96,7 @@ case class MergeRequestDiscussion(
 )
 
 object MergeRequestDiscussion {
-  implicit val MergeRequestDiscussionDecoder: Decoder[MergeRequestDiscussion] = deriveDecoder[MergeRequestDiscussion]
+  implicit val MergeRequestDiscussionCodec: Codec[MergeRequestDiscussion] = deriveCodec[MergeRequestDiscussion]
 }
 
 case class NewThreadPosition(

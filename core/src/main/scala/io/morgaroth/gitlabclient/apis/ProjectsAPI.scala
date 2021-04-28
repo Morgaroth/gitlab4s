@@ -1,5 +1,6 @@
 package io.morgaroth.gitlabclient.apis
 
+import cats.data.EitherT
 import cats.instances.vector._
 import cats.syntax.traverse._
 import io.morgaroth.gitlabclient._
@@ -56,6 +57,34 @@ trait ProjectsAPI[F[_]] {
     implicit val rId: RequestId = RequestId.newOne("create-project-push-rules")
     val req                     = reqGen.post(API + s"/projects/${projectId.toStringId}/push_rule", MJson.write(pushRules))
     invokeRequest(req).unmarshall[PushRules]
+  }
+
+  // @see: https://docs.gitlab.com/ee/api/merge_request_approvals.html#get-project-level-rules
+  def getProjectApprovalRules(projectId: EntityId): EitherT[F, GitlabError, Vector[ProjectApprovalRule]] = {
+    implicit val rId: RequestId = RequestId.newOne("get-project-approval-rules")
+    val req                     = reqGen.get(API + s"/projects/${projectId.toStringId}/approval_rules")
+    invokeRequest(req).unmarshall[Vector[ProjectApprovalRule]]
+  }
+
+  //  @see: https://docs.gitlab.com/ee/api/merge_request_approvals.html#create-project-level-rule
+  def createProjectApprovalRule(
+      projectId: EntityId,
+      payload: UpsertProjectApprovalRule,
+  ): EitherT[F, GitlabError, ProjectApprovalRule] = {
+    implicit val rId: RequestId = RequestId.newOne("create-project-approval-rule")
+    val req                     = reqGen.post(API + s"/projects/${projectId.toStringId}/approval_rules", MJson.write(payload))
+    invokeRequest(req).unmarshall[ProjectApprovalRule]
+  }
+
+  //  @see: https://docs.gitlab.com/ee/api/merge_request_approvals.html#update-project-level-rule
+  def updateProjectApprovalRule(
+      projectId: EntityId,
+      approvalRuleId: BigInt,
+      payload: UpsertProjectApprovalRule,
+  ): EitherT[F, GitlabError, ProjectApprovalRule] = {
+    implicit val rId: RequestId = RequestId.newOne("update-project-approval-rule")
+    val req                     = reqGen.put(API + s"/projects/${projectId.toStringId}/approval_rules/$approvalRuleId", MJson.write(payload))
+    invokeRequest(req).unmarshall[ProjectApprovalRule]
   }
 
 }

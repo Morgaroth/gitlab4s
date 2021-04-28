@@ -1,7 +1,8 @@
 package io.morgaroth.gitlabclient.models
 
-import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
-import io.circe.{Codec, Decoder, Encoder}
+import io.circe.generic.semiauto.{deriveCodec, deriveEncoder}
+import io.circe.{Codec, Encoder}
+import io.morgaroth.gitlabclient.maintenance.MissingPropertiesLogger
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
 import java.time.ZonedDateTime
@@ -12,7 +13,7 @@ case class ApprovedBy(
 )
 
 object ApprovedBy {
-  implicit val ApprovedByDecoder: Decoder[ApprovedBy] = deriveDecoder[ApprovedBy]
+  implicit val ApprovedByCodec: Codec[ApprovedBy] = deriveCodec[ApprovedBy]
 }
 
 sealed abstract class RuleType(val name: String) extends Product with Serializable
@@ -38,7 +39,7 @@ case class ApprovalRule(
 )
 
 object ApprovalRule {
-  implicit val ApprovalRuleDecoder: Decoder[ApprovalRule] = deriveDecoder[ApprovalRule]
+  implicit val ApprovalRuleCodec: Codec[ApprovalRule] = deriveCodec[ApprovalRule]
 }
 
 case class MergeRequestApprovals(
@@ -65,7 +66,7 @@ case class MergeRequestApprovals(
 )
 
 object MergeRequestApprovals {
-  implicit val MergeRequestApprovalsDecoder: Decoder[MergeRequestApprovals] = deriveDecoder[MergeRequestApprovals]
+  implicit val MergeRequestApprovalsCodec: Codec[MergeRequestApprovals] = deriveCodec[MergeRequestApprovals]
 }
 
 case class SourceApprovalRuleInfo(
@@ -73,7 +74,7 @@ case class SourceApprovalRuleInfo(
 )
 
 object SourceApprovalRuleInfo {
-  implicit val SourceApprovalRuleInfoDecoder: Decoder[SourceApprovalRuleInfo] = deriveDecoder[SourceApprovalRuleInfo]
+  implicit val SourceApprovalRuleInfoCodec: Codec[SourceApprovalRuleInfo] = deriveCodec[SourceApprovalRuleInfo]
 }
 
 case class MergeRequestApprovalRule(
@@ -89,7 +90,7 @@ case class MergeRequestApprovalRule(
 )
 
 object MergeRequestApprovalRule {
-  implicit val MergeRequestApprovalRuleDecoder: Decoder[MergeRequestApprovalRule] = deriveDecoder[MergeRequestApprovalRule]
+  implicit val MergeRequestApprovalRuleCodec: Codec[MergeRequestApprovalRule] = deriveCodec[MergeRequestApprovalRule]
 }
 
 case class MergeRequestApprovalRules(
@@ -112,4 +113,60 @@ object CreateMergeRequestApprovalRule {
   def oneOf(name: String, userId: BigInt*): CreateMergeRequestApprovalRule =
     new CreateMergeRequestApprovalRule(name, 1, None, Some(userId.toVector), None)
 
+}
+
+case class BranchProtectionEntry(
+    access_level: Int,
+    access_level_description: String,
+    user_id: Option[BigInt],
+    group_id: Option[BigInt],
+)
+
+object BranchProtectionEntry {
+  implicit val BranchProtectionEntryCodec: Codec[BranchProtectionEntry] =
+    MissingPropertiesLogger.loggingCodec(deriveCodec[BranchProtectionEntry])
+
+}
+
+case class ProtectedBranchesConfig(
+    id: BigInt,
+    name: String,
+    allow_force_push: Boolean,
+    code_owner_approval_required: Boolean,
+    merge_access_levels: Vector[BranchProtectionEntry],
+    push_access_levels: Vector[BranchProtectionEntry],
+    unprotect_access_levels: Vector[BranchProtectionEntry],
+)
+
+object ProtectedBranchesConfig {
+  implicit val ProtectedBranchesConfigCodec: Codec[ProtectedBranchesConfig] =
+    MissingPropertiesLogger.loggingCodec(deriveCodec[ProtectedBranchesConfig])
+
+}
+
+case class ProjectApprovalRule(
+    id: BigInt,
+    name: String,
+    rule_type: RuleType,
+    approvals_required: Int,
+    eligible_approvers: Vector[GitlabUser],
+    users: Vector[GitlabUser],
+    groups: Vector[GitlabGroup],
+    contains_hidden_groups: Boolean,
+    protected_branches: Vector[ProtectedBranchesConfig],
+)
+
+object ProjectApprovalRule {
+  implicit val ProjectApprovalRuleCodec: Codec[ProjectApprovalRule] = MissingPropertiesLogger.loggingCodec(deriveCodec[ProjectApprovalRule])
+}
+
+case class UpsertProjectApprovalRule(
+    name: String,
+    approvals_required: Int,
+    user_ids: Option[Vector[BigInt]],
+    group_ids: Option[Vector[BigInt]],
+)
+
+object UpsertProjectApprovalRule {
+  implicit val UpdateProjectApprovalRuleEncoder: Encoder[UpsertProjectApprovalRule] = deriveEncoder[UpsertProjectApprovalRule]
 }

@@ -123,4 +123,25 @@ class Gitlab4SMarshallingTest extends AnyFlatSpec with Matchers with Gitlab4SMar
       result shouldBe Symbol("right")
     }
   }
+
+  val projectApprovalRules = Table("project approval rules") ++ Seq(
+//    "approval_rules_of_project_1.json",
+  )
+
+  it should "parse project approval rules" in {
+    forAll(projectApprovalRules) { resourceName =>
+      val result = MJson.read[Vector[ProjectApprovalRule]](Source.fromResource(resourceName).mkString)
+      result shouldBe Symbol("right")
+    }
+  }
+  val projectInfos = Table("project infos") ++ Seq(
+//    "project_info_1.json",
+  )
+
+  it should "parse project info" in {
+    forAll(projectInfos) { resourceName =>
+      val result = MJson.read[ProjectInfo](Source.fromResource(resourceName).mkString)
+      result shouldBe Symbol("right")
+    }
+  }
 }

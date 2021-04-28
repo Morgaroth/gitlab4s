@@ -16,7 +16,7 @@
     "source_branch": "y2Jf5oqvSAm1gNxS0lMalwTsSfq37LM5t6ADXtXD",
     "user_notes_count": 4,
     "upvotes": 0,
-    "downvotes": 0,
+    "downvotes": 0, "reviewers": [],
     "assignee": null,
     "author": {
       "id": 111,
@@ -83,7 +83,7 @@
     "source_branch": "y2Jf5oqvSAm1gNxS0lMalwTsSfq37LM5t6ADXtXD",
     "user_notes_count": 0,
     "upvotes": 0,
-    "downvotes": 0,
+    "downvotes": 0, "reviewers": [],
     "assignee": null,
     "author": {
       "id": 111,
@@ -150,7 +150,7 @@
     "source_branch": "y2Jf5oqvSAm1gNxS0lMalwTsSfq37LM5t6ADXtXD",
     "user_notes_count": 0,
     "upvotes": 0,
-    "downvotes": 0,
+    "downvotes": 0, "reviewers": [],
     "assignee": null,
     "author": {
       "id": 111,
@@ -217,7 +217,7 @@
     "source_branch": "y2Jf5oqvSAm1gNxS0lMalwTsSfq37LM5t6ADXtXD",
     "user_notes_count": 0,
     "upvotes": 0,
-    "downvotes": 0,
+    "downvotes": 0, "reviewers": [],
     "assignee": null,
     "author": {
       "id": 111,
@@ -284,7 +284,7 @@
     "source_branch": "y2Jf5oqvSAm1gNxS0lMalwTsSfq37LM5t6ADXtXD",
     "user_notes_count": 1,
     "upvotes": 1,
-    "downvotes": 0,
+    "downvotes": 0, "reviewers": [],
     "assignee": {
       "id": 111,
       "name": "Felicia Lavelle",
@@ -367,7 +367,7 @@
     "source_branch": "y2Jf5oqvSAm1gNxS0lMalwTsSfq37LM5t6ADXtXD",
     "user_notes_count": 4,
     "upvotes": 0,
-    "downvotes": 0,
+    "downvotes": 0, "reviewers": [],
     "assignee": null,
     "author": {
       "id": 111,
@@ -434,7 +434,7 @@
     "source_branch": "y2Jf5oqvSAm1gNxS0lMalwTsSfq37LM5t6ADXtXD",
     "user_notes_count": 1,
     "upvotes": 0,
-    "downvotes": 0,
+    "downvotes": 0, "reviewers": [],
     "assignee": null,
     "author": {
       "id": 111,
@@ -501,7 +501,7 @@
     "source_branch": "y2Jf5oqvSAm1gNxS0lMalwTsSfq37LM5t6ADXtXD",
     "user_notes_count": 0,
     "upvotes": 1,
-    "downvotes": 0,
+    "downvotes": 0, "reviewers": [],
     "assignee": {
       "id": 111,
       "name": "Felicia Lavelle",
@@ -584,7 +584,7 @@
     "source_branch": "y2Jf5oqvSAm1gNxS0lMalwTsSfq37LM5t6ADXtXD",
     "user_notes_count": 0,
     "upvotes": 0,
-    "downvotes": 0,
+    "downvotes": 0, "reviewers": [],
     "assignee": null,
     "author": {
       "id": 111,
@@ -651,7 +651,7 @@
     "source_branch": "y2Jf5oqvSAm1gNxS0lMalwTsSfq37LM5t6ADXtXD",
     "user_notes_count": 0,
     "upvotes": 0,
-    "downvotes": 0,
+    "downvotes": 0, "reviewers": [],
     "assignee": null,
     "author": {
       "id": 111,
@@ -718,7 +718,7 @@
     "source_branch": "y2Jf5oqvSAm1gNxS0lMalwTsSfq37LM5t6ADXtXD",
     "user_notes_count": 0,
     "upvotes": 0,
-    "downvotes": 0,
+    "downvotes": 0, "reviewers": [],
     "assignee": null,
     "author": {
       "id": 111,
@@ -785,7 +785,7 @@
     "source_branch": "y2Jf5oqvSAm1gNxS0lMalwTsSfq37LM5t6ADXtXD",
     "user_notes_count": 0,
     "upvotes": 0,
-    "downvotes": 0,
+    "downvotes": 0, "reviewers": [],
     "assignee": null,
     "author": {
       "id": 111,
@@ -852,7 +852,7 @@
     "source_branch": "y2Jf5oqvSAm1gNxS0lMalwTsSfq37LM5t6ADXtXD",
     "user_notes_count": 0,
     "upvotes": 0,
-    "downvotes": 0,
+    "downvotes": 0, "reviewers": [],
     "assignee": null,
     "author": {
       "id": 111,

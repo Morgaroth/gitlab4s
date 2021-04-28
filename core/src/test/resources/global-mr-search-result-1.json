@@ -16,7 +16,7 @@
     "source_branch": "eZ6qpVYuGapHbr8fQnA0OUFZxCpVZikdCwKw9rcG",
     "user_notes_count": 18,
     "upvotes": 0,
-    "downvotes": 0,
+    "downvotes": 0, "reviewers": [],
     "assignee": {
       "id": 111,
       "name": "Dita MacIlroy",
@@ -92,7 +92,7 @@
     "source_branch": "eZ6qpVYuGapHbr8fQnA0OUFZxCpVZikdCwKw9rcG",
     "user_notes_count": 0,
     "upvotes": 0,
-    "downvotes": 0,
+    "downvotes": 0, "reviewers": [],
     "assignee": {
       "id": 111,
       "name": "Dita MacIlroy",
@@ -168,7 +168,7 @@
     "source_branch": "eZ6qpVYuGapHbr8fQnA0OUFZxCpVZikdCwKw9rcG",
     "user_notes_count": 6,
     "upvotes": 0,
-    "downvotes": 0,
+    "downvotes": 0, "reviewers": [],
     "assignee": {
       "id": 111,
       "name": "Dita MacIlroy",

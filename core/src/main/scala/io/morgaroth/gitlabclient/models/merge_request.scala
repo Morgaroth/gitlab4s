@@ -1,7 +1,7 @@
 package io.morgaroth.gitlabclient.models
 
-import io.circe.generic.semiauto.{deriveCodec, deriveDecoder, deriveEncoder}
-import io.circe.{Codec, Decoder, Encoder}
+import io.circe.generic.semiauto.{deriveCodec, deriveEncoder}
+import io.circe.{Codec, Encoder}
 import io.morgaroth.gitlabclient.maintenance.MissingPropertiesLogger
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
@@ -72,6 +72,28 @@ object ReferencesInfo {
   implicit val ReferencesInfoCodec: Codec[ReferencesInfo] = MissingPropertiesLogger.loggingCodec(deriveCodec[ReferencesInfo])
 }
 
+trait MergeRequestSimple {
+  def id: BigInt
+  def iid: BigInt
+  def project_id: BigInt
+  def title: String
+  def description: Option[String]
+  def state: MergeRequestState
+  def author: GitlabUser
+  def created_at: ZonedDateTime
+  def updated_at: ZonedDateTime
+  def merged_by: Option[GitlabUser]
+  def merged_at: Option[ZonedDateTime]
+  def closed_by: Option[GitlabUser]
+  def closed_at: Option[ZonedDateTime]
+  def target_branch: String
+  def source_branch: String
+  def source_project_id: BigInt
+  def target_project_id: BigInt
+  def references: ReferencesInfo
+  def web_url: String
+}
+
 case class MergeRequestInfo(
     id: BigInt,
     iid: BigInt,
@@ -114,10 +136,14 @@ case class MergeRequestInfo(
     blocking_discussions_resolved: Option[Boolean],
     web_url: String,
     task_completion_status: TaskStatus,
-)
+    milestone: Option[String],
+    reviewers: Vector[GitlabUser],
+    approvals_before_merge: Option[Int],
+    time_stats: TimeStats,
+) extends MergeRequestSimple
 
 object MergeRequestInfo {
-  implicit val MergeRequestInfoDecoder: Decoder[MergeRequestInfo] = deriveDecoder[MergeRequestInfo]
+  implicit val MergeRequestInfoCodec: Codec[MergeRequestInfo] = MissingPropertiesLogger.loggingCodec(deriveCodec[MergeRequestInfo])
 }
 
 case class UpdateMRPayload(
@@ -211,7 +237,7 @@ case class MergeRequestFull(
     milestone: Option[String],
     time_stats: TimeStats,
     reviewers: Vector[GitlabUser],
-)
+) extends MergeRequestSimple
 
 object MergeRequestFull {
   implicit val MergeRequestFullCodec: Codec[MergeRequestFull] = MissingPropertiesLogger.loggingCodec(deriveCodec[MergeRequestFull])

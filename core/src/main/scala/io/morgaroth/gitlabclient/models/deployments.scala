@@ -1,6 +1,6 @@
 package io.morgaroth.gitlabclient.models
 
-import io.circe.generic.semiauto.deriveDecoder
+import io.circe.generic.semiauto.{deriveCodec, deriveDecoder}
 import io.circe.{Codec, Decoder}
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
@@ -89,5 +89,5 @@ case class PipelineArtifactSimple(
 )
 
 object PipelineArtifactSimple {
-  implicit val PipelineArtifactSimpleDecoder: Decoder[PipelineArtifactSimple] = deriveDecoder[PipelineArtifactSimple]
+  implicit val PipelineArtifactSimpleCodec: Codec[PipelineArtifactSimple] = deriveCodec[PipelineArtifactSimple]
 }

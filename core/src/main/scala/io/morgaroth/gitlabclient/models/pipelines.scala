@@ -19,13 +19,15 @@ object PipelineStatus extends EnumMarshallingGlue[PipelineStatus] {
 
   case object Canceled extends PipelineStatus("canceled")
 
+  case object Pending extends PipelineStatus("pending")
+
   case object Running extends PipelineStatus("running")
 
   case object Scheduled extends PipelineStatus("scheduled")
 
   case object Manual extends PipelineStatus("manual")
 
-  val all: Seq[PipelineStatus]            = Seq(Success, Skipped, Failed, Canceled, Running, Scheduled, Manual)
+  val all: Seq[PipelineStatus]            = Seq(Success, Skipped, Failed, Canceled, Pending, Running, Scheduled, Manual)
   val byName: Map[String, PipelineStatus] = all.map(x => x.name -> x).toMap
 
   override def rawValue: PipelineStatus => String = _.name

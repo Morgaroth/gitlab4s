@@ -1,8 +1,8 @@
 package io.morgaroth.gitlabclient.models
 
+import io.circe.Codec
 import io.circe.generic.extras._
-import io.circe.generic.semiauto.{deriveCodec, deriveDecoder}
-import io.circe.{Codec, Decoder}
+import io.circe.generic.semiauto.deriveCodec
 import io.morgaroth.gitlabclient.maintenance.MissingPropertiesLogger
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
@@ -41,7 +41,7 @@ case class CommitSimple(
 )
 
 object CommitSimple {
-  implicit val CommitSimpleDecoder: Decoder[CommitSimple] = deriveDecoder[CommitSimple]
+  implicit val CommitSimpleCodec: Codec[CommitSimple] = deriveCodec[CommitSimple]
 }
 
 case class CommitStats(
@@ -51,7 +51,7 @@ case class CommitStats(
 )
 
 object CommitStats {
-  implicit val CommitStatsDecoder: Decoder[CommitStats] = deriveDecoder[CommitStats]
+  implicit val CommitStatsCodec: Codec[CommitStats] = deriveCodec[CommitStats]
 }
 
 case class LastPipelineInfo(
@@ -62,7 +62,7 @@ case class LastPipelineInfo(
 )
 
 object LastPipelineInfo {
-  implicit val LastPipelineInfoDecoder: Decoder[LastPipelineInfo] = deriveDecoder[LastPipelineInfo]
+  implicit val LastPipelineInfoCodec: Codec[LastPipelineInfo] = deriveCodec[LastPipelineInfo]
 }
 
 case class Commit(
@@ -85,7 +85,7 @@ case class Commit(
 )
 
 object Commit {
-  implicit val CommitDecoder: Decoder[Commit] = deriveDecoder[Commit]
+  implicit val CommitCodec: Codec[Commit] = deriveCodec[Commit]
 }
 
 @ConfiguredJsonCodec
@@ -115,5 +115,5 @@ case class CommitReference(
 )
 
 object CommitReference {
-  implicit val CommitReferenceDecoder: Decoder[CommitReference] = deriveDecoder[CommitReference]
+  implicit val CommitReferenceCodec: Codec[CommitReference] = deriveCodec[CommitReference]
 }

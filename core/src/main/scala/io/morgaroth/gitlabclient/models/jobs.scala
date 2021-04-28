@@ -1,7 +1,7 @@
 package io.morgaroth.gitlabclient.models
 
-import io.circe.generic.semiauto.deriveDecoder
-import io.circe.{Codec, Decoder}
+import io.circe.Codec
+import io.circe.generic.semiauto.deriveCodec
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
 import java.time.ZonedDateTime
@@ -79,7 +79,7 @@ case class JobFullInfo(
 )
 
 object JobFullInfo {
-  implicit val JobFullInfoDecoder: Decoder[JobFullInfo] = deriveDecoder[JobFullInfo]
+  implicit val JobFullInfoCodec: Codec[JobFullInfo] = deriveCodec[JobFullInfo]
 }
 
 case class JobRunner(
@@ -94,5 +94,5 @@ case class JobRunner(
 )
 
 object JobRunner {
-  implicit val JobRunnerDecoder: Decoder[JobRunner] = deriveDecoder[JobRunner]
+  implicit val JobRunnerCodec: Codec[JobRunner] = deriveCodec[JobRunner]
 }

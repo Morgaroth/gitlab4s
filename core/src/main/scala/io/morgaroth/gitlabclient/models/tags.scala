@@ -1,7 +1,7 @@
 package io.morgaroth.gitlabclient.models
 
-import io.circe.Decoder
-import io.circe.generic.semiauto.deriveDecoder
+import io.circe.Codec
+import io.circe.generic.semiauto.deriveCodec
 
 case class ReleaseShort(
     tag_name: String,
@@ -9,7 +9,7 @@ case class ReleaseShort(
 )
 
 object ReleaseShort {
-  implicit val ReleaseShortDecoder: Decoder[ReleaseShort] = deriveDecoder[ReleaseShort]
+  implicit val ReleaseShortCodec: Codec[ReleaseShort] = deriveCodec[ReleaseShort]
 }
 
 case class TagInfo(
@@ -22,5 +22,5 @@ case class TagInfo(
 )
 
 object TagInfo {
-  implicit val TagInfoDecoder: Decoder[TagInfo] = deriveDecoder[TagInfo]
+  implicit val TagInfoCodec: Codec[TagInfo] = deriveCodec[TagInfo]
 }

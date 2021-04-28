@@ -1,7 +1,8 @@
 package io.morgaroth.gitlabclient.models
 
-import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
-import io.circe.{Codec, Decoder, Encoder}
+import io.circe.generic.semiauto.{deriveCodec, deriveEncoder}
+import io.circe.{Codec, Encoder}
+import io.morgaroth.gitlabclient.maintenance.MissingPropertiesLogger
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
 import java.time.ZonedDateTime
@@ -50,7 +51,7 @@ case class GitlabNamespace(
 )
 
 object GitlabNamespace {
-  implicit val GitlabNamespaceDecoder: Decoder[GitlabNamespace] = deriveDecoder[GitlabNamespace]
+  implicit val GitlabNamespaceCodec: Codec[GitlabNamespace] = deriveCodec[GitlabNamespace]
 }
 
 case class ProjectLinks(
@@ -64,7 +65,41 @@ case class ProjectLinks(
 )
 
 object ProjectLinks {
-  implicit val ProjectLinksDecoder: Decoder[ProjectLinks] = deriveDecoder[ProjectLinks]
+  implicit val ProjectLinksCodec: Codec[ProjectLinks] = deriveCodec[ProjectLinks]
+}
+
+case class ContainerExpirationPolicy(
+    cadence: String,
+    enabled: Boolean,
+    keep_n: Int,
+    older_than: String,
+    name_regex: Option[String],
+    name_regex_keep: Option[String],
+    next_run_at: ZonedDateTime,
+)
+
+object ContainerExpirationPolicy {
+  implicit val ContainerExpirationPolicyCodec: Codec[ContainerExpirationPolicy] =
+    MissingPropertiesLogger.loggingCodec(deriveCodec[ContainerExpirationPolicy])
+
+}
+
+case class PermissionEntry(
+    access_level: Int,
+    notification_level: Int,
+)
+
+object PermissionEntry {
+  implicit val PermissionEntryCodec: Codec[PermissionEntry] = deriveCodec[PermissionEntry]
+}
+
+case class ProjectPermissions(
+    project_access: Option[PermissionEntry],
+    group_access: PermissionEntry,
+)
+
+object ProjectPermissions {
+  implicit val ProjectPermissionsCodec: Codec[ProjectPermissions] = deriveCodec[ProjectPermissions]
 }
 
 case class ProjectInfo(
@@ -91,12 +126,6 @@ case class ProjectInfo(
     archived: Boolean,
     visibility: String,
     owner: Option[GitlabUser],
-    container_registry_enabled: Option[Boolean],
-    issues_enabled: Boolean,
-    merge_requests_enabled: Boolean,
-    wiki_enabled: Boolean,
-    jobs_enabled: Boolean,
-    snippets_enabled: Boolean,
     issues_access_level: Option[String],
     repository_access_level: Option[String],
     merge_requests_access_level: Option[String],
@@ -108,7 +137,6 @@ case class ProjectInfo(
     creator_id: BigInt,
     merge_method: MergeStrategy,
     packages_enabled: Option[Boolean],
-    resolve_outdated_diff_discussions: Boolean,
     service_desk_enabled: Boolean,
     service_desk_address: Option[String],
     can_create_merge_request_in: Boolean,
@@ -117,7 +145,8 @@ case class ProjectInfo(
     emails_disabled: Option[Boolean],
     import_status: String,
     import_error: Option[String],
-    open_issues_count: Int,
+    open_issues_count: Option[Int], // if issues are enabled
+    issues_template: Option[String],
     runners_token: Option[String],
     ci_default_git_depth: Option[Int],
     public_jobs: Boolean,
@@ -127,26 +156,45 @@ case class ProjectInfo(
     build_coverage_regex: Option[String],
     ci_config_path: Option[String],
     shared_with_groups: Vector[String],
-    only_allow_merge_if_pipeline_succeeds: Boolean,
-    allow_merge_on_skipped_pipeline: Option[Boolean],
-    request_access_enabled: Boolean,
-    only_allow_merge_if_all_discussions_are_resolved: Boolean,
-    remove_source_branch_after_merge: Option[Boolean],
-    printing_merge_request_link_enabled: Boolean,
     suggestion_commit_message: Option[String],
-    auto_devops_enabled: Boolean,
     auto_devops_deploy_strategy: String,
-    autoclose_referenced_issues: Boolean,
-    approvals_before_merge: Int,
     mirror: Boolean,
     external_authorization_classification_label: Option[String],
     marked_for_deletion_at: Option[ZonedDateTime],
     marked_for_deletion_on: Option[ZonedDateTime],
     compliance_frameworks: Vector[String],
+    // flags
+    request_access_enabled: Boolean,
+    container_registry_enabled: Option[Boolean],
+    security_and_compliance_enabled: Boolean,
+    requirements_enabled: Boolean,
+    restrict_user_defined_variables: Boolean,
+    merge_requests_enabled: Boolean,
+    issues_enabled: Boolean,
+    wiki_enabled: Boolean,
+    jobs_enabled: Boolean,
+    snippets_enabled: Boolean,
+    auto_devops_enabled: Boolean,
+    ci_forward_deployment_enabled: Boolean,
+    // merge requests
+    only_allow_merge_if_all_discussions_are_resolved: Boolean,
+    remove_source_branch_after_merge: Option[Boolean],
+    autoclose_referenced_issues: Boolean,
+    approvals_before_merge: Int,
+    merge_requests_template: Option[String],
+    only_allow_merge_if_pipeline_succeeds: Boolean,
+    allow_merge_on_skipped_pipeline: Option[Boolean],
+    resolve_outdated_diff_discussions: Boolean,
+    printing_merge_request_link_enabled: Boolean,
+    container_registry_image_prefix: String,
+    operations_access_level: Option[String],
+    analytics_access_level: Option[String],
+    container_expiration_policy: ContainerExpirationPolicy,
+    permissions: ProjectPermissions,
 )
 
 object ProjectInfo {
-  implicit val ProjectInfoDecoder: Decoder[ProjectInfo] = deriveDecoder[ProjectInfo]
+  implicit val ProjectInfoCodec: Codec[ProjectInfo] = MissingPropertiesLogger.loggingCodec(deriveCodec[ProjectInfo])
 }
 
 object EditProjectRequest {

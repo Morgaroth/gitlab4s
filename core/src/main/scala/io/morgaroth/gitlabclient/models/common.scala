@@ -16,7 +16,7 @@ case class GitlabUser(
 )
 
 object GitlabUser {
-  implicit val GitlabUserCodec: Codec[GitlabUser] = MissingPropertiesLogger.loggingCodec(deriveCodec[GitlabUser])
+  implicit val GitlabUserCodec: Codec[GitlabUser] = deriveCodec[GitlabUser]
 }
 
 case class GitlabFullUser(
@@ -26,11 +26,18 @@ case class GitlabFullUser(
     state: String,
     avatar_url: String,
     web_url: String,
+    website_url: String,
     created_at: ZonedDateTime,
     bio: String,
+    bio_html: String,
     location: String,
-    public_email: Option[String],
     email: String,
+    public_email: Option[String],
+    skype: String,
+    twitter: String,
+    linkedin: String,
+    job_title: String,
+    organization: String,
 )
 
 object GitlabFullUser {

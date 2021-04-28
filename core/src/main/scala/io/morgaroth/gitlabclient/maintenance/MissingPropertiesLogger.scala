@@ -2,6 +2,8 @@ package io.morgaroth.gitlabclient.maintenance
 
 import com.typesafe.scalalogging.Logger
 import io.circe._
+import io.morgaroth.gitlabclient.RequestId
+import io.morgaroth.gitlabclient.maintenance.MissingPropertiesLogger.calculateMissingFields
 import io.morgaroth.gitlabclient.marshalling.Gitlab4SMarshalling.MJson
 import org.slf4j.LoggerFactory
 
@@ -10,7 +12,9 @@ import scala.reflect.ClassTag
 object MissingPropertiesLogger {
   val logger = Logger(LoggerFactory.getLogger(getClass.getPackageName + ".MissingPropertiesLogger"))
 
-  private def calculateMissingFields[T: ClassTag](inputData: Json, value: Decoder.Result[T])(implicit enc: Encoder[T]): Unit = {
+  private def calculateMissingFields[T: ClassTag](inputData: Json, value: Decoder.Result[T], rId: Option[RequestId])(implicit
+      enc: Encoder[T],
+  ): Unit = {
     val ct = implicitly[ClassTag[T]].runtimeClass
     value
       .map(MJson.encode(_))
@@ -22,7 +26,9 @@ object MissingPropertiesLogger {
           inputKeys
             .diff(encodedKeys)
             .toList
-            .map(x => s"$x needs to be covered in ${ct.getCanonicalName} (${inputData.asObject.get.apply(x).get})")
+            .map(x =>
+              s"$x needs to be covered in ${ct.getCanonicalName} (${inputData.asObject.get.apply(x).get}) ${rId.fold("")(_.toString)}",
+            )
         case _ =>
           Nil
       }
@@ -33,16 +39,25 @@ object MissingPropertiesLogger {
       .foreach(x => MissingPropertiesLogger.logger.info(x))
   }
 
-  def loggingCodec[T: ClassTag](underlying: Codec[T]) = new Codec[T] {
-    override def apply(a: T) = underlying.apply(a)
+  def loggingCodec[T: ClassTag](underlying: Codec[T]) = new MissingPropertiesLogger[T](underlying)
 
-    override def apply(c: HCursor) = {
-      val result                           = underlying.apply(c)
-      implicit val implicitCodec: Codec[T] = underlying
-      calculateMissingFields(c.value, result)
-      result
-    }
+}
 
+class MissingPropertiesLogger[T: ClassTag](underlying: Codec[T]) extends Codec[T] {
+  override def apply(a: T) = underlying.apply(a)
+
+  override def apply(c: HCursor) = {
+    val result                           = underlying.apply(c)
+    implicit val implicitCodec: Codec[T] = underlying
+    calculateMissingFields(c.value, result, None)
+    result
+  }
+
+  def apply(c: HCursor, requestId: RequestId) = {
+    val result                           = underlying.apply(c)
+    implicit val implicitCodec: Codec[T] = underlying
+    calculateMissingFields(c.value, result, Some(requestId))
+    result
   }
 
 }
