@@ -5,18 +5,16 @@ val silencerVersion = "1.7.1"
 
 val validate = Def.taskKey[Unit]("Validates entire project")
 
-val projectScalaVersion = "2.13.4"
-//val projectScalaVersion = "3.0.0-M3"
-val crossScalaVersionsValues = Seq(projectScalaVersion, "2.12.12")
+val projectScalaVersion      = "2.13.4"
+val crossScalaVersionsValues = Seq(projectScalaVersion, "2.12.13")
 
 val commonSettings = Seq(
   organization := "io.morgaroth",
   scalaVersion := projectScalaVersion,
   crossScalaVersions := crossScalaVersionsValues,
-  resolvers ++= Seq(
-    ("Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/").withAllowInsecureProtocol(true),
-    Resolver.bintrayRepo("morgaroth", "maven"),
-  ),
+  publishTo := Some("Mateusz Jaje JFrog Artifactory" at "https://mateuszjajedev.jfrog.io/artifactory/maven"),
+  credentials += Credentials(file(sys.env.getOrElse("JFROG_CREDENTIALS_FILE", ".credentials"))),
+  resolvers += "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/",
   scalacOptions ++= Seq(
     "-unchecked",
     "-deprecation",
@@ -42,9 +40,8 @@ val commonSettings = Seq(
   logBuffered := false,
   testOptions in Test += Tests.Filter(suiteName => !suiteName.endsWith("ISpec")),
   sources in doc := Seq.empty,
-  // Bintray
+  publishMavenStyle := false,
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
-  bintrayVcsUrl := Some("https://gitlab.com/morgaroth/gitlab4s.git"),
 )
 
 val testDeps = Seq(
@@ -65,8 +62,6 @@ val core = project
       "io.circe"                   %% "circe-generic-extras" % circeExtVersion,
       "com.typesafe"                % "config"               % "1.4.1",
       "com.typesafe.scala-logging" %% "scala-logging"        % "3.9.2",
-      //      "org.wickedsource" % "diffparser" % "1.0",
-      //      "io.github.java-diff-utils" % "java-diff-utils" % "4.5",
     ) ++ testDeps,
   )
 
@@ -100,7 +95,9 @@ val gitlab4s = project
     name := "gitlab4s",
     publish := {},
     publishLocal := {},
+    publishTo := Some("Mateusz Jaje JFrog Artifactory" at "https://mateuszjajedev.jfrog.io/artifactory/maven"),
     crossScalaVersions := crossScalaVersionsValues,
+    scalaVersion := projectScalaVersion,
     validate := Def.sequential {
       Test / test
       // tut.value
