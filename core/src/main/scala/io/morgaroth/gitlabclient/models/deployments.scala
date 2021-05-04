@@ -10,23 +10,19 @@ sealed abstract class DeploymentStatus(val name: String) extends Product with Se
 
 object DeploymentStatus extends EnumMarshallingGlue[DeploymentStatus] {
 
-  case object Created extends DeploymentStatus("created")
+  case object Created  extends DeploymentStatus("created")
+  case object Running  extends DeploymentStatus("running")
+  case object Success  extends DeploymentStatus("success")
+  case object Failed   extends DeploymentStatus("failed")
+  case object Skipped  extends DeploymentStatus("skipped")
+  case object Canceled extends DeploymentStatus("canceled")
 
-  case object Running extends DeploymentStatus("running")
-
-  case object success extends DeploymentStatus("success")
-
-  case object failed extends DeploymentStatus("failed")
-
-  case object canceled extends DeploymentStatus("canceled")
-
-  val all: Seq[DeploymentStatus]            = Seq(Created, Running, success, failed, canceled)
+  val all: Seq[DeploymentStatus]            = Seq(Created, Running, Success, Failed, Skipped, Canceled)
   val byName: Map[String, DeploymentStatus] = all.map(x => x.name -> x).toMap
 
   override def rawValue: DeploymentStatus => String = _.name
 
   implicit val DeploymentStatusCirceCodec: Codec[DeploymentStatus] = EnumMarshalling.stringEnumCodecOf(DeploymentStatus)
-
 }
 
 case class DeploymentInfo(
