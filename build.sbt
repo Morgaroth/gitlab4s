@@ -7,13 +7,17 @@ val validate = Def.taskKey[Unit]("Validates entire project")
 val projectScalaVersion      = "2.13.4"
 val crossScalaVersionsValues = Seq(projectScalaVersion, "2.12.13")
 
-val commonSettings = Seq(
-  organization := "io.morgaroth",
-  scalaVersion := projectScalaVersion,
-  crossScalaVersions := crossScalaVersionsValues,
-  versionScheme := Some("semver-spec"),
-  publishTo := Some("Mateusz Jaje JFrog Artifactory" at "https://mateuszjajedev.jfrog.io/artifactory/maven"),
+val publishSettings = Seq(
+  publishTo := Some("Artifactory" at "https://mateuszjajedev.jfrog.io/artifactory/maven/"),
   credentials += Credentials(file(sys.env.getOrElse("JFROG_CREDENTIALS_FILE", ".credentials"))),
+  versionScheme := Some("semver-spec"),
+  crossScalaVersions := crossScalaVersionsValues,
+  scalaVersion := projectScalaVersion,
+  publishMavenStyle := true,
+)
+
+val commonSettings = publishSettings ++ Seq(
+  organization := "io.morgaroth",
   resolvers += "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/",
   scalacOptions ++= Seq(
     "-unchecked",
@@ -40,7 +44,6 @@ val commonSettings = Seq(
   logBuffered := false,
   Test / testOptions += Tests.Filter(suiteName => !suiteName.endsWith("ISpec")),
   doc / sources := Seq.empty,
-  publishMavenStyle := false,
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
 )
 
@@ -91,13 +94,11 @@ val sttptry = project
 val gitlab4s = project
   .in(file("."))
   .aggregate(core, sttpjdk, sttptry)
+  .settings(publishSettings)
   .settings(
     name := "gitlab4s",
     publish := {},
     publishLocal := {},
-    publishTo := Some("Mateusz Jaje JFrog Artifactory" at "https://mateuszjajedev.jfrog.io/artifactory/maven"),
-    crossScalaVersions := crossScalaVersionsValues,
-    scalaVersion := projectScalaVersion,
     validate := Def.sequential {
       Test / test
       // tut.value

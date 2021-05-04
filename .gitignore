@@ -10,3 +10,4 @@
 /.ssh
 /checked.log
 /.bsp
+/.credentials
