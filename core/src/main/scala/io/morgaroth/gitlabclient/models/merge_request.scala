@@ -1,7 +1,8 @@
 package io.morgaroth.gitlabclient.models
 
-import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
+import io.circe.generic.semiauto.{deriveCodec, deriveDecoder, deriveEncoder}
 import io.circe.{Codec, Decoder, Encoder}
+import io.morgaroth.gitlabclient.maintenance.MissingPropertiesLogger
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
 import java.time.ZonedDateTime
@@ -62,13 +63,13 @@ object MergeStatus extends EnumMarshallingGlue[MergeStatus] {
 case class TaskStatus(count: Int, completed_count: Int)
 
 object TaskStatus {
-  implicit val TaskStatusDecoder: Decoder[TaskStatus] = deriveDecoder[TaskStatus]
+  implicit val TaskStatusCodec: Codec[TaskStatus] = MissingPropertiesLogger.loggingCodec(deriveCodec[TaskStatus])
 }
 
 case class ReferencesInfo(short: String, relative: String, full: String)
 
 object ReferencesInfo {
-  implicit val ReferencesInfoDecoder: Decoder[ReferencesInfo] = deriveDecoder[ReferencesInfo]
+  implicit val ReferencesInfoCodec: Codec[ReferencesInfo] = MissingPropertiesLogger.loggingCodec(deriveCodec[ReferencesInfo])
 }
 
 case class MergeRequestInfo(
@@ -141,12 +142,23 @@ object UpdateMRPayload {
   def description(newValue: String): UpdateMRPayload = new UpdateMRPayload(description = Some(newValue))
 }
 
+case class TimeStats(
+    time_estimate: Int,
+    total_time_spent: Int,
+    human_time_estimate: Option[String],
+    human_total_time_spent: Option[String],
+)
+
+object TimeStats {
+  implicit val TimeStatsCodec: Codec[TimeStats] = MissingPropertiesLogger.loggingCodec(deriveCodec[TimeStats])
+}
+
 case class MergeRequestFull(
     id: BigInt,
     iid: BigInt,
     project_id: BigInt,
     title: String,
-    description: String,
+    description: Option[String],
     state: MergeRequestState,
     merged_by: Option[GitlabUser],
     merged_at: Option[ZonedDateTime],
@@ -196,16 +208,19 @@ case class MergeRequestFull(
     pipeline: Option[PipelineShort],
     merge_error: Option[String],
     user: UserMergeInfo,
+    milestone: Option[String],
+    time_stats: TimeStats,
+    reviewers: Vector[GitlabUser],
 )
 
 object MergeRequestFull {
-  implicit val MergeRequestFullDecoder: Decoder[MergeRequestFull] = deriveDecoder[MergeRequestFull]
+  implicit val MergeRequestFullCodec: Codec[MergeRequestFull] = MissingPropertiesLogger.loggingCodec(deriveCodec[MergeRequestFull])
 }
 
 case class UserMergeInfo(can_merge: Boolean)
 
 object UserMergeInfo {
-  implicit val UserMergeInfoDecoder: Decoder[UserMergeInfo] = deriveDecoder[UserMergeInfo]
+  implicit val UserMergeInfoCodec: Codec[UserMergeInfo] = MissingPropertiesLogger.loggingCodec(deriveCodec[UserMergeInfo])
 }
 
 case class DiffRefs(
@@ -215,5 +230,5 @@ case class DiffRefs(
 )
 
 object DiffRefs {
-  implicit val DiffRefsDecoder: Decoder[DiffRefs] = deriveDecoder[DiffRefs]
+  implicit val DiffRefsCodec: Codec[DiffRefs] = MissingPropertiesLogger.loggingCodec(deriveCodec[DiffRefs])
 }

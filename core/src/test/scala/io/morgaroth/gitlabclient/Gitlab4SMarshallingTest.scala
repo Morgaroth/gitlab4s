@@ -91,8 +91,6 @@ class Gitlab4SMarshallingTest extends AnyFlatSpec with Matchers with Gitlab4SMar
   }
 
   val mergeRequestApprovalRules = Table("merge request approval rules") ++ Seq(
-    "approval_rules_of_mr_1.json",
-    "approval_rules_of_mr_2.json",
   )
 
   it should "parse merge request's approval rules" in {
@@ -102,7 +100,6 @@ class Gitlab4SMarshallingTest extends AnyFlatSpec with Matchers with Gitlab4SMar
     }
   }
   val deploymentsList = Table("project deployments") ++ Seq(
-    "project_deployments_1.json",
     "project_deployments_2.json",
   )
 

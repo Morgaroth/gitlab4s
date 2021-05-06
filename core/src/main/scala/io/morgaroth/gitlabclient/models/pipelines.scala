@@ -1,7 +1,8 @@
 package io.morgaroth.gitlabclient.models
 
-import io.circe.generic.semiauto.deriveDecoder
-import io.circe.{Codec, Decoder}
+import io.circe.Codec
+import io.circe.generic.semiauto.deriveCodec
+import io.morgaroth.gitlabclient.maintenance.MissingPropertiesLogger
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
 import java.time.ZonedDateTime
@@ -50,6 +51,7 @@ object PipelineScope {
 
 case class PipelineShort(
     id: BigInt,
+    project_id: BigInt,
     sha: String,
     ref: String,
     status: PipelineStatus,
@@ -59,11 +61,12 @@ case class PipelineShort(
 )
 
 object PipelineShort {
-  implicit val PipelineShort: Decoder[PipelineShort] = deriveDecoder[PipelineShort]
+  implicit val PipelineShortCodec: Codec[PipelineShort] = MissingPropertiesLogger.loggingCodec(deriveCodec[PipelineShort])
 }
 
 case class PipelineFullInfo(
     id: BigInt,
+    project_id: BigInt,
     sha: String,
     ref: String,
     status: PipelineStatus,
@@ -78,12 +81,13 @@ case class PipelineFullInfo(
     finished_at: Option[ZonedDateTime],
     committed_at: Option[ZonedDateTime],
     duration: Option[Int],
-    coverage: Option[Boolean],
+    coverage: Option[String],
     detailed_status: PipelineStatusInfo,
+    queued_duration: Option[Int],
 )
 
 object PipelineFullInfo {
-  implicit val PipelineFullInfoDecoder: Decoder[PipelineFullInfo] = deriveDecoder[PipelineFullInfo]
+  implicit val PipelineFullInfoCodec: Codec[PipelineFullInfo] = MissingPropertiesLogger.loggingCodec(deriveCodec[PipelineFullInfo])
 }
 
 case class PipelineStatusInfo(
@@ -99,5 +103,5 @@ case class PipelineStatusInfo(
 )
 
 object PipelineStatusInfo {
-  implicit val PipelineStatusInfoDecoder: Decoder[PipelineStatusInfo] = deriveDecoder[PipelineStatusInfo]
+  implicit val PipelineStatusInfoCodec: Codec[PipelineStatusInfo] = MissingPropertiesLogger.loggingCodec(deriveCodec[PipelineStatusInfo])
 }

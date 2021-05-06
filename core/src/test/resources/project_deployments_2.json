@@ -71,6 +71,7 @@
       },
       "pipeline": {
         "id": 111,
+        "project_id": 111,
         "sha": "60b0e790076ffc58812f2de66084b2353dffadbd991616c554",
         "ref": "wRI1B/K542F5s3pvKVcRz",
         "status": "running",
@@ -166,6 +167,7 @@
       },
       "pipeline": {
         "id": 111,
+        "project_id": 111,
         "sha": "60b0e790076ffc58812f2de66084b2353dffadbd991616c554",
         "ref": "wRI1B/K542F5s3pvKVcRz",
         "status": "success",
@@ -284,6 +286,7 @@
       },
       "pipeline": {
         "id": 111,
+        "project_id": 111,
         "sha": "60b0e790076ffc58812f2de66084b2353dffadbd991616c554",
         "ref": "wRI1B/K542F5s3pvKVcRz",
         "status": "failed",

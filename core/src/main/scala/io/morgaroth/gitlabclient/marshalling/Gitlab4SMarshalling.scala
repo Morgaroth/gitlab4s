@@ -20,14 +20,14 @@ trait Gitlab4SMarshalling {
   implicit val zonedDateTimeCodec: Codec[ZonedDateTime] = Codec.from(Decoder.decodeZonedDateTime, Encoder.encodeZonedDateTime)
 
   object MJson {
-    def read[T](str: String)(implicit d: Decoder[T]): Either[Error, T] = decode[T](str)
+    def read[T: Decoder](str: String): Either[Error, T] = decode[T](str)
 
-    def readT[F[_], T](str: String)(implicit d: Decoder[T], m: Monad[F], requestId: RequestId): EitherT[F, GitlabError, T] =
+    def readT[F[_]: Monad, T: Decoder](str: String)(implicit requestId: RequestId): EitherT[F, GitlabError, T] =
       EitherT.fromEither(read[T](str).leftMap[GitlabError](e => GitlabUnmarshallingError(e.getMessage, requestId.id, e)))
 
-    def write[T](value: T)(implicit d: Encoder[T]): String = Printer.noSpaces.copy(dropNullValues = true).print(value.asJson)
-
-    def writePretty[T](value: T)(implicit d: Encoder[T]): String = printer.print(value.asJson)
+    def write[T: Encoder](value: T): String       = Printer.noSpaces.copy(dropNullValues = true).print(value.asJson)
+    def encode[T: Encoder](value: T): Json        = value.asJson
+    def writePretty[T: Encoder](value: T): String = printer.print(value.asJson)
   }
 
   // keep all special settings with method write above

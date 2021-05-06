@@ -1,8 +1,9 @@
 package io.morgaroth.gitlabclient.models
 
 import io.circe.generic.extras._
-import io.circe.generic.semiauto.deriveDecoder
+import io.circe.generic.semiauto.{deriveCodec, deriveDecoder}
 import io.circe.{Codec, Decoder}
+import io.morgaroth.gitlabclient.maintenance.MissingPropertiesLogger
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
 import java.time.ZonedDateTime
@@ -105,7 +106,7 @@ case class FileDiff(
 )
 
 object FileDiff {
-  implicit val FileDiffDecoder: Decoder[FileDiff] = deriveDecoder[FileDiff]
+  implicit val FileDiffCodec: Codec[FileDiff] = MissingPropertiesLogger.loggingCodec(deriveCodec[FileDiff])
 }
 
 case class CommitReference(
