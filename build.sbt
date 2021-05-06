@@ -8,7 +8,10 @@ val projectScalaVersion      = "2.13.4"
 val crossScalaVersionsValues = Seq(projectScalaVersion, "2.12.13")
 
 val publishSettings = Seq(
-  publishTo := Some("Artifactory" at "https://mateuszjajedev.jfrog.io/artifactory/maven/"),
+  publishTo := Some {
+    if (isSnapshot.value) "Artifactory releases" at "https://mateuszjajedev.jfrog.io/artifactory/maven/"
+    else "Artifactory snapshots" at s"https://mateuszjajedev.jfrog.io/artifactory/maven;build.timestamp=${new java.util.Date().getTime}"
+  },
   credentials += Credentials(file(sys.env.getOrElse("JFROG_CREDENTIALS_FILE", ".credentials"))),
   versionScheme := Some("semver-spec"),
   crossScalaVersions := crossScalaVersionsValues,

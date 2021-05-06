@@ -25,6 +25,14 @@ Check formatting:
   script:
     - sbt -v scalafmtCheckAll
 
+Pubilsh snapshot:
+  stage: publish
+  script:
+    - sbt -v +publish
+  except:
+    - master
+    - tags
+
 Release next version:
   stage: publish
   only:
