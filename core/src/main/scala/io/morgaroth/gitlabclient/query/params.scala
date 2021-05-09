@@ -31,6 +31,8 @@ object ParamQuery {
   implicit class fromString(paramName: String) {
     def eqParam(value: String): ParamQuery = new StringKVParam(paramName, value)
 
+    def eqParam(value: BigInt): ParamQuery = new BigIntKVParam(paramName, value)
+
     def eqParam(value: ZonedDateTime): ParamQuery = new StringKVParam(paramName, CustomDateTimeFormatter.toISO8601UTC(value))
 
     def eqParam(value: LocalDate): ParamQuery = new StringKVParam(paramName, CustomDateTimeFormatter.toDate(value))
@@ -53,6 +55,10 @@ class StringKVParam(key: String, value: String) extends ParamQuery {
 }
 
 class IntKVParam(key: String, value: Int) extends ParamQuery {
+  override def render: String = s"$key=$value"
+}
+
+class BigIntKVParam(key: String, value: BigInt) extends ParamQuery {
   override def render: String = s"$key=$value"
 }
 

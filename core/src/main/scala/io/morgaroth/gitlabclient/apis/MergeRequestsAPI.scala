@@ -3,6 +3,7 @@ package io.morgaroth.gitlabclient.apis
 import cats.instances.vector._
 import cats.syntax.traverse._
 import io.morgaroth.gitlabclient._
+import io.morgaroth.gitlabclient.helpers.{NullValue, NullableField}
 import io.morgaroth.gitlabclient.models._
 import io.morgaroth.gitlabclient.query.ParamQuery._
 import io.morgaroth.gitlabclient.query._
@@ -260,6 +261,38 @@ trait MergeRequestsAPI[F[_]] {
       MJson.write(payload),
     )
     invokeRequest(req).unmarshall[MergeRequestNote]
+  }
+
+  // @see: https://docs.gitlab.com/ee/api/merge_requests.html#list-merge-requests
+  def globalMergeRequestSearch(
+      state: NullableField[MergeRequestState] = NullValue,
+      authorId: NullableField[BigInt] = NullValue,
+      authorUsername: NullableField[String] = NullValue,
+      scope: NullableField[MergeRequestSearchScope] = NullValue,
+      titleOrDescriptionText: NullableField[String] = NullValue,
+      createdBefore: NullableField[ZonedDateTime] = NullValue,
+      createdAfter: NullableField[ZonedDateTime] = NullValue,
+      updatedBefore: NullableField[ZonedDateTime] = NullValue,
+      updatedAfter: NullableField[ZonedDateTime] = NullValue,
+      withMergeStatusRecheck: NullableField[Boolean] = NullValue,
+      sort: NullableField[Sorting[MergeRequestsSort]] = NullValue,
+  ): GitlabResponseT[Vector[MergeRequestInfo]] = {
+    implicit val rId: RequestId = RequestId.newOne("list-mrs")
+    val q = Vector(
+      state.toList.map(_.toParam),
+      authorId.toList.map("author_id" eqParam _),
+      authorUsername.toList.map("author_username" eqParam _),
+      scope.toList.map(_.name).map("scope" eqParam _),
+      titleOrDescriptionText.toList.map("search" eqParam _),
+      createdBefore.toList.map("created_before" eqParam _),
+      createdAfter.toList.map("created_after" eqParam _),
+      updatedBefore.toList.map("updated_before" eqParam _),
+      updatedAfter.toList.map("updated_after" eqParam _),
+      withMergeStatusRecheck.toList.map("with_merge_status_recheck" eqParam _),
+      sort.toList.flatMap(s => List("order_by".eqParam(s.field.property), "sort".eqParam(s.direction.toString))),
+    ).flatten
+    val req = reqGen.get(s"$API/merge_requests", q: _*)
+    invokeRequest(req).unmarshall[Vector[MergeRequestInfo]]
   }
 
 }

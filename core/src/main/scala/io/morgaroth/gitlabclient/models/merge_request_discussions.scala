@@ -14,11 +14,12 @@ object NoteType {
 
 object NoteTypes extends EnumMarshallingGlue[NoteType] {
 
+  case object Note     extends NoteType("Note")
   case object DiffNote extends NoteType("DiffNote")
 
   case object DiscussionNote extends NoteType("DiscussionNote")
 
-  val all: Seq[NoteType]            = Seq(DiffNote, DiscussionNote)
+  val all: Seq[NoteType]            = Seq(Note, DiffNote, DiscussionNote)
   val byName: Map[String, NoteType] = all.map(x => x.name -> x).toMap
 
   override def rawValue: NoteType => String = _.name
@@ -28,7 +29,6 @@ sealed abstract class NoteableType(val name: String) extends Product with Serial
 
 object NoteableType {
   implicit val NoteableTypesCirceCodec: Codec[NoteableType] = EnumMarshalling.stringEnumCodecOf(NoteableTypes)
-
 }
 
 object NoteableTypes extends EnumMarshallingGlue[NoteableType] {

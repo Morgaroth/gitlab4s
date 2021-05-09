@@ -258,3 +258,11 @@ case class DiffRefs(
 object DiffRefs {
   implicit val DiffRefsCodec: Codec[DiffRefs] = MissingPropertiesLogger.loggingCodec(deriveCodec[DiffRefs])
 }
+
+sealed abstract class MergeRequestSearchScope(val name: String) extends Product with Serializable
+
+object MergeRequestSearchScope {
+  case object CreatedByMe  extends MergeRequestSearchScope("created_by_me")
+  case object AssignedToMe extends MergeRequestSearchScope("assigned_to_me")
+  case object All          extends MergeRequestSearchScope("all")
+}

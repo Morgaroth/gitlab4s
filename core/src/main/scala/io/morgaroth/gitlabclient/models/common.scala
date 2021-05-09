@@ -7,7 +7,7 @@ import io.morgaroth.gitlabclient.maintenance.MissingPropertiesLogger
 import java.time.ZonedDateTime
 
 case class GitlabUser(
-    id: Long,
+    id: BigInt,
     name: String,
     username: String,
     state: String,
