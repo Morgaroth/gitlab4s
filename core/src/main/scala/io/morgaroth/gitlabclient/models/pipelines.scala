@@ -1,7 +1,7 @@
 package io.morgaroth.gitlabclient.models
 
-import io.circe.Codec
-import io.circe.generic.semiauto.deriveCodec
+import io.circe.{Codec, Encoder}
+import io.circe.generic.semiauto.{deriveCodec, deriveEncoder}
 import io.morgaroth.gitlabclient.maintenance.MissingPropertiesLogger
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
@@ -10,6 +10,8 @@ import java.time.ZonedDateTime
 sealed abstract class PipelineStatus(val name: String) extends Product with Serializable
 
 object PipelineStatus extends EnumMarshallingGlue[PipelineStatus] {
+
+  case object Created extends PipelineStatus("created")
 
   case object Success extends PipelineStatus("success")
 
@@ -27,7 +29,7 @@ object PipelineStatus extends EnumMarshallingGlue[PipelineStatus] {
 
   case object Manual extends PipelineStatus("manual")
 
-  val all: Seq[PipelineStatus]            = Seq(Success, Skipped, Failed, Canceled, Pending, Running, Scheduled, Manual)
+  val all: Seq[PipelineStatus]            = Seq(Created, Success, Skipped, Failed, Canceled, Pending, Running, Scheduled, Manual)
   val byName: Map[String, PipelineStatus] = all.map(x => x.name -> x).toMap
 
   override def rawValue: PipelineStatus => String = _.name
@@ -106,4 +108,42 @@ case class PipelineStatusInfo(
 
 object PipelineStatusInfo {
   implicit val PipelineStatusInfoCodec: Codec[PipelineStatusInfo] = MissingPropertiesLogger.loggingCodec(deriveCodec[PipelineStatusInfo])
+}
+
+sealed abstract class PipelineVariableType(val name: String) extends Product with Serializable
+
+object PipelineVariableType extends EnumMarshallingGlue[PipelineVariableType] {
+
+  case object File extends PipelineVariableType("file")
+
+  case object Text extends PipelineVariableType("env_var")
+
+  val all: Seq[PipelineVariableType]            = Seq(File, Text)
+  val byName: Map[String, PipelineVariableType] = all.map(x => x.name -> x).toMap
+
+  override def rawValue: PipelineVariableType => String = _.name
+
+  implicit val PipelineStatusCirceCodec: Codec[PipelineVariableType] = EnumMarshalling.stringEnumCodecOf(PipelineVariableType)
+}
+
+case class PipelineVar(
+    key: String,
+    value: String,
+    variable_type: PipelineVariableType,
+)
+
+object PipelineVar {
+  def text(name: String, value: String)       = new PipelineVar(name, value, PipelineVariableType.Text)
+  def file(name: String, fileContent: String) = new PipelineVar(name, fileContent, PipelineVariableType.File)
+
+  implicit val PipelineVarCodec: Codec[PipelineVar] = deriveCodec[PipelineVar]
+}
+
+case class TriggerPipelineRequest(
+    ref: String,
+    variables: Vector[PipelineVar],
+)
+
+object TriggerPipelineRequest {
+  implicit val PipelineVarEncoder: Encoder[TriggerPipelineRequest] = deriveEncoder[TriggerPipelineRequest]
 }

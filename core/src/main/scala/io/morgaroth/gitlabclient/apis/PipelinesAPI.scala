@@ -62,4 +62,15 @@ trait PipelinesAPI[F[_]] {
     invokeRequest(req).unmarshall[Vector[JobFullInfo]]
   }
 
+  // @see: https://docs.gitlab.com/ee/api/pipelines.html#create-a-new-pipeline
+  def triggerPipeline(
+      projectId: EntityId,
+      branch: String,
+      vars: Vector[PipelineVar] = Vector.empty,
+  ): EitherT[F, GitlabError, PipelineFullInfo] = {
+    implicit val rId: RequestId = RequestId.newOne("trigger-pipeline")
+    val req                     = reqGen.post(s"$API/projects/${projectId.toStringId}/pipeline", MJson.write(TriggerPipelineRequest(branch, vars)))
+    invokeRequest(req).unmarshall[PipelineFullInfo]
+  }
+
 }
