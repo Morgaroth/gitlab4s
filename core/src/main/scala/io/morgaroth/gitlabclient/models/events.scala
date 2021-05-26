@@ -77,13 +77,30 @@ object ActionName extends EnumMarshallingGlue[ActionName] {
 
   case object Accepted extends ActionName("accepted")
 
+  case object Imported extends ActionName("imported")
+
   case object Closed extends ActionName("closed")
 
   case object Deleted extends ActionName("deleted")
 
   case object RemovedDueToExpiry extends ActionName("removed due to membership expiration from")
 
-  val all    = Seq(Approved, Created, Joined, Leaved, PushedTo, PushedNew, Opened, CommentedOn, Accepted, Closed, Deleted, RemovedDueToExpiry)
+  val all = Seq(
+    Approved,
+    Created,
+    Joined,
+    Leaved,
+    PushedTo,
+    PushedNew,
+    Opened,
+    CommentedOn,
+    Accepted,
+    Imported,
+    Closed,
+    Deleted,
+    RemovedDueToExpiry,
+  )
+
   val byName = all.map(x => x.name -> x).toMap
 
   override def rawValue: ActionName => String = _.name
@@ -269,11 +286,11 @@ object EventInfo {
     val actionField = cursor.downField("action_name").as[ActionName]
     val targetType  = cursor.downField("target_type").as[Option[ResponseTargetType]]
     actionField.flatMap(a => targetType.map(a -> _)).flatMap {
-      case (Created | Joined | Leaved | RemovedDueToExpiry, None)      => cursor.as[ProjectCreatedEvent]
-      case (PushedTo | PushedNew | Deleted, None)                      => cursor.as[PushedEventInfo]
-      case (Approved | Opened | Accepted | Closed, Some(MergeRequest)) => cursor.as[MREventInfo]
-      case (Opened | Closed, Some(Issue))                              => cursor.as[IssueEvent]
-      case (CommentedOn, Some(DiffNote | Note | DiscussionNote))       => cursor.as[DiffNoteEvent]
+      case (Created | Joined | Imported | Leaved | RemovedDueToExpiry, None) => cursor.as[ProjectCreatedEvent]
+      case (PushedTo | PushedNew | Deleted, None)                            => cursor.as[PushedEventInfo]
+      case (Approved | Opened | Accepted | Closed, Some(MergeRequest))       => cursor.as[MREventInfo]
+      case (Opened | Closed, Some(Issue))                                    => cursor.as[IssueEvent]
+      case (CommentedOn, Some(DiffNote | Note | DiscussionNote))             => cursor.as[DiffNoteEvent]
       case unknown =>
         DecodingFailure(s"unknown mapping for action_name & target_type: $unknown for EventInfo object", cursor.history).asLeft
     }
