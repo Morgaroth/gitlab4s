@@ -73,4 +73,14 @@ trait PipelinesAPI[F[_]] {
     invokeRequest(req).unmarshall[PipelineFullInfo]
   }
 
+  // @see: https://docs.gitlab.com/ee/api/pipelines.html#get-variables-of-a-pipeline
+  def getPipelineVariables(
+      projectId: EntityId,
+      pipelineId: BigInt,
+  ): EitherT[F, GitlabError, Vector[PipelineVar]] = {
+    implicit val rId: RequestId = RequestId.newOne("get-pipeline-variables")
+    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/pipelines/$pipelineId/variables")
+    invokeRequest(req).unmarshall[Vector[PipelineVar]]
+  }
+
 }
