@@ -115,11 +115,11 @@ object PermissionEntry {
 
 case class ProjectPermissions(
     project_access: Option[PermissionEntry],
-    group_access: PermissionEntry,
+    group_access: Option[PermissionEntry],
 )
 
 object ProjectPermissions {
-  implicit val ProjectPermissionsCodec: Codec[ProjectPermissions] = deriveCodec[ProjectPermissions]
+  implicit val ProjectPermissionsCodec: Codec[ProjectPermissions] = MissingPropertiesLogger.loggingCodec(deriveCodec[ProjectPermissions])
 }
 
 case class ProjectInfo(

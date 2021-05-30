@@ -10,7 +10,7 @@ class SttpGitlabAPISpec extends AnyFlatSpec with Matchers {
   assume(maybeAccessToken.isDefined, "gitlab-private-token env must be set for this test")
 
   val apiToken = maybeAccessToken.get
-  val cfg      = GitlabConfig(apiToken, "https://gitlab.com")
+  val cfg      = GitlabConfig(apiToken, "https://gitlab.com", ignoreSslErrors = false, Map.empty)
   val client   = new SttpGitlabAPISync(cfg, GitlabRestAPIConfig())
 
   "SttpGitlabAPI" should "fetch current user" in {

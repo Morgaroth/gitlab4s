@@ -2,7 +2,7 @@ package io.morgaroth.gitlabclient.query
 
 import io.morgaroth.gitlabclient.helpers.CustomDateTimeFormatter
 import io.morgaroth.gitlabclient.models.{MergeRequestState, SearchScope}
-import io.morgaroth.gitlabclient.{GitlabConfig, Sorting, SortingFamily}
+import io.morgaroth.gitlabclient.{EntityId, GitlabConfig, Sorting, SortingFamily}
 
 import java.net.URLEncoder
 import java.time.{LocalDate, ZonedDateTime}
@@ -80,9 +80,23 @@ object Methods {
 
 }
 
-case class GitlabRequest(server: String, method: Method, path: String, query: Vector[ParamQuery], payload: Option[String]) {
+case class GitlabRequest(
+    server: String,
+    method: Method,
+    path: String,
+    query: Vector[ParamQuery],
+    payload: Option[String],
+    extraHeaders: Map[String, String],
+    projectId: Option[String],
+) {
   def withParams(params: ParamQuery*): GitlabRequest =
     copy(query = query ++ params.toList.filterNot(_ == NoParam))
+
+  def withPayload(newPayload: String): GitlabRequest =
+    copy(payload = Some(newPayload))
+
+  def withProjectId(projectId: EntityId): GitlabRequest =
+    copy(projectId = Some(projectId.toStringId))
 
   lazy val render: String = {
     val base = s"${server.stripSuffix("/")}/${path.stripPrefix("/")}"
@@ -95,28 +109,28 @@ case class GitlabRequest(server: String, method: Method, path: String, query: Ve
 
 case class RequestGenerator(cfg: GitlabConfig) {
   def get(path: String): GitlabRequest =
-    GitlabRequest(cfg.server, Methods.Get, path, Vector.empty, None)
+    GitlabRequest(cfg.server, Methods.Get, path, Vector.empty, None, Map.empty, None)
 
   def delete(path: String): GitlabRequest =
-    GitlabRequest(cfg.server, Methods.Delete, path, Vector.empty, None)
+    GitlabRequest(cfg.server, Methods.Delete, path, Vector.empty, None, Map.empty, None)
 
   def delete(path: String, query: ParamQuery*): GitlabRequest =
-    GitlabRequest(cfg.server, Methods.Delete, path, query.toVector.filterNot(_ == NoParam), None)
+    GitlabRequest(cfg.server, Methods.Delete, path, query.toVector.filterNot(_ == NoParam), None, Map.empty, None)
 
   def get(path: String, query: ParamQuery*): GitlabRequest =
-    GitlabRequest(cfg.server, Methods.Get, path, query.toVector.filterNot(_ == NoParam), None)
+    GitlabRequest(cfg.server, Methods.Get, path, query.toVector.filterNot(_ == NoParam), None, Map.empty, None)
 
   def get(path: String, query: List[ParamQuery]): GitlabRequest =
-    GitlabRequest(cfg.server, Methods.Get, path, query.toVector.filterNot(_ == NoParam), None)
+    GitlabRequest(cfg.server, Methods.Get, path, query.toVector.filterNot(_ == NoParam), None, Map.empty, None)
 
   def post(path: String, query: ParamQuery*): GitlabRequest =
-    GitlabRequest(cfg.server, Methods.Post, path, query.toVector.filterNot(_ == NoParam), None)
+    GitlabRequest(cfg.server, Methods.Post, path, query.toVector.filterNot(_ == NoParam), None, Map.empty, None)
 
   def post(path: String, data: String, query: ParamQuery*): GitlabRequest =
-    GitlabRequest(cfg.server, Methods.Post, path, query.toVector.filterNot(_ == NoParam), Some(data))
+    GitlabRequest(cfg.server, Methods.Post, path, query.toVector.filterNot(_ == NoParam), Some(data), Map.empty, None)
 
   def put(path: String, data: String): GitlabRequest =
-    GitlabRequest(cfg.server, Methods.Put, path, Vector.empty, Some(data))
+    GitlabRequest(cfg.server, Methods.Put, path, Vector.empty, Some(data), Map.empty, None)
 
 }
 

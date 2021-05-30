@@ -63,7 +63,7 @@ class SttpGitlabAPISync(val config: GitlabConfig, apiConfig: GitlabRestAPIConfig
     val u = requestData.render
     val requestWithoutPayload = basicRequest
       .method(requestData.method, uri"$u")
-      .header("Private-Token", config.privateToken)
+      .header(AuthHeaderName, authHeader(requestData))
     requestData.payload
       .map(rawPayload => requestWithoutPayload.body(rawPayload).contentType("application/json"))
       .getOrElse(requestWithoutPayload)

@@ -29,7 +29,8 @@ trait GitlabRestAPI[F[_]]
 
   implicit def m: Monad[F]
 
-  val API = "/api/v4"
+  val API            = "/api/v4"
+  val AuthHeaderName = "Private-Token"
 
   def config: GitlabConfig
 
@@ -41,6 +42,9 @@ trait GitlabRestAPI[F[_]]
   protected def invokeRequestRaw(request: GitlabRequest)(implicit requestId: RequestId): EitherT[F, GitlabError, GitlabResponse[String]]
 
   protected def byteRequest(request: GitlabRequest)(implicit requestId: RequestId): EitherT[F, GitlabError, GitlabResponse[Array[Byte]]]
+
+  def authHeader(req: GitlabRequest) =
+    req.extraHeaders.getOrElse(AuthHeaderName, config.tokenForPath(req.projectId))
 
   def getCurrentUser: GitlabResponseT[GitlabFullUser] = {
     implicit val rId: RequestId = RequestId.newOne("get-current-user")

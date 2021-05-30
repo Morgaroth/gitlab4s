@@ -15,7 +15,7 @@ class PrivateGitlabAPISpec extends AnyFlatSpec with Matchers with LazyLogging wi
   assume(maybeAccessToken.isDefined, "gitlab-access-token env must be set for this test")
   assume(maybeAddress.isDefined, "gitlab-address env must be set for this test")
 
-  private val cfg = GitlabConfig(maybeAccessToken.get, maybeAddress.get, ignoreSslErrors = true)
+  private val cfg = GitlabConfig(maybeAccessToken.get, maybeAddress.get, ignoreSslErrors = true, Map.empty)
   val client      = new SttpGitlabAPISync(cfg, GitlabRestAPIConfig(true))
 
   behavior of "SttpGitlabAPI"

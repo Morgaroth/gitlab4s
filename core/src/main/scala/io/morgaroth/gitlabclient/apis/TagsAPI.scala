@@ -38,14 +38,14 @@ trait TagsAPI[F[_]] {
       message.map("message".eqParam).toList,
       description.map("release_description".eqParam).toList,
     ).flatten
-    val req = reqGen.post(s"$API/projects/${projectId.toStringId}/repository/tags", q: _*)
+    val req = reqGen.post(s"$API/projects/${projectId.toStringId}/repository/tags", q: _*).withProjectId(projectId)
     invokeRequest(req).unmarshall[TagInfo]
   }
 
   // @see: https://docs.gitlab.com/ee/api/tags.html#get-a-single-repository-tag
   def getTag(projectId: EntityId, tagName: String): EitherT[F, GitlabError, TagInfo] = {
     implicit val rId: RequestId = RequestId.newOne("get-tag")
-    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/tags/$tagName")
+    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/tags/$tagName").withProjectId(projectId)
     invokeRequest(req).unmarshall[TagInfo]
   }
 

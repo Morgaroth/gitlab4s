@@ -14,14 +14,14 @@ trait CommitsAPI[F[_]] {
   // @see: https://docs.gitlab.com/ee/api/commits.html#get-a-single-commit
   def getCommit(projectId: EntityId, ref: String): EitherT[F, GitlabError, Commit] = {
     implicit val rId: RequestId = RequestId.newOne("get-single-commit")
-    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$ref")
+    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$ref").withProjectId(projectId)
     invokeRequest(req).unmarshall[Commit]
   }
 
   // @see: https://docs.gitlab.com/ee/api/commits.html#get-references-a-commit-is-pushed-to
   def getCommitRefs(projectId: EntityId, commitId: String): EitherT[F, GitlabError, Vector[RefSimpleInfo]] = {
     implicit val rId: RequestId = RequestId.newOne("get-refs-of-a-commit")
-    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$commitId/refs")
+    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$commitId/refs").withProjectId(projectId)
     invokeRequest(req).unmarshall[Vector[RefSimpleInfo]]
   }
 
@@ -39,28 +39,28 @@ trait CommitsAPI[F[_]] {
       wrap(since).map(_.toISO8601UTC).map("since".eqParam(_)),
       wrap(until).map(_.toISO8601UTC).map("until".eqParam(_)),
     ).flatten
-    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits", params: _*)
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits", params: _*).withProjectId(projectId)
     getAllPaginatedResponse[CommitSimple](req, "get-commits", paging)
   }
 
   // @see: https://docs.gitlab.com/ee/api/commits.html#get-the-diff-of-a-commit
   def getDiffOfACommit(projectId: EntityId, ref: String): EitherT[F, GitlabError, Vector[FileDiff]] = {
     implicit val rId: RequestId = RequestId.newOne("get-commits-diff")
-    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$ref/diff")
+    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$ref/diff").withProjectId(projectId)
     invokeRequest(req).unmarshall[Vector[FileDiff]]
   }
 
   // @see: https://docs.gitlab.com/ee/api/commits.html#list-merge-requests-associated-with-a-commit
   def getMergeRequestsOfCommit(projectId: EntityId, commitSha: String): EitherT[F, GitlabError, Vector[MergeRequestInfo]] = {
     implicit val rId: RequestId = RequestId.newOne("get-commit-merge-requests")
-    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$commitSha/merge_requests")
+    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$commitSha/merge_requests").withProjectId(projectId)
     invokeRequest(req).unmarshall[Vector[MergeRequestInfo]]
   }
 
   // @see: https://docs.gitlab.com/ee/api/commits.html#get-references-a-commit-is-pushed-to
   def getCommitsReferences(projectId: EntityId, commitSha: String): EitherT[F, GitlabError, Vector[CommitReference]] = {
     implicit val rId: RequestId = RequestId.newOne("get-commit-references")
-    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$commitSha/refs")
+    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$commitSha/refs").withProjectId(projectId)
     invokeRequest(req).unmarshall[Vector[CommitReference]]
   }
 

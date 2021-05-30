@@ -13,7 +13,7 @@ trait EmojiAwardsAPI[F[_]] {
   // @see: https://docs.gitlab.com/ee/api/award_emoji.html#list-an-awardables-award-emoji
   def getEmojiAwards(projectID: EntityId, scope: AwardableScope, awardableId: BigInt): EitherT[F, GitlabError, Vector[EmojiAward]] = {
     implicit val rId: RequestId = RequestId.newOne(s"get-$scope-awards")
-    val req                     = reqGen.get(s"$API/projects/${projectID.toStringId}/$scope/$awardableId/award_emoji")
+    val req                     = reqGen.get(s"$API/projects/${projectID.toStringId}/$scope/$awardableId/award_emoji").withProjectId(projectID)
     invokeRequest(req).unmarshall[Vector[EmojiAward]]
   }
 
@@ -25,7 +25,8 @@ trait EmojiAwardsAPI[F[_]] {
       emojiName: String,
   ): EitherT[F, GitlabError, EmojiAward] = {
     implicit val rId: RequestId = RequestId.newOne(s"award-$scope-emoji")
-    val req                     = reqGen.post(s"$API/projects/${projectID.toStringId}/$scope/$awardableId/award_emoji", "name".eqParam(emojiName))
+    val req = reqGen
+      .post(s"$API/projects/${projectID.toStringId}/$scope/$awardableId/award_emoji", "name".eqParam(emojiName))
     invokeRequest(req).unmarshall[EmojiAward]
   }
 
