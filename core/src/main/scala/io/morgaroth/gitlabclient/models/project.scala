@@ -71,8 +71,8 @@ object ProjectLinks {
 case class ContainerExpirationPolicy(
     cadence: String,
     enabled: Boolean,
-    keep_n: Int,
-    older_than: String,
+    keep_n: Option[Int],
+    older_than: Option[String],
     name_regex: Option[String],
     name_regex_keep: Option[String],
     next_run_at: ZonedDateTime,
