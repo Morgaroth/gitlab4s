@@ -105,6 +105,7 @@ object ProjectPermissions {
 case class ProjectInfo(
     id: BigInt,
     description: Option[String],
+    topics: Vector[String],
     name: String,
     name_with_namespace: String,
     path: String,
