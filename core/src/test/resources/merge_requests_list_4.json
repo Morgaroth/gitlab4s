@@ -16,7 +16,8 @@
     "source_branch": "TZUcMGia0OEv1Gc7DYkBtEu6jpcsV80MucFr2HN3",
     "user_notes_count": 17,
     "upvotes": 0,
-    "downvotes": 0, "reviewers": [],
+    "downvotes": 0,
+    "reviewers": [],
     "assignee": null,
     "author": {
       "id": 111,
@@ -31,6 +32,7 @@
     "target_project_id": 111,
     "labels": [],
     "work_in_progress": false,
+    "draft": false,
     "milestone": null,
     "merge_when_pipeline_succeeds": false,
     "merge_status": "can_be_merged",
