@@ -39,6 +39,26 @@ object MergeStrategy extends EnumMarshallingGlue[MergeStrategy] {
 
 }
 
+sealed abstract class SquashOption(val name: String) extends Product with Serializable
+
+object SquashOption extends EnumMarshallingGlue[SquashOption] {
+
+  final case object NotAllow extends SquashOption("never")
+
+  final case object Allow extends SquashOption("default_off")
+
+  final case object Encourage extends SquashOption("default_on")
+
+  final case object Require extends SquashOption("always")
+
+  val all: Seq[SquashOption]            = Seq(Require, Encourage, Allow, NotAllow)
+  val byName: Map[String, SquashOption] = all.map(x => x.name -> x).toMap
+  val rawValue: SquashOption => String  = _.name
+
+  implicit val SquashOptionCirceCodec: Codec[SquashOption] = EnumMarshalling.stringEnumCodecOf(SquashOption)
+
+}
+
 case class GitlabNamespace(
     id: BigInt,
     name: String,
@@ -137,6 +157,7 @@ case class ProjectInfo(
     lfs_enabled: Boolean,
     creator_id: BigInt,
     merge_method: MergeStrategy,
+    squash_option: SquashOption,
     packages_enabled: Option[Boolean],
     service_desk_enabled: Boolean,
     service_desk_address: Option[String],
@@ -192,6 +213,7 @@ case class ProjectInfo(
     analytics_access_level: Option[String],
     container_expiration_policy: ContainerExpirationPolicy,
     permissions: ProjectPermissions,
+    ci_job_token_scope_enabled: Boolean,
 )
 
 object ProjectInfo {
@@ -259,6 +281,7 @@ case class EditProjectRequest private (
     show_default_award_emojis: Option[Boolean] = None,
     snippets_access_level: Option[String] = None,
     snippets_enabled: Option[Boolean] = None,
+    squash_option: Option[SquashOption] = None,
     suggestion_commit_message: Option[String] = None,
     tag_list: Option[Set[String]] = None,
     visibility: Option[String] = None,
@@ -368,6 +391,8 @@ case class EditProjectRequest private (
   def withSnippetsAccessLevel(value: String) = copy(snippets_access_level = Some(value))
 
   def withSnippetsEnabled(value: Boolean) = copy(snippets_enabled = Some(value))
+
+  def withSquashOption(value: SquashOption) = copy(squash_option = Some(value))
 
   def withSuggestionCommitMessage(value: String) = copy(suggestion_commit_message = Some(value))
 
