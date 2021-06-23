@@ -214,6 +214,7 @@ case class ProjectInfo(
     container_expiration_policy: ContainerExpirationPolicy,
     permissions: ProjectPermissions,
     ci_job_token_scope_enabled: Boolean,
+    keep_latest_artifact: Boolean,
 )
 
 object ProjectInfo {
