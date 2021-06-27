@@ -165,13 +165,23 @@ trait MergeRequestsAPI[F[_]] {
     getAllPaginatedResponse[MergeRequestNote](req, "merge-request-notes", paging)
   }
 
+  // @see: https://docs.gitlab.com/ee/api/notes.html#get-single-merge-request-note
+  def getMergeRequestNote(
+      projectId: EntityId,
+      mergeRequestIId: BigInt,
+      noteId: BigInt,
+  ): GitlabResponseT[MergeRequestNote] = {
+    implicit val rId: RequestId = RequestId.newOne("get-merge-request-note")
+    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes/$noteId").withProjectId(projectId)
+    invokeRequest(req).unmarshall[MergeRequestNote]
+  }
+
   // @see: https://docs.gitlab.com/ee/api/notes.html#create-new-merge-request-note
   def createMergeRequestNote(projectId: EntityId, mergeRequestIId: BigInt, body: String): GitlabResponseT[MergeRequestNote] = {
     implicit val rId: RequestId = RequestId.newOne("merge-request-note-create")
     val payload                 = MJson.write(MergeRequestNoteCreate(body))
     val req = reqGen
       .post(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes", payload)
-      .withProjectId(projectId)
     invokeRequest(req).unmarshall[MergeRequestNote]
   }
 
@@ -186,7 +196,6 @@ trait MergeRequestsAPI[F[_]] {
     val payload                 = MJson.write(MergeRequestNoteCreate(newBody))
     val req = reqGen
       .put(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes/$noteId", payload)
-      .withProjectId(projectId)
     invokeRequest(req).unmarshall[MergeRequestNote]
   }
 

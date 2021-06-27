@@ -31,7 +31,7 @@ trait EventsAPI[F[_]] {
 
   // @see: https://docs.gitlab.com/ee/api/events.html#get-user-contribution-events
   def getUserContributionEvents(
-      userId: BigInt,
+      userId: EntityId,
       since: UtcDate = null,
       until: UtcDate = null,
       targetType: TargetType = null,
@@ -46,7 +46,7 @@ trait EventsAPI[F[_]] {
       wrap(action).map(_.name).map("action".eqParam(_)),
       wrap(sort).flatMap(_.toParams),
     ).flatten
-    val req = reqGen.get(API + s"/users/$userId/events", params: _*)
+    val req = reqGen.get(API + s"/users/${userId.toStringId}/events", params: _*)
     getAllPaginatedResponse[EventInfo](req, "events", paging)
   }
 

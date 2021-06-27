@@ -2,6 +2,7 @@ package io.morgaroth.gitlabclient.models
 
 import io.circe.generic.semiauto.{deriveCodec, deriveEncoder}
 import io.circe.{Codec, Encoder}
+import io.morgaroth.gitlabclient.maintenance.MissingPropertiesLogger
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
 import java.time.ZonedDateTime
@@ -45,6 +46,26 @@ object NoteableTypes extends EnumMarshallingGlue[NoteableType] {
   override def rawValue: NoteableType => String = _.name
 }
 
+case class LineDef(
+    line_code: String,
+    `type`: String,
+    old_line: Option[Int],
+    new_line: Option[Int],
+)
+
+object LineDef {
+  implicit val LineDefCodec: Codec[LineDef] = MissingPropertiesLogger.loggingCodec(deriveCodec[LineDef])
+}
+
+case class LineRange(
+    start: LineDef,
+    end: LineDef,
+)
+
+object LineRange {
+  implicit val LineRangeCodec: Codec[LineRange] = MissingPropertiesLogger.loggingCodec(deriveCodec[LineRange])
+}
+
 case class NotePosition(
     base_sha: Option[String], // not sure in what case
     start_sha: String,
@@ -54,10 +75,11 @@ case class NotePosition(
     position_type: String,
     old_line: Option[Int],
     new_line: Option[Int],
+    line_range: LineRange,
 )
 
 object NotePosition {
-  implicit val NotePositionCodec: Codec[NotePosition] = deriveCodec[NotePosition]
+  implicit val NotePositionCodec: Codec[NotePosition] = MissingPropertiesLogger.loggingCodec(deriveCodec[NotePosition])
 }
 
 case class MergeRequestNote(
@@ -68,6 +90,7 @@ case class MergeRequestNote(
     created_at: ZonedDateTime,
     updated_at: ZonedDateTime,
     system: Boolean,
+    commit_id: Option[String],
     noteable_type: NoteableType,
     noteable_id: Option[BigInt],    // when noteable_type is commit
     noteable_iid: Option[BigInt],   // when noteable_type is commit
@@ -75,10 +98,14 @@ case class MergeRequestNote(
     resolvable: Boolean,
     resolved: Option[Boolean], // not present for system "new commits added..." etc, present when MR comment
     resolved_by: Option[GitlabUser],
+    resolved_at: Option[ZonedDateTime],
+    attachment: Option[Int],
+    confidential: Boolean,
+    commands_changes: Map[String, Int],
 )
 
 object MergeRequestNote {
-  implicit val MergeRequestNoteCodec: Codec[MergeRequestNote] = deriveCodec[MergeRequestNote]
+  implicit val MergeRequestNoteCodec: Codec[MergeRequestNote] = MissingPropertiesLogger.loggingCodec(deriveCodec[MergeRequestNote])
 }
 
 case class MergeRequestNoteCreate(
