@@ -122,6 +122,19 @@ object ProjectPermissions {
   implicit val ProjectPermissionsCodec: Codec[ProjectPermissions] = MissingPropertiesLogger.loggingCodec(deriveCodec[ProjectPermissions])
 }
 
+case class SharedGroup(
+    group_id: BigInt,
+    group_name: String,
+    group_full_path: String,
+    group_access_level: Int,
+    expires_at: Option[ZonedDateTime],
+)
+
+object SharedGroup {
+  implicit val SharedGroupCodec: Codec[SharedGroup] = MissingPropertiesLogger.loggingCodec(deriveCodec[SharedGroup])
+
+}
+
 case class ProjectInfo(
     id: BigInt,
     description: Option[String],
@@ -177,7 +190,7 @@ case class ProjectInfo(
     auto_cancel_pending_pipelines: String,
     build_coverage_regex: Option[String],
     ci_config_path: Option[String],
-    shared_with_groups: Option[Vector[String]],
+    shared_with_groups: Vector[SharedGroup],
     suggestion_commit_message: Option[String],
     auto_devops_deploy_strategy: String,
     mirror: Boolean,
