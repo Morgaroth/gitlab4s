@@ -177,7 +177,7 @@ case class ProjectInfo(
     auto_cancel_pending_pipelines: String,
     build_coverage_regex: Option[String],
     ci_config_path: Option[String],
-    shared_with_groups: Vector[String],
+    shared_with_groups: Option[Vector[String]],
     suggestion_commit_message: Option[String],
     auto_devops_deploy_strategy: String,
     mirror: Boolean,
