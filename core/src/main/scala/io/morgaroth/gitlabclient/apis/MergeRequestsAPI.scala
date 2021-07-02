@@ -17,7 +17,11 @@ trait MergeRequestsAPI[F[_]] {
     globalSearch(SearchScope.MergeRequests, phrase)
 
   // @see: https://docs.gitlab.com/ee/api/search.html#scope-merge_requests-1
-  private def groupGlobalSearch(groupId: EntityId, scope: SearchScope, phrase: Option[String])(implicit rId: RequestId) = {
+  private def groupGlobalSearch(
+      groupId: EntityId,
+      scope: SearchScope,
+      phrase: Option[String],
+  )(implicit rId: RequestId) = {
     val req = reqGen.get(s"$API/groups/${groupId.toStringId}/search", scope.toParam, phrase.map(Search).getOrElse(NoParam))
     invokeRequest(req)
   }
@@ -32,16 +36,17 @@ trait MergeRequestsAPI[F[_]] {
   def getMergeRequests(
       projectID: EntityId,
       state: MergeRequestState = MergeRequestStates.All,
-      search: String = null,
-      myReaction: String = null,
-      updatedBefore: ZonedDateTime = null,
-      updatedAfter: ZonedDateTime = null,
-      createdBefore: ZonedDateTime = null,
-      createdAfter: ZonedDateTime = null,
+      search: NullableField[String] = NullValue,
+      myReaction: NullableField[String] = NullValue,
+      createdBefore: NullableField[ZonedDateTime] = NullValue,
+      createdAfter: NullableField[ZonedDateTime] = NullValue,
+      updatedBefore: NullableField[ZonedDateTime] = NullValue,
+      updatedAfter: NullableField[ZonedDateTime] = NullValue,
+      withMergeStatusRecheck: NullableField[Boolean] = NullValue,
       paging: Paging = AllPages,
-      sort: Sorting[MergeRequestsSort] = null,
+      sort: NullableField[Sorting[MergeRequestsSort]] = NullValue,
   ): GitlabResponseT[Vector[MergeRequestInfo]] = {
-    val q   = renderParams(myReaction, search, state, updatedBefore, updatedAfter, createdBefore, createdAfter, sort)
+    val q   = renderParams(myReaction, search, state, updatedBefore, updatedAfter, createdBefore, createdAfter, withMergeStatusRecheck, sort)
     val req = reqGen.get(s"$API/projects/${projectID.toStringId}/merge_requests", q: _*).withProjectId(projectID)
     getAllPaginatedResponse[MergeRequestInfo](req, "merge-requests-per-project", paging)
   }
@@ -54,16 +59,17 @@ trait MergeRequestsAPI[F[_]] {
   def getGroupMergeRequests(
       groupId: EntityId,
       state: MergeRequestState = MergeRequestStates.All,
-      search: String = null,
-      myReaction: String = null,
-      updatedBefore: ZonedDateTime = null,
-      updatedAfter: ZonedDateTime = null,
-      createdBefore: ZonedDateTime = null,
-      createdAfter: ZonedDateTime = null,
+      search: NullableField[String] = NullValue,
+      myReaction: NullableField[String] = NullValue,
+      updatedBefore: NullableField[ZonedDateTime] = NullValue,
+      updatedAfter: NullableField[ZonedDateTime] = NullValue,
+      createdBefore: NullableField[ZonedDateTime] = NullValue,
+      createdAfter: NullableField[ZonedDateTime] = NullValue,
+      withMergeStatusRecheck: NullableField[Boolean] = NullValue,
       paging: Paging = AllPages,
-      sort: Sorting[MergeRequestsSort] = null,
+      sort: NullableField[Sorting[MergeRequestsSort]] = NullValue,
   ): GitlabResponseT[Vector[MergeRequestInfo]] = {
-    val q = renderParams(myReaction, search, state, updatedBefore, updatedAfter, createdBefore, createdAfter, sort)
+    val q = renderParams(myReaction, search, state, updatedBefore, updatedAfter, createdBefore, createdAfter, withMergeStatusRecheck, sort)
 
     val req = reqGen.get(s"$API/groups/${groupId.toStringId}/merge_requests", q: _*)
     getAllPaginatedResponse[MergeRequestInfo](req, "merge-requests-per-group", paging)

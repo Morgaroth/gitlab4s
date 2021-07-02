@@ -5,6 +5,7 @@ import cats.data.EitherT
 import com.typesafe.scalalogging.LazyLogging
 import io.circe.Decoder
 import io.morgaroth.gitlabclient.apis._
+import io.morgaroth.gitlabclient.helpers.NullableField
 import io.morgaroth.gitlabclient.marshalling.Gitlab4SMarshalling
 import io.morgaroth.gitlabclient.models._
 import io.morgaroth.gitlabclient.query.ParamQuery._
@@ -65,23 +66,25 @@ trait GitlabRestAPI[F[_]]
   }
 
   protected def renderParams(
-      myReaction: String,
-      search: String,
+      myReaction: NullableField[String],
+      search: NullableField[String],
       state: MergeRequestState,
-      updatedBefore: ZonedDateTime,
-      updatedAfter: ZonedDateTime,
-      createdBefore: ZonedDateTime,
-      createdAfter: ZonedDateTime,
-      sort: Sorting[MergeRequestsSort],
+      updatedBefore: NullableField[ZonedDateTime],
+      updatedAfter: NullableField[ZonedDateTime],
+      createdBefore: NullableField[ZonedDateTime],
+      createdAfter: NullableField[ZonedDateTime],
+      withMergeStatusRecheck: NullableField[Boolean],
+      sort: NullableField[Sorting[MergeRequestsSort]],
   ): Vector[ParamQuery] = {
     Vector(
-      wrap(sort).flatMap(s => List("order_by".eqParam(s.field.property), "sort".eqParam(s.direction.toString))),
-      wrap(myReaction).map("my_reaction_emoji".eqParam),
-      wrap(updatedBefore).map("updated_before".eqParam),
-      wrap(updatedAfter).map("updated_after".eqParam),
-      wrap(createdBefore).map("created_before".eqParam),
-      wrap(createdAfter).map("created_after".eqParam),
-      wrap(search).map("search".eqParam),
+      sort.toList.flatMap(s => List("order_by".eqParam(s.field.property), "sort".eqParam(s.direction.toString))),
+      myReaction.toList.map("my_reaction_emoji".eqParam),
+      updatedBefore.toList.map("updated_before".eqParam),
+      updatedAfter.toList.map("updated_after".eqParam),
+      createdBefore.toList.map("created_before".eqParam),
+      createdAfter.toList.map("created_after".eqParam),
+      withMergeStatusRecheck.toList.map("with_merge_status_recheck".eqParam),
+      search.toList.map("search".eqParam),
       List(state.toParam),
     ).flatten
   }
