@@ -36,6 +36,7 @@ trait MergeRequestsAPI[F[_]] {
   def getMergeRequests(
       projectID: EntityId,
       state: MergeRequestState = MergeRequestStates.All,
+      author: NullableField[EntityId] = NullValue,
       search: NullableField[String] = NullValue,
       myReaction: NullableField[String] = NullValue,
       createdBefore: NullableField[ZonedDateTime] = NullValue,
@@ -46,13 +47,24 @@ trait MergeRequestsAPI[F[_]] {
       paging: Paging = AllPages,
       sort: NullableField[Sorting[MergeRequestsSort]] = NullValue,
   ): GitlabResponseT[Vector[MergeRequestInfo]] = {
-    val q   = renderParams(myReaction, search, state, updatedBefore, updatedAfter, createdBefore, createdAfter, withMergeStatusRecheck, sort)
+    val q = renderParams(
+      myReaction,
+      author,
+      search,
+      state,
+      updatedBefore,
+      updatedAfter,
+      createdBefore,
+      createdAfter,
+      withMergeStatusRecheck,
+      sort,
+    )
     val req = reqGen.get(s"$API/projects/${projectID.toStringId}/merge_requests", q: _*).withProjectId(projectID)
     getAllPaginatedResponse[MergeRequestInfo](req, "merge-requests-per-project", paging)
   }
 
   // traverse over all states and fetch merge requests for every state, gitlab doesn't offer search by multiple states
-  def getMergeRequests(projectID: EntityId, states: Iterable[MergeRequestState]): GitlabResponseT[Vector[MergeRequestInfo]] =
+  def getMergeRequestds(projectID: EntityId, states: Iterable[MergeRequestState]): GitlabResponseT[Vector[MergeRequestInfo]] =
     states.toVector.traverse(state => getMergeRequests(projectID, state)).map(_.flatten)
 
   // @see: https://docs.gitlab.com/ee/api/merge_requests.html#list-group-merge-requests
@@ -60,6 +72,7 @@ trait MergeRequestsAPI[F[_]] {
       groupId: EntityId,
       state: MergeRequestState = MergeRequestStates.All,
       search: NullableField[String] = NullValue,
+      author: NullableField[EntityId] = NullValue,
       myReaction: NullableField[String] = NullValue,
       updatedBefore: NullableField[ZonedDateTime] = NullValue,
       updatedAfter: NullableField[ZonedDateTime] = NullValue,
@@ -69,7 +82,18 @@ trait MergeRequestsAPI[F[_]] {
       paging: Paging = AllPages,
       sort: NullableField[Sorting[MergeRequestsSort]] = NullValue,
   ): GitlabResponseT[Vector[MergeRequestInfo]] = {
-    val q = renderParams(myReaction, search, state, updatedBefore, updatedAfter, createdBefore, createdAfter, withMergeStatusRecheck, sort)
+    val q = renderParams(
+      myReaction,
+      author,
+      search,
+      state,
+      updatedBefore,
+      updatedAfter,
+      createdBefore,
+      createdAfter,
+      withMergeStatusRecheck,
+      sort,
+    )
 
     val req = reqGen.get(s"$API/groups/${groupId.toStringId}/merge_requests", q: _*)
     getAllPaginatedResponse[MergeRequestInfo](req, "merge-requests-per-group", paging)
@@ -298,8 +322,7 @@ trait MergeRequestsAPI[F[_]] {
   // @see: https://docs.gitlab.com/ee/api/merge_requests.html#list-merge-requests
   def globalMergeRequestSearch(
       state: NullableField[MergeRequestState] = NullValue,
-      authorId: NullableField[BigInt] = NullValue,
-      authorUsername: NullableField[String] = NullValue,
+      author: NullableField[EntityId] = NullValue,
       scope: NullableField[MergeRequestSearchScope] = NullValue,
       titleOrDescriptionText: NullableField[String] = NullValue,
       createdBefore: NullableField[ZonedDateTime] = NullValue,
@@ -312,8 +335,10 @@ trait MergeRequestsAPI[F[_]] {
     implicit val rId: RequestId = RequestId.newOne("list-mrs")
     val q = Vector(
       state.toList.map(_.toParam),
-      authorId.toList.map("author_id" eqParam _),
-      authorUsername.toList.map("author_username" eqParam _),
+      author.toList.map {
+        case NumericEntityIdId(id) => "author_id".eqParam(id)
+        case StringEntityId(id)    => "author_username".eqParam(id)
+      },
       scope.toList.map(_.name).map("scope" eqParam _),
       titleOrDescriptionText.toList.map("search" eqParam _),
       createdBefore.toList.map("created_before" eqParam _),

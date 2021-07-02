@@ -67,6 +67,7 @@ trait GitlabRestAPI[F[_]]
 
   protected def renderParams(
       myReaction: NullableField[String],
+      author: NullableField[EntityId],
       search: NullableField[String],
       state: MergeRequestState,
       updatedBefore: NullableField[ZonedDateTime],
@@ -77,6 +78,10 @@ trait GitlabRestAPI[F[_]]
       sort: NullableField[Sorting[MergeRequestsSort]],
   ): Vector[ParamQuery] = {
     Vector(
+      author.toList.map {
+        case NumericEntityIdId(id) => "author_id".eqParam(id)
+        case StringEntityId(id)    => "author_username".eqParam(id)
+      },
       sort.toList.flatMap(s => List("order_by".eqParam(s.field.property), "sort".eqParam(s.direction.toString))),
       myReaction.toList.map("my_reaction_emoji".eqParam),
       updatedBefore.toList.map("updated_before".eqParam),
