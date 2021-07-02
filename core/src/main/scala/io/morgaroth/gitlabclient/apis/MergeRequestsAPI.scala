@@ -64,7 +64,7 @@ trait MergeRequestsAPI[F[_]] {
   }
 
   // traverse over all states and fetch merge requests for every state, gitlab doesn't offer search by multiple states
-  def getMergeRequestds(projectID: EntityId, states: Iterable[MergeRequestState]): GitlabResponseT[Vector[MergeRequestInfo]] =
+  def getMergeRequests(projectID: EntityId, states: Iterable[MergeRequestState]): GitlabResponseT[Vector[MergeRequestInfo]] =
     states.toVector.traverse(state => getMergeRequests(projectID, state)).map(_.flatten)
 
   // @see: https://docs.gitlab.com/ee/api/merge_requests.html#list-group-merge-requests
