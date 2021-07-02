@@ -13,5 +13,8 @@ case class SomeValue[T](value: T) extends NullableField[T] {
 }
 
 object NullableField {
+  implicit def wrapOption[T](value: Option[T])(implicit du: DummyImplicit): NullableField[T] =
+    value.map(SomeValue(_)).getOrElse(NullValue)
+
   implicit def wrapIntoSome[T](value: T): NullableField[T] = SomeValue(value)
 }
