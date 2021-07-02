@@ -88,7 +88,7 @@ trait MergeRequestSimple {
   def closed_at: Option[ZonedDateTime]
   def target_branch: String
   def source_branch: String
-  def source_project_id: BigInt
+  def source_project_id: Option[BigInt]
   def target_project_id: BigInt
   def references: ReferencesInfo
   def web_url: String
@@ -114,7 +114,7 @@ case class MergeRequestInfo(
     author: GitlabUser,
     assignee: Option[GitlabUser],
     assignees: Option[Vector[GitlabUser]],
-    source_project_id: BigInt,
+    source_project_id: Option[BigInt],
     target_project_id: BigInt,
     labels: Vector[String],
     merge_status: MergeStatus,
@@ -200,7 +200,7 @@ case class MergeRequestFull(
     author: GitlabUser,
     assignee: Option[GitlabUser],
     assignees: Option[Vector[GitlabUser]],
-    source_project_id: BigInt,
+    source_project_id: Option[BigInt],
     target_project_id: BigInt,
     labels: Vector[String],
     merge_status: Option[MergeStatus],
