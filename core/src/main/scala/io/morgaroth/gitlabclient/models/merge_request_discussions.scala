@@ -75,7 +75,7 @@ case class NotePosition(
     position_type: String,
     old_line: Option[Int],
     new_line: Option[Int],
-    line_range: LineRange,
+    line_range: Option[LineRange],
 )
 
 object NotePosition {
