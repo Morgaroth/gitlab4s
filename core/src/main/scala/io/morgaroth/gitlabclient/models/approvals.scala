@@ -22,7 +22,7 @@ object RuleType extends EnumMarshallingGlue[RuleType] {
 
   final case object Regular     extends RuleType("regular")
   final case object AnyApprover extends RuleType("any_approver")
-  final case object CodeOwner   extends RuleType("rule_type")
+  final case object CodeOwner   extends RuleType("code_owner")
 
   val all: Seq[RuleType]            = Seq(Regular, AnyApprover, CodeOwner)
   val byName: Map[String, RuleType] = all.map(x => x.name -> x).toMap
