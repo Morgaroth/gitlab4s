@@ -20,11 +20,11 @@ sealed abstract class RuleType(val name: String) extends Product with Serializab
 
 object RuleType extends EnumMarshallingGlue[RuleType] {
 
-  final case object Regular extends RuleType("regular")
-
+  final case object Regular     extends RuleType("regular")
   final case object AnyApprover extends RuleType("any_approver")
+  final case object CodeOwner   extends RuleType("rule_type")
 
-  val all: Seq[RuleType]            = Seq(Regular, AnyApprover)
+  val all: Seq[RuleType]            = Seq(Regular, AnyApprover, CodeOwner)
   val byName: Map[String, RuleType] = all.map(x => x.name -> x).toMap
 
   override def rawValue: RuleType => String = _.name
