@@ -147,6 +147,16 @@ object MergeRequestInfo {
   implicit val MergeRequestInfoCodec: Codec[MergeRequestInfo] = MissingPropertiesLogger.loggingCodec(deriveCodec[MergeRequestInfo])
 }
 
+case class UpdateMergeRequestState(name: String) extends Product with Serializable
+
+object UpdateMergeRequestState {
+  case object Reopen extends MergeRequestState("reopen")
+
+  case object Close extends MergeRequestState("close")
+
+  implicit val updateMRPayloadEncoder: Encoder[UpdateMergeRequestState] = Encoder.encodeString.contramap(_.name)
+}
+
 case class UpdateMRPayload(
     target_branch: Option[String] = None,
     title: Option[String] = None,
@@ -155,7 +165,7 @@ case class UpdateMRPayload(
     milestone_id: Option[Long] = None,
     labels: Option[Vector[String]] = None,
     description: Option[String] = None,
-    state_event: Option[MergeRequestState] = None,
+    state_event: Option[UpdateMergeRequestState] = None,
     remove_source_branch: Option[Boolean] = None,
     squash: Option[Boolean] = None,
     discussion_locked: Option[Boolean] = None,
