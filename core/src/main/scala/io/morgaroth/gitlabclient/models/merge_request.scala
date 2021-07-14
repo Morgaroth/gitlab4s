@@ -147,12 +147,12 @@ object MergeRequestInfo {
   implicit val MergeRequestInfoCodec: Codec[MergeRequestInfo] = MissingPropertiesLogger.loggingCodec(deriveCodec[MergeRequestInfo])
 }
 
-case class UpdateMergeRequestState(name: String) extends Product with Serializable
+abstract class UpdateMergeRequestState(val name: String) extends Product with Serializable
 
 object UpdateMergeRequestState {
-  case object Reopen extends MergeRequestState("reopen")
+  case object Reopen extends UpdateMergeRequestState("reopen")
 
-  case object Close extends MergeRequestState("close")
+  case object Close extends UpdateMergeRequestState("close")
 
   implicit val updateMRPayloadEncoder: Encoder[UpdateMergeRequestState] = Encoder.encodeString.contramap(_.name)
 }
