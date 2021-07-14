@@ -119,6 +119,13 @@ trait MergeRequestsAPI[F[_]] {
     invokeRequest(req).unmarshall[MergeRequestFull]
   }
 
+  // @see: https://docs.gitlab.com/ee/api/merge_requests.html#delete-a-merge-request
+  def deleteMergeRequest(projectID: EntityId, mrIid: BigInt): GitlabResponseT[Unit] = {
+    implicit val rId: RequestId = RequestId.newOne("delete-merge-request")
+    val req                     = reqGen.delete(s"$API/projects/${projectID.toStringId}/merge_requests/$mrIid")
+    invokeRequest(req).map(_ => ())
+  }
+
   // @see: https://docs.gitlab.com/ee/api/merge_requests.html#get-single-mr-changes
   def getMergeRequestDiff(projectID: EntityId, mrId: BigInt): GitlabResponseT[MergeRequestFull] = {
     implicit val rId: RequestId = RequestId.newOne("get-merge-request-diff")
