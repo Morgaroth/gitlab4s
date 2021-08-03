@@ -135,6 +135,23 @@ object SharedGroup {
 
 }
 
+sealed abstract class ContainerRegistryAccessLevel(val name: String) extends Product with Serializable
+
+object ContainerRegistryAccessLevel extends EnumMarshallingGlue[ContainerRegistryAccessLevel] {
+
+  final case object Enabled extends ContainerRegistryAccessLevel("enabled")
+
+  final case object Disabled extends ContainerRegistryAccessLevel("disabled")
+
+  val all: Seq[ContainerRegistryAccessLevel]            = Seq(Enabled, Disabled)
+  val byName: Map[String, ContainerRegistryAccessLevel] = all.map(x => x.name -> x).toMap
+  val rawValue: ContainerRegistryAccessLevel => String  = _.name
+
+  implicit val ContainerRegistryAccessLevelCirceCodec: Codec[ContainerRegistryAccessLevel] =
+    EnumMarshalling.stringEnumCodecOf(ContainerRegistryAccessLevel)
+
+}
+
 case class ProjectInfo(
     id: BigInt,
     description: Option[String],
@@ -223,13 +240,15 @@ case class ProjectInfo(
     allow_merge_on_skipped_pipeline: Option[Boolean],
     resolve_outdated_diff_discussions: Boolean,
     printing_merge_request_link_enabled: Boolean,
-    container_registry_image_prefix: String,
     operations_access_level: Option[String],
     analytics_access_level: Option[String],
     container_expiration_policy: ContainerExpirationPolicy,
     permissions: ProjectPermissions,
     ci_job_token_scope_enabled: Boolean,
     keep_latest_artifact: Boolean,
+    // container registry
+    container_registry_image_prefix: String,
+    container_registry_access_level: ContainerRegistryAccessLevel,
 )
 
 object ProjectInfo {
