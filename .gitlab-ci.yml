@@ -23,7 +23,7 @@ Run Tests:
 Check formatting:
   stage: validate
   script:
-    - sbt -v scalafmtCheckAll
+    - sbt -v fmtcheck
 
 Pubilsh snapshot:
   stage: publish

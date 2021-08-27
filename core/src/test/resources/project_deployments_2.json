@@ -77,7 +77,8 @@
         "status": "running",
         "created_at": "1970-01-01T12:00:00.000+00:00",
         "updated_at": "1970-01-01T12:00:00.000+00:00",
-        "web_url": "https://google.com?q=VoxEiboM13"
+        "web_url": "https://google.com?q=VoxEiboM13",
+        "source": "push"
       },
       "web_url": "https://google.com?q=VoxEiboM13",
       "artifacts": [],
@@ -173,7 +174,8 @@
         "status": "success",
         "created_at": "1970-01-01T12:00:00.000+00:00",
         "updated_at": "1970-01-01T12:00:00.000+00:00",
-        "web_url": "https://google.com?q=VoxEiboM13"
+        "web_url": "https://google.com?q=VoxEiboM13",
+        "source": "push"
       },
       "web_url": "https://google.com?q=VoxEiboM13",
       "artifacts_file": {
@@ -292,7 +294,8 @@
         "status": "failed",
         "created_at": "1970-01-01T12:00:00.000+00:00",
         "updated_at": "1970-01-01T12:00:00.000+00:00",
-        "web_url": "https://google.com?q=VoxEiboM13"
+        "web_url": "https://google.com?q=VoxEiboM13",
+        "source": "push"
       },
       "web_url": "https://google.com?q=VoxEiboM13",
       "artifacts": [],

@@ -1,7 +1,7 @@
 package io.morgaroth.gitlabclient.models
 
-import io.circe.{Codec, Encoder}
 import io.circe.generic.semiauto.{deriveCodec, deriveEncoder}
+import io.circe.{Codec, Encoder}
 import io.morgaroth.gitlabclient.maintenance.MissingPropertiesLogger
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
@@ -37,6 +37,22 @@ object PipelineStatus extends EnumMarshallingGlue[PipelineStatus] {
   implicit val PipelineStatusCirceCodec: Codec[PipelineStatus] = EnumMarshalling.stringEnumCodecOf(PipelineStatus)
 }
 
+sealed abstract class PipelineSource(val name: String) extends Product with Serializable
+
+object PipelineSource extends EnumMarshallingGlue[PipelineSource] {
+
+  case object API extends PipelineSource("api")
+
+  case object Push extends PipelineSource("push")
+
+  val all: Seq[PipelineSource]            = Seq(API, Push)
+  val byName: Map[String, PipelineSource] = all.map(x => x.name -> x).toMap
+
+  override def rawValue: PipelineSource => String = _.name
+
+  implicit val PipelineSourceCirceCodec: Codec[PipelineSource] = EnumMarshalling.stringEnumCodecOf(PipelineSource)
+}
+
 sealed abstract class PipelineScope(val name: String) extends Product with Serializable
 
 object PipelineScope {
@@ -62,6 +78,7 @@ case class PipelineShort(
     created_at: ZonedDateTime,
     updated_at: ZonedDateTime,
     web_url: String,
+    source: PipelineSource,
 )
 
 object PipelineShort {
