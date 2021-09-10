@@ -21,7 +21,7 @@ trait CommitsAPI[F[_]] {
   // @see: https://docs.gitlab.com/ee/api/commits.html#get-references-a-commit-is-pushed-to
   def getCommitRefs(projectId: EntityId, commitId: String): EitherT[F, GitlabError, Vector[RefSimpleInfo]] = {
     implicit val rId: RequestId = RequestId.newOne("get-refs-of-a-commit")
-    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$commitId/refs").withProjectId(projectId)
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$commitId/refs").withProjectId(projectId)
     invokeRequest(req).unmarshall[Vector[RefSimpleInfo]]
   }
 
@@ -53,14 +53,14 @@ trait CommitsAPI[F[_]] {
   // @see: https://docs.gitlab.com/ee/api/commits.html#list-merge-requests-associated-with-a-commit
   def getMergeRequestsOfCommit(projectId: EntityId, commitSha: String): EitherT[F, GitlabError, Vector[MergeRequestInfo]] = {
     implicit val rId: RequestId = RequestId.newOne("get-commit-merge-requests")
-    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$commitSha/merge_requests").withProjectId(projectId)
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$commitSha/merge_requests").withProjectId(projectId)
     invokeRequest(req).unmarshall[Vector[MergeRequestInfo]]
   }
 
   // @see: https://docs.gitlab.com/ee/api/commits.html#get-references-a-commit-is-pushed-to
   def getCommitsReferences(projectId: EntityId, commitSha: String): EitherT[F, GitlabError, Vector[CommitReference]] = {
     implicit val rId: RequestId = RequestId.newOne("get-commit-references")
-    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$commitSha/refs").withProjectId(projectId)
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$commitSha/refs").withProjectId(projectId)
     invokeRequest(req).unmarshall[Vector[CommitReference]]
   }
 

@@ -37,7 +37,7 @@ trait JobsAPI[F[_]] {
       artifactPath: String,
   ): EitherT[F, GitlabError, RawResponse] = {
     implicit val rId: RequestId = RequestId.newOne("get-single-artifact")
-    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/jobs/$jobId/artifacts/$artifactPath").withProjectId(projectId)
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/jobs/$jobId/artifacts/$artifactPath").withProjectId(projectId)
     byteRequest(req).map(RawResponse.from)
   }
 

@@ -1,22 +1,22 @@
 val circeVersion    = "0.13.0"
 val circeExtVersion = "0.13.0"
-val silencerVersion = "1.7.1"
+val silencerVersion = "1.7.5"
 
 val validate = Def.taskKey[Unit]("Validates entire project")
 
-val projectScalaVersion      = "2.13.4"
+val projectScalaVersion      = "2.13.6"
 val crossScalaVersionsValues = Seq(projectScalaVersion, "2.12.13")
 
 val publishSettings = Seq(
   publishTo := Some {
-    if (isSnapshot.value) "Artifactory releases" at "https://mateuszjajedev.jfrog.io/artifactory/maven/"
-    else "Artifactory snapshots" at s"https://mateuszjajedev.jfrog.io/artifactory/maven;build.timestamp=${new java.util.Date().getTime}"
+    if (!isSnapshot.value) "Artifactory releases" at "https://jajemateuszdev.jfrog.io/artifactory/maven/"
+    else "Artifactory snapshots" at s"https://jajemateuszdev.jfrog.io/artifactory/maven;build.timestamp=${new java.util.Date().getTime}"
   },
   credentials += Credentials(file(sys.env.getOrElse("JFROG_CREDENTIALS_FILE", ".credentials"))),
-  versionScheme := Some("semver-spec"),
+  versionScheme      := Some("semver-spec"),
   crossScalaVersions := crossScalaVersionsValues,
-  scalaVersion := projectScalaVersion,
-  publishMavenStyle := true,
+  scalaVersion       := projectScalaVersion,
+  publishMavenStyle  := true,
 )
 
 val commonSettings = publishSettings ++ Seq(
@@ -99,16 +99,16 @@ val gitlab4s = project
   .aggregate(core, sttpjdk, sttptry)
   .settings(publishSettings)
   .settings(
-    name := "gitlab4s",
-    publish := {},
+    name         := "gitlab4s",
+    publish      := {},
     publishLocal := {},
     validate := Def.sequential {
       Test / test
       // tut.value
     }.value,
     // Release
-    releaseTagComment := s"Releasing ${(ThisBuild / version).value} [skip ci]",
-    releaseCommitMessage := s"Setting version to ${(ThisBuild / version).value} [skip ci]",
+    releaseTagComment        := s"Releasing ${(ThisBuild / version).value} [skip ci]",
+    releaseCommitMessage     := s"Setting version to ${(ThisBuild / version).value} [skip ci]",
     releaseNextCommitMessage := s"Setting version to ${(ThisBuild / version).value} [skip ci]",
-    releaseCrossBuild := true,
+    releaseCrossBuild        := true,
   )

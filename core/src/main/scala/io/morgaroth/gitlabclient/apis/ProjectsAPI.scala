@@ -83,7 +83,7 @@ trait ProjectsAPI[F[_]] {
       payload: UpsertProjectApprovalRule,
   ): EitherT[F, GitlabError, ProjectApprovalRule] = {
     implicit val rId: RequestId = RequestId.newOne("update-project-approval-rule")
-    val req                     = reqGen.put(API + s"/projects/${projectId.toStringId}/approval_rules/$approvalRuleId", MJson.write(payload))
+    val req = reqGen.put(API + s"/projects/${projectId.toStringId}/approval_rules/$approvalRuleId", MJson.write(payload))
     invokeRequest(req).unmarshall[ProjectApprovalRule]
   }
 

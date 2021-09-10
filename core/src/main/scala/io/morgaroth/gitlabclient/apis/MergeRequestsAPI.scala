@@ -138,7 +138,7 @@ trait MergeRequestsAPI[F[_]] {
   // @see: https://docs.gitlab.com/ee/api/merge_request_approvals.html#get-configuration-1
   def getApprovals(projectId: EntityId, mergeRequestIId: BigInt): GitlabResponseT[MergeRequestApprovals] = {
     implicit val rId: RequestId = RequestId.newOne("get-mr-approvals")
-    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approvals").withProjectId(projectId)
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approvals").withProjectId(projectId)
     invokeRequest(req).unmarshall[MergeRequestApprovals]
   }
 
@@ -148,7 +148,7 @@ trait MergeRequestsAPI[F[_]] {
       mergeRequestIId: BigInt,
   ): GitlabResponseT[Vector[MergeRequestApprovalRule]] = {
     implicit val rId: RequestId = RequestId.newOne("get-mr-approval-rules")
-    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approval_rules").withProjectId(projectId)
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approval_rules").withProjectId(projectId)
     invokeRequest(req).unmarshall[Vector[MergeRequestApprovalRule]]
   }
 
@@ -176,7 +176,7 @@ trait MergeRequestsAPI[F[_]] {
   // @see https://docs.gitlab.com/ee/api/merge_request_approvals.html#delete-merge-request-level-rule
   def deleteApprovalRule(projectId: EntityId, mergeRequestIId: BigInt, approvalRuleId: BigInt): GitlabResponseT[String] = {
     implicit val rId: RequestId = RequestId.newOne("delete-mr-approval-rule")
-    val req                     = reqGen.delete(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approval_rules/$approvalRuleId")
+    val req = reqGen.delete(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approval_rules/$approvalRuleId")
     invokeRequest(req)
   }
 
@@ -209,7 +209,7 @@ trait MergeRequestsAPI[F[_]] {
       noteId: BigInt,
   ): GitlabResponseT[MergeRequestNote] = {
     implicit val rId: RequestId = RequestId.newOne("get-merge-request-note")
-    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes/$noteId").withProjectId(projectId)
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes/$noteId").withProjectId(projectId)
     invokeRequest(req).unmarshall[MergeRequestNote]
   }
 
