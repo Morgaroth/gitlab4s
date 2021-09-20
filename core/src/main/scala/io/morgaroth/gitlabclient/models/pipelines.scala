@@ -45,9 +45,10 @@ object PipelineSource extends EnumMarshallingGlue[PipelineSource] {
 
   case object Push              extends PipelineSource("push")
   case object Web               extends PipelineSource("web")
+  case object Schedule          extends PipelineSource("schedule")
   case object MergeRequestEvent extends PipelineSource("merge_request_event")
 
-  val all: Seq[PipelineSource]            = Seq(API, Push, Web, MergeRequestEvent)
+  val all: Seq[PipelineSource]            = Seq(API, Push, Web, Schedule, MergeRequestEvent)
   val byName: Map[String, PipelineSource] = all.map(x => x.name -> x).toMap
 
   override def rawValue: PipelineSource => String = _.name
