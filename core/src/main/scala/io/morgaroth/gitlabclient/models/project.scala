@@ -243,7 +243,7 @@ case class ProjectInfo(
     operations_access_level: Option[String],
     analytics_access_level: Option[String],
     container_expiration_policy: ContainerExpirationPolicy,
-    permissions: ProjectPermissions,
+    permissions: Option[ProjectPermissions],
     ci_job_token_scope_enabled: Boolean,
     keep_latest_artifact: Boolean,
     // container registry

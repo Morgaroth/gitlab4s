@@ -30,13 +30,13 @@ Pubilsh snapshot:
   script:
     - sbt -v +publish
   except:
-    - master
+    - main
     - tags
 
 Release next version:
   stage: publish
   only:
-    - master
+    - main
   script:
     - apt update
     - apt install --no-install-recommends -y dnsutils netcat-openbsd
