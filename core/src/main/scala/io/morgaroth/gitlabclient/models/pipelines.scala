@@ -41,8 +41,7 @@ sealed abstract class PipelineSource(val name: String) extends Product with Seri
 
 object PipelineSource extends EnumMarshallingGlue[PipelineSource] {
 
-  case object API extends PipelineSource("api")
-
+  case object API               extends PipelineSource("api")
   case object Push              extends PipelineSource("push")
   case object Web               extends PipelineSource("web")
   case object Schedule          extends PipelineSource("schedule")
