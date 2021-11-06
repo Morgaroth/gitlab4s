@@ -66,6 +66,9 @@ case class JobFullInfo(
     tag: Boolean,
     //coverage ??
     allow_failure: Boolean,
+    queued_duration: Option[Double],
+    tag_list: Vector[String],
+    artifacts_file: Option[ArtifactFile],
     created_at: ZonedDateTime,
     started_at: Option[ZonedDateTime],
     finished_at: Option[ZonedDateTime],

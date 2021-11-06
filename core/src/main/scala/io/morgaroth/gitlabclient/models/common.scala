@@ -84,3 +84,12 @@ case class PaginatedResponse[A](
     previous: Option[String],
     values: Vector[A],
 )
+
+case class ArtifactFile(
+    filename: String,
+    size: Long,
+)
+
+object ArtifactFile {
+  implicit val ArtifactFileDecoder: Codec[ArtifactFile] = deriveCodec[ArtifactFile]
+}

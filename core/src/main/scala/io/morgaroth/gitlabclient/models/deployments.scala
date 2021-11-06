@@ -72,15 +72,6 @@ object DeploymentDeployable {
   implicit val DeploymentDeployableDecoder: Decoder[DeploymentDeployable] = deriveDecoder[DeploymentDeployable]
 }
 
-case class ArtifactFile(
-    filename: String,
-    size: Long,
-)
-
-object ArtifactFile {
-  implicit val ArtifactFileDecoder: Decoder[ArtifactFile] = deriveDecoder[ArtifactFile]
-}
-
 case class PipelineArtifactSimple(
     file_type: String,
     size: Long,
