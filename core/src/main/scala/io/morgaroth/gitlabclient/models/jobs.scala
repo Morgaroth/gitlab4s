@@ -2,6 +2,7 @@ package io.morgaroth.gitlabclient.models
 
 import io.circe.Codec
 import io.circe.generic.semiauto.deriveCodec
+import io.morgaroth.gitlabclient.maintenance.MissingPropertiesLogger
 import io.morgaroth.gitlabclient.marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
 import java.time.ZonedDateTime
@@ -79,7 +80,7 @@ case class JobFullInfo(
 )
 
 object JobFullInfo {
-  implicit val JobFullInfoCodec: Codec[JobFullInfo] = deriveCodec[JobFullInfo]
+  implicit val JobFullInfoCodec: Codec[JobFullInfo] = MissingPropertiesLogger.loggingCodec(deriveCodec[JobFullInfo])
 }
 
 case class JobRunner(
@@ -88,9 +89,9 @@ case class JobRunner(
     ip_address: String,
     active: Boolean,
     is_shared: Boolean,
+    runner_type: String,
     name: String,
     online: Boolean,
-    status: String,
 )
 
 object JobRunner {
