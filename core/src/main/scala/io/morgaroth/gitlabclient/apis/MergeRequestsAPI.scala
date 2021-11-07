@@ -1,5 +1,6 @@
 package io.morgaroth.gitlabclient.apis
 
+import cats.data.EitherT
 import cats.instances.vector._
 import cats.syntax.traverse._
 import io.morgaroth.gitlabclient._
@@ -142,6 +143,36 @@ trait MergeRequestsAPI[F[_]] {
     invokeRequest(req).unmarshall[MergeRequestApprovals]
   }
 
+  def getApprovals(mergeRequest: MergeRequestID): GitlabResponseT[MergeRequestApprovals] =
+    getApprovals(mergeRequest.project_id, mergeRequest.iid)
+
+  //  @see: https://docs.gitlab.com/ee/api/merge_request_approvals.html#approve-merge-request
+  def approveMergeRequest(
+      projectId: EntityId,
+      mergeRequestIId: BigInt,
+      headSha: Option[String] = None,
+  ): EitherT[F, GitlabError, MergeRequestApprovals] = {
+    implicit val rId: RequestId = RequestId.newOne("approve-mr")
+    val data                    = headSha.map("sha" -> _).toMap
+    val req = reqGen.post(API + s"/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approve", MJson.write(data))
+    invokeRequest(req).unmarshall[MergeRequestApprovals]
+  }
+
+  def approveMergeRequest(
+      mergeRequest: MergeRequestID,
+      headSha: Option[String],
+  ): EitherT[F, GitlabError, MergeRequestApprovals] = approveMergeRequest(mergeRequest.project_id, mergeRequest.iid, headSha)
+
+  //  @see: https://docs.gitlab.com/ee/api/merge_request_approvals.html#unapprove-merge-request
+  def unapproveMergeRequest(
+      projectId: EntityId,
+      mergeRequestIId: BigInt,
+  ): EitherT[F, GitlabError, MergeRequestApprovals] = {
+    implicit val rId: RequestId = RequestId.newOne("unapprove-mr")
+    val req                     = reqGen.post(API + s"/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/unapprove")
+    invokeRequest(req).unmarshall[MergeRequestApprovals]
+  }
+
   // @see https://docs.gitlab.com/ee/api/merge_request_approvals.html#get-the-approval-state-of-merge-requests
   def getMergeRequestApprovalRules(
       projectId: EntityId,
@@ -201,6 +232,16 @@ trait MergeRequestsAPI[F[_]] {
 
     getAllPaginatedResponse[MergeRequestNote](req, "merge-request-notes", paging)
   }
+
+  def getMergeRequestNotes(mr: MergeRequestID): GitlabResponseT[Vector[MergeRequestNote]] =
+    getMergeRequestNotes(mr.project_id, mr.iid)
+
+  def getMergeRequestNotes(
+      mr: MergeRequestID,
+      paging: Paging,
+      sort: Option[Sorting[MergeRequestNotesSort]],
+  ): GitlabResponseT[Vector[MergeRequestNote]] =
+    getMergeRequestNotes(mr.project_id, mr.iid, paging, sort)
 
   // @see: https://docs.gitlab.com/ee/api/notes.html#get-single-merge-request-note
   def getMergeRequestNote(

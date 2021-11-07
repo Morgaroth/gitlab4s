@@ -26,6 +26,23 @@ object NoteTypes extends EnumMarshallingGlue[NoteType] {
   override def rawValue: NoteType => String = _.name
 }
 
+sealed abstract class LineRangeType(val name: String) extends Product with Serializable
+
+object LineRangeType {
+  implicit val LineRangeTypeCirceCodec: Codec[LineRangeType] = EnumMarshalling.stringEnumCodecOf(LineRangeTypes)
+}
+
+object LineRangeTypes extends EnumMarshallingGlue[LineRangeType] {
+
+  case object New extends LineRangeType("new")
+  case object Old extends LineRangeType("old")
+
+  val all: Seq[LineRangeType]            = Seq(New, Old)
+  val byName: Map[String, LineRangeType] = all.map(x => x.name -> x).toMap
+
+  override def rawValue: LineRangeType => String = _.name
+}
+
 sealed abstract class NoteableType(val name: String) extends Product with Serializable
 
 object NoteableType {
@@ -48,7 +65,7 @@ object NoteableTypes extends EnumMarshallingGlue[NoteableType] {
 
 case class LineDef(
     line_code: String,
-    `type`: String,
+    `type`: Option[LineRangeType],
     old_line: Option[Int],
     new_line: Option[Int],
 )

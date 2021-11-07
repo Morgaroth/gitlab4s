@@ -72,10 +72,13 @@ object ReferencesInfo {
   implicit val ReferencesInfoCodec: Codec[ReferencesInfo] = MissingPropertiesLogger.loggingCodec(deriveCodec[ReferencesInfo])
 }
 
-trait MergeRequestSimple {
+trait MergeRequestID {
   def id: BigInt
   def iid: BigInt
   def project_id: BigInt
+}
+
+trait MergeRequestSimple extends MergeRequestID {
   def title: String
   def description: Option[String]
   def state: MergeRequestState
@@ -249,6 +252,7 @@ case class MergeRequestFull(
     milestone: Option[String],
     time_stats: TimeStats,
     reviewers: Vector[GitlabUser],
+    overflow: Boolean,
 ) extends MergeRequestSimple
 
 object MergeRequestFull {
