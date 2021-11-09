@@ -252,7 +252,7 @@ case class MergeRequestFull(
     milestone: Option[String],
     time_stats: TimeStats,
     reviewers: Vector[GitlabUser],
-    overflow: Boolean,
+    overflow: Option[Boolean],
 ) extends MergeRequestSimple
 
 object MergeRequestFull {
