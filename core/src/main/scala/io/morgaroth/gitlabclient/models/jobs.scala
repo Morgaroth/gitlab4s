@@ -80,6 +80,7 @@ case class JobFullInfo(
     artifacts: Vector[PipelineArtifactSimple],
     runner: Option[JobRunner],
     artifacts_expire_at: Option[ZonedDateTime],
+    coverage: Option[String],
 )
 
 object JobFullInfo {
