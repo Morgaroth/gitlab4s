@@ -289,6 +289,7 @@ case class EditProjectRequest private (
     issues_enabled: Option[Boolean] = None,
     jobs_enabled: Option[Boolean] = None,
     lfs_enabled: Option[Boolean] = None,
+    merge_commit_template: Option[String] = None,
     merge_method: Option[MergeStrategy] = None,
     merge_requests_access_level: Option[String] = None,
     merge_requests_enabled: Option[Boolean] = None,
