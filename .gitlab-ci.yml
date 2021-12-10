@@ -1,4 +1,4 @@
-image: hseeberger/scala-sbt:11.0.10_1.5.1_2.12.13
+image: hseeberger/scala-sbt:11.0.13_1.5.6_2.13.7
 
 cache:
   paths:
@@ -28,7 +28,10 @@ Check formatting:
 Pubilsh snapshot:
   stage: publish
   script:
-    - sbt -v +publish
+    - gpg --batch --yes --import $GPG_SIGNING_KEY
+    - gpg --list-keys
+    - cp $SONATYPE_CONFIG sonatype-creds.sbt
+    - sbt -v +publishSigned
   except:
     - main
     - tags
@@ -38,8 +41,9 @@ Release next version:
   only:
     - main
   script:
-    - apt update
-    - apt install --no-install-recommends -y dnsutils netcat-openbsd
+    - gpg --batch --yes --import $GPG_SIGNING_KEY
+    - gpg --list-keys
+    - apt update && apt install --no-install-recommends -y dnsutils netcat-openbsd
     - mkdir ~/.ssh
     - set -xe
     - ssh-keyscan -H -p 22 gitlab.com > ~/.ssh/known_hosts
@@ -50,7 +54,8 @@ Release next version:
     - git checkout $CI_COMMIT_REF_NAME
     - git remote set-url --push origin $(perl -pe 's#.*@(.+?(\:\d+)?)/#git@\1:#' <<< $CI_REPOSITORY_URL)
     - git config --list
-    - sbt -v ";Test / compile; release with-defaults"
+    - cp $SONATYPE_CONFIG sonatype-creds.sbt
+    - sbt -v "release with-defaults"
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /\[no release\]/

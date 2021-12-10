@@ -11,3 +11,4 @@
 /checked.log
 /.bsp
 /.credentials
+/sonatype-creds.sbt
