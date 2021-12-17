@@ -251,6 +251,8 @@ case class ProjectInfo(
     // container registry
     container_registry_image_prefix: String,
     container_registry_access_level: ContainerRegistryAccessLevel,
+    squash_commit_template: Option[String],
+    merge_commit_template: Option[String],
 )
 
 object ProjectInfo {

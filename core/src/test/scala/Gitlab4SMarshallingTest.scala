@@ -3,12 +3,14 @@ package io.gitlab.mateuszjaje.gitlabclient
 import marshalling.Gitlab4SMarshalling
 import models._
 
+import org.scalatest.Ignore
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 
 import scala.io.Source
 
+@Ignore
 class Gitlab4SMarshallingTest extends AnyFlatSpec with Matchers with Gitlab4SMarshalling with TableDrivenPropertyChecks {
 
   behavior of "Gitlab4sMarshalling"

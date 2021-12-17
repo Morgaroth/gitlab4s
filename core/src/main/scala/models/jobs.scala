@@ -83,6 +83,7 @@ case class JobFullInfo(
     runner: Option[JobRunner],
     artifacts_expire_at: Option[ZonedDateTime],
     coverage: Option[String],
+    failure_reason: Option[String],
 )
 
 object JobFullInfo {

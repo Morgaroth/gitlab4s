@@ -75,6 +75,7 @@ object PipelineScope {
 
 case class PipelineShort(
     id: BigInt,
+    iid: BigInt,
     project_id: BigInt,
     sha: String,
     ref: String,
