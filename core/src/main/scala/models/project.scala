@@ -142,10 +142,11 @@ sealed abstract class ContainerRegistryAccessLevel(val name: String) extends Pro
 object ContainerRegistryAccessLevel extends EnumMarshallingGlue[ContainerRegistryAccessLevel] {
 
   final case object Enabled extends ContainerRegistryAccessLevel("enabled")
+  final case object Private extends ContainerRegistryAccessLevel("private")
 
   final case object Disabled extends ContainerRegistryAccessLevel("disabled")
 
-  val all: Seq[ContainerRegistryAccessLevel]            = Seq(Enabled, Disabled)
+  val all: Seq[ContainerRegistryAccessLevel]            = Seq(Enabled, Private, Disabled)
   val byName: Map[String, ContainerRegistryAccessLevel] = all.map(x => x.name -> x).toMap
   val rawValue: ContainerRegistryAccessLevel => String  = _.name
 
