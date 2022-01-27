@@ -92,6 +92,7 @@ object PipelineShort {
 
 case class PipelineFullInfo(
     id: BigInt,
+    iid: BigInt,
     project_id: BigInt,
     sha: String,
     ref: String,

@@ -218,6 +218,7 @@ case class ProjectInfo(
     marked_for_deletion_at: Option[ZonedDateTime],
     marked_for_deletion_on: Option[ZonedDateTime],
     compliance_frameworks: Vector[String],
+    runner_token_expiration_interval: Option[String],
     // flags
     request_access_enabled: Boolean,
     container_registry_enabled: Option[Boolean],
