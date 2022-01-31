@@ -89,7 +89,7 @@ case class NotePosition(
     base_sha: Option[String], // not sure in what case
     start_sha: String,
     head_sha: String,
-    old_path: String,
+    old_path: Option[String],
     new_path: String,
     position_type: String,
     old_line: Option[Int],
