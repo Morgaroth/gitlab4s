@@ -246,6 +246,7 @@ case class ProjectInfo(
     printing_merge_request_link_enabled: Boolean,
     operations_access_level: Option[String],
     analytics_access_level: Option[String],
+    requirements_access_level: Option[String],
     container_expiration_policy: ContainerExpirationPolicy,
     permissions: Option[ProjectPermissions],
     ci_job_token_scope_enabled: Boolean,
