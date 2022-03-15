@@ -234,6 +234,7 @@ case class ProjectInfo(
     ci_forward_deployment_enabled: Boolean,
     merge_pipelines_enabled: Boolean,
     merge_trains_enabled: Boolean,
+    security_and_compliance_access_level: Option[String],
     // merge requests
     only_allow_merge_if_all_discussions_are_resolved: Boolean,
     remove_source_branch_after_merge: Option[Boolean],
