@@ -232,6 +232,7 @@ case class ProjectInfo(
     snippets_enabled: Boolean,
     auto_devops_enabled: Boolean,
     ci_forward_deployment_enabled: Boolean,
+    ci_separated_caches: Option[Boolean],
     merge_pipelines_enabled: Boolean,
     merge_trains_enabled: Boolean,
     security_and_compliance_access_level: Option[String],
@@ -257,6 +258,11 @@ case class ProjectInfo(
     container_registry_access_level: ContainerRegistryAccessLevel,
     squash_commit_template: Option[String],
     merge_commit_template: Option[String],
+    // import
+    import_type: Option[String],
+    import_url: Option[String],
+    // other
+    enforce_auth_checks_on_uploads: Option[Boolean],
 )
 
 object ProjectInfo {

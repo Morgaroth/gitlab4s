@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
 import scala.reflect.ClassTag
 
 object MissingPropertiesLogger {
-  val logger = Logger(LoggerFactory.getLogger(getClass.getPackageName + ".MissingPropertiesLogger"))
+  val logger = Logger(LoggerFactory.getLogger(getClass.getPackage.getName + ".MissingPropertiesLogger"))
 
   private def calculateMissingFields[T: ClassTag](inputData: Json, value: Decoder.Result[T], rId: Option[RequestId])(implicit
       enc: Encoder[T],

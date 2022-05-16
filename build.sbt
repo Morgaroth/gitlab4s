@@ -4,17 +4,19 @@ import xerial.sbt.Sonatype.GitLabHosting
 
 val circeVersion    = "0.13.0"
 val circeExtVersion = "0.13.0"
-val silencerVersion = "1.7.5"
+val silencerVersion = "1.7.8"
 
 val validate = Def.taskKey[Unit]("Validates entire project")
 
 val projectScalaVersion      = "2.13.6"
-val crossScalaVersionsValues = Seq(projectScalaVersion, "2.12.13")
+val crossScalaVersionsValues = Seq(projectScalaVersion, "2.12.15")
 
 val publishSettings = Seq(
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
   sonatypeProjectHosting := Some(GitLabHosting("mateuszjaje", "gitlab4s", "mateuszjaje@gmail.com")),
-  developers             := List(Developer("mjd", "Mateusz Jaje", "mateuszjaje@gmail.com", new URL("https://gitlab.com/mateuszjajedev"))),
+  developers       := List(Developer("Mateusz Jaje", "Mateusz Jaje", "mateuszjaje@gmail.com", new URL("https://gitlab.com/mateuszjaje"))),
+  organizationName := "Mateusz Jaje",
+  organizationHomepage   := Some(url("https://gitlab.com/mateuszjaje")),
   versionScheme          := Some("semver-spec"),
   crossScalaVersions     := crossScalaVersionsValues,
   scalaVersion           := projectScalaVersion,
