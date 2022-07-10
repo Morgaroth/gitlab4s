@@ -263,6 +263,7 @@ case class ProjectInfo(
     import_url: Option[String],
     // other
     enforce_auth_checks_on_uploads: Option[Boolean],
+    ci_opt_in_jwt: Option[Boolean],
 )
 
 object ProjectInfo {

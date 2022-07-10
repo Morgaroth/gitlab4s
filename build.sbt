@@ -2,13 +2,13 @@ import Syntax._
 import com.jsuereth.sbtpgp.PgpKeys.publishSigned
 import xerial.sbt.Sonatype.GitLabHosting
 
-val circeVersion    = "0.13.0"
-val circeExtVersion = "0.13.0"
-val silencerVersion = "1.7.8"
+val circeVersion    = "0.14.2"
+val circeExtVersion = "0.14.2"
+val silencerVersion = "1.7.9"
 
 val validate = Def.taskKey[Unit]("Validates entire project")
 
-val projectScalaVersion      = "2.13.6"
+val projectScalaVersion      = "2.13.8"
 val crossScalaVersionsValues = Seq(projectScalaVersion, "2.12.15")
 
 val publishSettings = Seq(
@@ -74,9 +74,9 @@ val commonSettings = publishSettings ++ Seq(
 )
 
 val testDeps = Seq(
-  "org.scalatest" %% "scalatest-flatspec"       % "3.2.3" % Test,
-  "org.scalatest" %% "scalatest-shouldmatchers" % "3.2.3" % Test,
-  "ch.qos.logback" % "logback-classic"          % "1.2.3" % Test,
+  "org.scalatest" %% "scalatest-flatspec"       % "3.2.12" % Test,
+  "org.scalatest" %% "scalatest-shouldmatchers" % "3.2.12" % Test,
+  "ch.qos.logback" % "logback-classic"          % "1.2.11" % Test,
 )
 
 val core = project
@@ -89,8 +89,8 @@ val core = project
       "io.circe"                   %% "circe-generic"        % circeVersion,
       "io.circe"                   %% "circe-parser"         % circeVersion,
       "io.circe"                   %% "circe-generic-extras" % circeExtVersion,
-      "com.typesafe"                % "config"               % "1.4.1",
-      "com.typesafe.scala-logging" %% "scala-logging"        % "3.9.2",
+      "com.typesafe"                % "config"               % "1.4.2",
+      "com.typesafe.scala-logging" %% "scala-logging"        % "3.9.5",
     ) ++ testDeps,
   )
 
@@ -101,8 +101,8 @@ val sttpjdk = project
   .settings(
     name := "gitlab4s-sttp",
     libraryDependencies ++= Seq(
-      "com.softwaremill.sttp.client3" %% "core"               % "3.0.0",
-      "com.softwaremill.sttp.client3" %% "httpclient-backend" % "3.0.0",
+      "com.softwaremill.sttp.client3" %% "core"               % "3.6.2",
+      "com.softwaremill.sttp.client3" %% "httpclient-backend" % "3.5.2",
     ) ++ testDeps,
   )
 
@@ -113,7 +113,7 @@ val sttptry = project
   .settings(
     name := "gitlab4s-sttp-try",
     libraryDependencies ++= Seq(
-      "com.softwaremill.sttp.client3" %% "core" % "3.0.0",
+      "com.softwaremill.sttp.client3" %% "core" % "3.6.2",
     ) ++ testDeps,
   )
 
