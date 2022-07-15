@@ -36,10 +36,11 @@ object LineRangeType {
 
 object LineRangeTypes extends EnumMarshallingGlue[LineRangeType] {
 
-  case object New extends LineRangeType("new")
-  case object Old extends LineRangeType("old")
+  case object New      extends LineRangeType("new")
+  case object Old      extends LineRangeType("old")
+  case object Expanded extends LineRangeType("expanded")
 
-  val all: Seq[LineRangeType]            = Seq(New, Old)
+  val all: Seq[LineRangeType]            = Seq(New, Old, Expanded)
   val byName: Map[String, LineRangeType] = all.map(x => x.name -> x).toMap
 
   override def rawValue: LineRangeType => String = _.name
