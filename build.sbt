@@ -4,12 +4,11 @@ import xerial.sbt.Sonatype.GitLabHosting
 
 val circeVersion    = "0.14.2"
 val circeExtVersion = "0.14.2"
-val silencerVersion = "1.7.9"
 
 val validate = Def.taskKey[Unit]("Validates entire project")
 
 val projectScalaVersion      = "2.13.8"
-val crossScalaVersionsValues = Seq(projectScalaVersion, "2.12.15")
+val crossScalaVersionsValues = Seq(projectScalaVersion, "3.1.2")
 
 val publishSettings = Seq(
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
@@ -38,6 +37,7 @@ val publishSettings = Seq(
       setNextVersion,
       commitNextVersion,
       pushChanges,
+      pushChanges,
     )
   },
 )
@@ -55,16 +55,22 @@ val commonSettings = publishSettings ++ Seq(
     "-language:higherKinds",
     "-language:postfixOps",
     "-language:implicitConversions",
-    "-Ywarn-unused:imports",
-    "-P:silencer:checkUnused",
   ) ++ {
-    if (scalaVersion.value.startsWith("2.13")) Seq("-Ymacro-annotations") else Seq.empty
+    if (scalaVersion.value.startsWith("2.13"))
+      Seq(
+        "-Ymacro-annotations",
+        "-Ywarn-unused:imports",
+      )
+    else if (scalaVersion.value.startsWith("3."))
+      Seq(
+        "-Xmax-inlines",
+        "110",
+      )
+    else Seq.empty
   },
-  libraryDependencies ++= Seq(
-    compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
-    "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full,
-  ) ++ {
-    if (scalaVersion.value.startsWith("2.12")) Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full))
+  libraryDependencies ++= {
+    if (scalaVersion.value.startsWith("2.12"))
+      Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full))
     else Seq.empty
   },
   idePackagePrefix.invisible := Some("io.gitlab.mateuszjaje.gitlabclient"),
@@ -84,13 +90,13 @@ val core = project
   .settings(
     name := "gitlab4s-core",
     libraryDependencies ++= Seq(
-      "org.typelevel"              %% "cats-core"            % "2.3.1",
-      "io.circe"                   %% "circe-core"           % circeVersion,
-      "io.circe"                   %% "circe-generic"        % circeVersion,
-      "io.circe"                   %% "circe-parser"         % circeVersion,
-      "io.circe"                   %% "circe-generic-extras" % circeExtVersion,
-      "com.typesafe"                % "config"               % "1.4.2",
-      "com.typesafe.scala-logging" %% "scala-logging"        % "3.9.5",
+      "org.typelevel"              %% "cats-core"     % "2.8.0",
+      "io.circe"                   %% "circe-core"    % circeVersion,
+      "io.circe"                   %% "circe-generic" % circeVersion,
+      "io.circe"                   %% "circe-parser"  % circeVersion,
+      "io.circe"                   %% "circe-generic" % circeExtVersion,
+      "com.typesafe"                % "config"        % "1.4.2",
+      "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5",
     ) ++ testDeps,
   )
 
@@ -122,11 +128,13 @@ val gitlab4s = project
   .aggregate(core, sttpjdk, sttptry)
   .settings(publishSettings)
   .settings(
-    organization  := "io.gitlab.mateuszjaje",
-    name          := "gitlab4s",
-    publish       := {},
-    publishSigned := {},
-    publishLocal  := {},
+    organization                 := "io.gitlab.mateuszjaje",
+    name                         := "gitlab4s",
+    publish                      := {},
+    publishSigned                := {},
+    publishLocal                 := {},
+    doc / sources                := Seq.empty,
+    packageDoc / publishArtifact := false,
     validate := Def.sequential {
       Test / test
       // tut.value

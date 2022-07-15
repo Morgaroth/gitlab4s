@@ -13,19 +13,19 @@ sealed abstract class TargetType(val name: String) extends Product with Serializ
 
 object TargetTypes {
 
-  final case object Issue extends TargetType("issue")
+  case object Issue extends TargetType("issue")
 
-  final case object Milestone extends TargetType("milestone")
+  case object Milestone extends TargetType("milestone")
 
-  final case object MergeRequest extends TargetType("merge_request")
+  case object MergeRequest extends TargetType("merge_request")
 
-  final case object Note extends TargetType("note")
+  case object Note extends TargetType("note")
 
-  final case object Project extends TargetType("project")
+  case object Project extends TargetType("project")
 
-  final case object Snippet extends TargetType("snippet")
+  case object Snippet extends TargetType("snippet")
 
-  final case object User extends TargetType("user")
+  case object User extends TargetType("user")
 
 }
 
@@ -33,27 +33,27 @@ sealed abstract class ActionType(val name: String) extends Product with Serializ
 
 object ActionTypes {
 
-  final case object Created extends ActionType("created")
+  case object Created extends ActionType("created")
 
-  final case object Updated extends ActionType("updated")
+  case object Updated extends ActionType("updated")
 
-  final case object Closed extends ActionType("closed")
+  case object Closed extends ActionType("closed")
 
-  final case object Reopened extends ActionType("reopened")
+  case object Reopened extends ActionType("reopened")
 
-  final case object Pushed extends ActionType("pushed")
+  case object Pushed extends ActionType("pushed")
 
-  final case object Commented extends ActionType("commented")
+  case object Commented extends ActionType("commented")
 
-  final case object Merged extends ActionType("merged")
+  case object Merged extends ActionType("merged")
 
-  final case object Joined extends ActionType("joined")
+  case object Joined extends ActionType("joined")
 
-  final case object Left extends ActionType("left")
+  case object Left extends ActionType("left")
 
-  final case object Destroyed extends ActionType("destroyed")
+  case object Destroyed extends ActionType("destroyed")
 
-  final case object Expired extends ActionType("expired")
+  case object Expired extends ActionType("expired")
 
 }
 
@@ -114,15 +114,15 @@ sealed abstract class ResponseTargetType(val name: String) extends Product with 
 
 object ResponseTargetType extends EnumMarshallingGlue[ResponseTargetType] {
 
-  final case object MergeRequest extends ResponseTargetType("MergeRequest")
+  case object MergeRequest extends ResponseTargetType("MergeRequest")
 
-  final case object DiffNote extends ResponseTargetType("DiffNote") // when some piece of code was commented, the MR's Diff page
+  case object DiffNote extends ResponseTargetType("DiffNote") // when some piece of code was commented, the MR's Diff page
 
-  final case object DiscussionNote extends ResponseTargetType("DiscussionNote") // when resolvable discussion was started on a MR page
+  case object DiscussionNote extends ResponseTargetType("DiscussionNote") // when resolvable discussion was started on a MR page
 
-  final case object Note extends ResponseTargetType("Note") // when simple note was posted on a MR page
+  case object Note extends ResponseTargetType("Note") // when simple note was posted on a MR page
 
-  final case object Issue extends ResponseTargetType("Issue")
+  case object Issue extends ResponseTargetType("Issue")
 
   val all    = Seq(MergeRequest, DiffNote, DiscussionNote, Note, Issue)
   val byName = all.map(x => x.name -> x).toMap

@@ -5,7 +5,6 @@ import maintenance.MissingPropertiesLogger
 import marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
 import io.circe.Codec
-import io.circe.generic.extras._
 import io.circe.generic.semiauto.deriveCodec
 
 import java.time.ZonedDateTime
@@ -90,11 +89,16 @@ object Commit {
   implicit val CommitCodec: Codec[Commit] = deriveCodec[Commit]
 }
 
-@ConfiguredJsonCodec
 case class RefSimpleInfo(
     name: String,
-    @JsonKey("type") kind: String,
-)
+    `type`: String,
+) {
+  val kind = `type`
+}
+
+object RefSimpleInfo {
+  implicit val RefSimpleInfoCodec: Codec[RefSimpleInfo] = deriveCodec
+}
 
 case class FileDiff(
     diff: String,

@@ -27,11 +27,11 @@ sealed abstract class MergeStrategy(val name: String) extends Product with Seria
 
 object MergeStrategy extends EnumMarshallingGlue[MergeStrategy] {
 
-  final case object FastForward extends MergeStrategy("ff")
+  case object FastForward extends MergeStrategy("ff")
 
-  final case object RebaseMerge extends MergeStrategy("rebase_merge")
+  case object RebaseMerge extends MergeStrategy("rebase_merge")
 
-  final case object MergeCommit extends MergeStrategy("merge")
+  case object MergeCommit extends MergeStrategy("merge")
 
   val all: Seq[MergeStrategy]            = Seq(MergeCommit, RebaseMerge, FastForward)
   val byName: Map[String, MergeStrategy] = all.map(x => x.name -> x).toMap
@@ -45,13 +45,13 @@ sealed abstract class SquashOption(val name: String) extends Product with Serial
 
 object SquashOption extends EnumMarshallingGlue[SquashOption] {
 
-  final case object NotAllow extends SquashOption("never")
+  case object NotAllow extends SquashOption("never")
 
-  final case object Allow extends SquashOption("default_off")
+  case object Allow extends SquashOption("default_off")
 
-  final case object Encourage extends SquashOption("default_on")
+  case object Encourage extends SquashOption("default_on")
 
-  final case object Require extends SquashOption("always")
+  case object Require extends SquashOption("always")
 
   val all: Seq[SquashOption]            = Seq(Require, Encourage, Allow, NotAllow)
   val byName: Map[String, SquashOption] = all.map(x => x.name -> x).toMap
@@ -141,10 +141,9 @@ sealed abstract class ContainerRegistryAccessLevel(val name: String) extends Pro
 
 object ContainerRegistryAccessLevel extends EnumMarshallingGlue[ContainerRegistryAccessLevel] {
 
-  final case object Enabled extends ContainerRegistryAccessLevel("enabled")
-  final case object Private extends ContainerRegistryAccessLevel("private")
-
-  final case object Disabled extends ContainerRegistryAccessLevel("disabled")
+  case object Enabled  extends ContainerRegistryAccessLevel("enabled")
+  case object Private  extends ContainerRegistryAccessLevel("private")
+  case object Disabled extends ContainerRegistryAccessLevel("disabled")
 
   val all: Seq[ContainerRegistryAccessLevel]            = Seq(Enabled, Private, Disabled)
   val byName: Map[String, ContainerRegistryAccessLevel] = all.map(x => x.name -> x).toMap
