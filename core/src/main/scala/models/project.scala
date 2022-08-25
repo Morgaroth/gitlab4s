@@ -262,6 +262,7 @@ case class ProjectInfo(
     import_url: Option[String],
     // other
     enforce_auth_checks_on_uploads: Option[Boolean],
+    ci_allow_fork_pipelines_to_run_in_parent_project: Option[Boolean],
     ci_opt_in_jwt: Option[Boolean],
 )
 
