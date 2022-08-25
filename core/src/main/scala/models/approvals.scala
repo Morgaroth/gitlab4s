@@ -155,6 +155,7 @@ case class ProjectApprovalRule(
     users: Vector[GitlabUser],
     groups: Vector[GitlabGroup],
     contains_hidden_groups: Boolean,
+    applies_to_all_protected_branches: Option[Boolean],
     protected_branches: Vector[ProtectedBranchesConfig],
 )
 
