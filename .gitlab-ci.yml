@@ -19,11 +19,17 @@ Run Tests:
   stage: validate
   script:
     - sbt -v +test
+  except:
+    - main
+    - tags
 
 Check formatting:
   stage: validate
   script:
     - sbt -v fmtcheck
+  except:
+    - main
+    - tags
 
 Pubilsh snapshot:
   stage: publish
@@ -33,7 +39,6 @@ Pubilsh snapshot:
     - cp $SONATYPE_CONFIG sonatype-creds.sbt
     - sbt -v +publishSigned
   except:
-    - main
     - tags
 
 Release next version:
@@ -59,3 +64,14 @@ Release next version:
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /\[no release\]/
+      - $CI_COMMIT_MESSAGE =~ /\[release commit\]/
+
+Publish release:
+  stage: publish
+  script:
+    - gpg --batch --yes --import $GPG_SIGNING_KEY
+    - gpg --list-keys
+    - cp $SONATYPE_CONFIG sonatype-creds.sbt
+    - sbt -v ";+publishSigned;sonatypeBundleRelease"
+  only:
+    - tags

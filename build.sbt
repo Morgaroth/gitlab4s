@@ -4,6 +4,7 @@ import xerial.sbt.Sonatype.GitLabHosting
 
 val circeVersion    = "0.14.2"
 val circeExtVersion = "0.14.2"
+val sttpVersion     = "3.7.6"
 
 val validate = Def.taskKey[Unit]("Validates entire project")
 
@@ -32,11 +33,8 @@ val publishSettings = Seq(
       setReleaseVersion,
       commitReleaseVersion,
       tagRelease,
-      releaseStepCommandAndRemaining("+publishSigned"),
-      releaseStepCommand("sonatypeBundleRelease"),
       setNextVersion,
       commitNextVersion,
-      pushChanges,
       pushChanges,
     )
   },
@@ -80,8 +78,8 @@ val commonSettings = publishSettings ++ Seq(
 )
 
 val testDeps = Seq(
-  "org.scalatest" %% "scalatest-flatspec"       % "3.2.12" % Test,
-  "org.scalatest" %% "scalatest-shouldmatchers" % "3.2.12" % Test,
+  "org.scalatest" %% "scalatest-flatspec"       % "3.2.13" % Test,
+  "org.scalatest" %% "scalatest-shouldmatchers" % "3.2.13" % Test,
   "ch.qos.logback" % "logback-classic"          % "1.2.11" % Test,
 )
 
@@ -107,7 +105,7 @@ val sttpjdk = project
   .settings(
     name := "gitlab4s-sttp",
     libraryDependencies ++= Seq(
-      "com.softwaremill.sttp.client3" %% "core"               % "3.6.2",
+      "com.softwaremill.sttp.client3" %% "core"               % "3.7.6",
       "com.softwaremill.sttp.client3" %% "httpclient-backend" % "3.5.2",
     ) ++ testDeps,
   )
@@ -119,7 +117,7 @@ val sttptry = project
   .settings(
     name := "gitlab4s-sttp-try",
     libraryDependencies ++= Seq(
-      "com.softwaremill.sttp.client3" %% "core" % "3.6.2",
+      "com.softwaremill.sttp.client3" %% "core" % sttpVersion,
     ) ++ testDeps,
   )
 
@@ -140,8 +138,8 @@ val gitlab4s = project
       // tut.value
     }.value,
     // Release
-    releaseTagComment        := s"Releasing ${(ThisBuild / version).value} [skip ci]",
-    releaseCommitMessage     := s"Setting version to ${(ThisBuild / version).value} [skip ci]",
-    releaseNextCommitMessage := s"Setting version to ${(ThisBuild / version).value} [skip ci]",
+    releaseTagComment        := s"Releasing ${(ThisBuild / version).value}",
+    releaseCommitMessage     := s"Setting version to ${(ThisBuild / version).value}\n[release commit]",
+    releaseNextCommitMessage := s"Setting version to ${(ThisBuild / version).value}",
     releaseCrossBuild        := true,
   )
