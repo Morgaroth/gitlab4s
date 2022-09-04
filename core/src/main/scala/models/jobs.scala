@@ -84,6 +84,7 @@ case class JobFullInfo(
     artifacts_expire_at: Option[ZonedDateTime],
     coverage: Option[String],
     failure_reason: Option[String],
+    ci_job_token_scope_enabled: Option[Boolean],
 )
 
 object JobFullInfo {
