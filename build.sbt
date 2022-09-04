@@ -140,6 +140,6 @@ val gitlab4s = project
     // Release
     releaseTagComment        := s"Releasing ${(ThisBuild / version).value}",
     releaseCommitMessage     := s"Setting version to ${(ThisBuild / version).value}\n[release commit]",
-    releaseNextCommitMessage := s"Setting version to ${(ThisBuild / version).value}",
+    releaseNextCommitMessage := s"Setting version to ${(ThisBuild / version).value}\n[skip ci]",
     releaseCrossBuild        := true,
   )
