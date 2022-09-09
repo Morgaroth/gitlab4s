@@ -84,11 +84,21 @@ case class JobFullInfo(
     artifacts_expire_at: Option[ZonedDateTime],
     coverage: Option[String],
     failure_reason: Option[String],
-    ci_job_token_scope_enabled: Option[Boolean],
+    project: ProjectPropertyOfJobInfo,
 )
 
 object JobFullInfo {
   implicit val JobFullInfoCodec: Codec[JobFullInfo] = MissingPropertiesLogger.loggingCodec(deriveCodec[JobFullInfo])
+}
+
+case class ProjectPropertyOfJobInfo(
+    ci_job_token_scope_enabled: Boolean,
+)
+
+object ProjectPropertyOfJobInfo {
+  implicit val ProjectPropertyOfJobInfoCodec: Codec[ProjectPropertyOfJobInfo] =
+    MissingPropertiesLogger.loggingCodec(deriveCodec[ProjectPropertyOfJobInfo])
+
 }
 
 case class JobRunner(
