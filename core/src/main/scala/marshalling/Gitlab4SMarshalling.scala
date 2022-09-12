@@ -1,12 +1,12 @@
 package io.gitlab.mateuszjaje.gitlabclient
 package marshalling
 
+import apisv2.ThisMonad
 import maintenance.MissingPropertiesLogger
 import query.GitlabResponse
 
-import cats.Monad
+import cats.Functor
 import cats.data.EitherT
-import cats.syntax.either._
 import io.circe._
 import io.circe.parser.{decode, parse}
 import io.circe.syntax.EncoderOps
@@ -20,21 +20,23 @@ trait Gitlab4SMarshalling {
   object MJson {
     def read[T: Decoder](str: String): Either[Error, T] = decode[T](str)
 
-    def loggingDecode[A](input: String, id: RequestId)(implicit decoder: Decoder[A]): Either[Error, A] =
+    def loggingDecode[A](input: String)(implicit id: RequestId, decoder: Decoder[A]): Either[Error, A] = {
+      import cats.syntax.either._
       parse(input)
         .leftMap(_.asInstanceOf[Error])
         .flatMap { data =>
           val cursor: HCursor = HCursor.fromJson(data)
           decoder match {
-            case loggingDecoder: MissingPropertiesLogger[A] => loggingDecoder.apply(cursor, id)
+            case loggingDecoder: MissingPropertiesLogger[A] => loggingDecoder.apply(cursor)
             case _                                          => decoder.apply(cursor)
           }
         }
+    }
 
-    def readT[F[_]: Monad, T: Decoder](str: String)(implicit requestId: RequestId): EitherT[F, GitlabError, T] =
-      EitherT.fromEither(
-        loggingDecode[T](str, requestId).leftMap[GitlabError](e => GitlabUnmarshallingError(e.getMessage, requestId.id, e)),
-      )
+    def readE[T: Decoder](str: String)(implicit requestId: RequestId): Either[GitlabError, T] = {
+      import cats.syntax.either._
+      loggingDecode[T](str).leftMap[GitlabError](e => GitlabUnmarshallingError(e.getMessage, requestId.id, e))
+    }
 
     def write[T: Encoder](value: T): String       = Printer.noSpaces.copy(dropNullValues = true).print(value.asJson)
     def encode[T: Encoder](value: T): Json        = value.asJson
@@ -44,15 +46,29 @@ trait Gitlab4SMarshalling {
   // keep all special settings with method write above
   implicit val printer: Printer = Printer.spaces2.copy(dropNullValues = true)
 
-  implicit class unmarshallEitherT[F[_]](data: EitherT[F, GitlabError, String])(implicit m: Monad[F]) {
+  implicit class unmarshallEitherT[F[_]](data: EitherT[F, GitlabError, String])(implicit m: Functor[F]) {
     def unmarshall[TargetType: Decoder](implicit rId: RequestId): EitherT[F, GitlabError, TargetType] =
-      data.flatMap(MJson.readT[F, TargetType])
+      data.subflatMap(MJson.readE[TargetType])
 
   }
 
-  implicit class unmarshallEitherGitlabT[F[_]](data: EitherT[F, GitlabError, GitlabResponse[String]])(implicit m: Monad[F]) {
+  implicit class unmarshallEitherGitlabT[F[_]](data: EitherT[F, GitlabError, GitlabResponse[String]])(implicit m: Functor[F]) {
     def unmarshall[TargetType: Decoder](implicit rId: RequestId): EitherT[F, GitlabError, TargetType] =
-      data.map(_.payload).flatMap(MJson.readT[F, TargetType])
+      data.map(_.payload).subflatMap(MJson.readE[TargetType])
+
+  }
+
+  implicit class unmarshallF[F[_]](data: F[Either[GitlabError, GitlabResponse[String]]])(implicit m: ThisMonad[F]) {
+    def unmarshall[TargetType: Decoder](implicit rId: RequestId): F[Either[GitlabError, TargetType]] = {
+      val value: F[Either[GitlabError, String]] = ThisMonad.syntax.toOps(data).map(_.payload)
+      ThisMonad.syntax.toOps(value).subFlatMap(MJson.readE[TargetType](_))
+    }
+
+  }
+
+  implicit class unmarshallFF[F[_]](data: F[Either[GitlabError, String]])(implicit m: ThisMonad[F]) {
+    def unmarshall[TargetType: Decoder](implicit rId: RequestId): F[Either[GitlabError, TargetType]] =
+      ThisMonad.syntax.toOps(data).subFlatMap(MJson.readE[TargetType](_))
 
   }
 

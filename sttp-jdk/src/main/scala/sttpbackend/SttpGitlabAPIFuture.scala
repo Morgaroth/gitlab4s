@@ -6,14 +6,15 @@ import query.{GitlabRequest, GitlabResponse}
 
 import cats.Monad
 import cats.data.EitherT
-import cats.syntax.either._
+import cats.syntax.either.*
 import com.typesafe.scalalogging.{LazyLogging, Logger}
 import org.slf4j.LoggerFactory
-import sttp.client3._
+import sttp.client3.*
 import sttp.client3.httpclient.HttpClientFutureBackend
 
 import scala.concurrent.{ExecutionContext, Future}
 
+@deprecated("Use SttpGitlabAPIV2Future instead")
 class SttpGitlabAPIFuture(val config: GitlabConfig, apiConfig: GitlabRestAPIConfig)(implicit ex: ExecutionContext)
     extends GitlabRestAPI[Future]
     with LazyLogging {
@@ -23,7 +24,7 @@ class SttpGitlabAPIFuture(val config: GitlabConfig, apiConfig: GitlabRestAPIConf
     TrustAllCerts.configure()
   }
 
-  val backend: SttpBackend[Future, _] = HttpClientFutureBackend()
+  val backend = HttpClientFutureBackend()
   private val requestsLogger          = Logger(LoggerFactory.getLogger(getClass.getPackage.getName + ".requests"))
 
   private def logRequest[T](request: RequestT[Identity, Either[String, T], Nothing], requestData: GitlabRequest)(implicit
@@ -41,7 +42,11 @@ class SttpGitlabAPIFuture(val config: GitlabConfig, apiConfig: GitlabRestAPIConf
       request: RequestT[Identity, Either[String, T], Any],
   )(implicit requestId: RequestId): EitherT[Future, GitlabError, (Map[String, String], T)] = {
 
-    EitherT(request.send(backend).map(_.asRight).recover { case t: Throwable => t.asLeft })
+    val future: Future[Response[Either[String, T]]] = request.send(backend)
+    val value: EitherT[Future, Throwable, Response[Either[String, T]]] = EitherT(
+      future.map(_.asRight).recover { case t: Throwable => t.asLeft },
+    )
+    value
       .leftMap[GitlabError](GitlabRequestingError("try-http-backend-left", requestId.id, _))
       .subflatMap { response =>
         if (apiConfig.debug) logger.debug(s"received response: $response")

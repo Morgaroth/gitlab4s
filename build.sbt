@@ -43,6 +43,7 @@ val publishSettings = Seq(
 val commonSettings = publishSettings ++ Seq(
   organization := "io.gitlab.mateuszjaje",
   resolvers += "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/",
+  scalaVersion           := projectScalaVersion,
   scalacOptions ++= Seq(
     "-unchecked",
     "-deprecation",
@@ -58,17 +59,20 @@ val commonSettings = publishSettings ++ Seq(
       Seq(
         "-Ymacro-annotations",
         "-Ywarn-unused:imports",
+        "-Xsource:3",
+        "-P:kind-projector:underscore-placeholders",
       )
     else if (scalaVersion.value.startsWith("3."))
       Seq(
+        "-Ykind-projector",
         "-Xmax-inlines",
         "110",
       )
     else Seq.empty
   },
   libraryDependencies ++= {
-    if (scalaVersion.value.startsWith("2.12"))
-      Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full))
+    if (scalaVersion.value.startsWith("2.13"))
+      Seq(compilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full))
     else Seq.empty
   },
   idePackagePrefix.invisible := Some("io.gitlab.mateuszjaje.gitlabclient"),
@@ -110,6 +114,30 @@ val sttpjdk = project
     ) ++ testDeps,
   )
 
+val sttpzio1 = project
+  .in(file("sttp-zio1"))
+  .dependsOn(core)
+  .settings(commonSettings: _*)
+  .settings(
+    name := "gitlab4s-sttp",
+    libraryDependencies ++= Seq(
+      "com.softwaremill.sttp.client3" %% "core" % "3.7.6",
+      "com.softwaremill.sttp.client3" %% "zio1" % "3.7.6",// for ZIO 1.x
+    ) ++ testDeps,
+  )
+
+val sttpzio2 = project
+  .in(file("sttp-zio"))
+  .dependsOn(core)
+  .settings(commonSettings: _*)
+  .settings(
+    name := "gitlab4s-sttp",
+    libraryDependencies ++= Seq(
+      "com.softwaremill.sttp.client3" %% "core" % "3.7.6",
+      "com.softwaremill.sttp.client3" %% "zio"  % "3.7.6",
+    ) ++ testDeps,
+  )
+
 val sttptry = project
   .in(file("sttp-try"))
   .dependsOn(core)
@@ -123,7 +151,7 @@ val sttptry = project
 
 val gitlab4s = project
   .in(file("."))
-  .aggregate(core, sttpjdk, sttptry)
+  .aggregate(core, sttpjdk, sttptry, sttpzio1, sttpzio2)
   .settings(publishSettings)
   .settings(
     organization                 := "io.gitlab.mateuszjaje",

@@ -1,9 +1,8 @@
 package io.gitlab.mateuszjaje.gitlabclient
-package sttptrybackend
 
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
-import javax.net.ssl._
+import javax.net.ssl.*
 
 object TrustAllCerts {
   def configure(): Unit = {

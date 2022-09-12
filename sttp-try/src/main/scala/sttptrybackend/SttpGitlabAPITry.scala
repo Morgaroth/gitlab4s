@@ -6,13 +6,14 @@ import query.{GitlabRequest, GitlabResponse}
 
 import cats.Monad
 import cats.data.EitherT
-import cats.syntax.either._
+import cats.syntax.either.*
 import com.typesafe.scalalogging.{LazyLogging, Logger}
 import org.slf4j.LoggerFactory
-import sttp.client3._
+import sttp.client3.*
 
 import scala.util.Try
 
+@deprecated("Use SttpGitlabAPIV2Try instead")
 class SttpGitlabAPITry(val config: GitlabConfig, apiConfig: GitlabRestAPIConfig) extends GitlabRestAPI[cats.Id] with LazyLogging {
 
   override val m: Monad[cats.Id] = cats.catsInstancesForId

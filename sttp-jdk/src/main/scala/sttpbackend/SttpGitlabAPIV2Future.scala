@@ -1,28 +1,33 @@
 package io.gitlab.mateuszjaje.gitlabclient
 package sttpbackend
 
+import apisv2.ThisMonad
 import query.Methods.Get
 import query.{GitlabRequest, GitlabResponse}
 
-import cats.Monad
 import cats.data.EitherT
 import cats.syntax.either.*
 import com.typesafe.scalalogging.{LazyLogging, Logger}
 import org.slf4j.LoggerFactory
 import sttp.client3.*
-import sttp.client3.httpclient.HttpClientSyncBackend
+import sttp.client3.httpclient.HttpClientFutureBackend
 
-import scala.util.Try
+import scala.concurrent.{ExecutionContext, Future}
 
-class SttpGitlabAPISync(val config: GitlabConfig, apiConfig: GitlabRestAPIConfig) extends GitlabRestAPI[cats.Id] with LazyLogging {
+class SttpGitlabAPIV2Future(val config: GitlabConfig, apiConfig: GitlabRestAPIConfig)(implicit ex: ExecutionContext)
+    extends GitlabRestAPIV2[Future]
+    with LazyLogging {
 
-  override val m: Monad[cats.Id] = cats.catsInstancesForId
+//  override val m: Monad[Future] = cats.instances.future.catsStdInstancesForFuture
+
   if (config.ignoreSslErrors) {
     TrustAllCerts.configure()
   }
 
-  val backend: SttpBackend[Identity, Any] = HttpClientSyncBackend()
-  private val requestsLogger              = Logger(LoggerFactory.getLogger(getClass.getPackage.getName + ".requests"))
+  implicit override def m: ThisMonad[Future] = ThisMonad.fromCats[Future]
+
+  val backend                = HttpClientFutureBackend()
+  private val requestsLogger = Logger(LoggerFactory.getLogger(getClass.getPackage.getName + ".requests"))
 
   private def logRequest[T](request: RequestT[Identity, Either[String, T], Nothing], requestData: GitlabRequest)(implicit
       requestId: RequestId,
@@ -37,10 +42,15 @@ class SttpGitlabAPISync(val config: GitlabConfig, apiConfig: GitlabRestAPIConfig
 
   private def execReq[T](
       request: RequestT[Identity, Either[String, T], Any],
-  )(implicit requestId: RequestId): Either[GitlabError, (Map[String, String], T)] = {
-    Try(request.send(backend)).toEither
+  )(implicit requestId: RequestId): EitherT[Future, GitlabError, (Map[String, String], T)] = {
+
+    val future: Future[Response[Either[String, T]]] = request.send(backend)
+    val value: EitherT[Future, Throwable, Response[Either[String, T]]] = EitherT(
+      future.map(_.asRight).recover { case t: Throwable => t.asLeft },
+    )
+    value
       .leftMap[GitlabError](GitlabRequestingError("try-http-backend-left", requestId.id, _))
-      .flatMap { response =>
+      .subflatMap { response =>
         if (apiConfig.debug) logger.debug(s"received response: $response")
         val responseContentType = response.header("Content-Type")
         val responseLength      = response.header("Content-Length").map(_.toInt)
@@ -72,23 +82,21 @@ class SttpGitlabAPISync(val config: GitlabConfig, apiConfig: GitlabRestAPIConfig
 
   override def byteRequest(
       requestData: GitlabRequest,
-  )(implicit requestId: RequestId): EitherT[cats.Id, GitlabError, GitlabResponse[Array[Byte]]] = {
+  )(implicit requestId: RequestId): Future[Either[GitlabError, GitlabResponse[Array[Byte]]]] = {
     val request = createReq(requestData).response(asByteArray)
     logRequest(request, requestData)
-    val response = execReq(request).map(x => GitlabResponse(x._1, x._2))
-    EitherT.fromEither[Identity](response)
+    val response = ThisMonad.syntax.toOps(execReq(request).value).map(x => GitlabResponse(x._1, x._2))
+    response
   }
 
   override def invokeRequestRaw(
       requestData: GitlabRequest,
-  )(implicit requestId: RequestId): EitherT[cats.Id, GitlabError, GitlabResponse[String]] = {
+  )(implicit requestId: RequestId): Future[Either[GitlabError, GitlabResponse[String]]] = {
     val request = createReq(requestData)
       .header("Accept", "application/json")
-
     logRequest(request, requestData)
-
-    val response = execReq(request).map(x => GitlabResponse(x._1, x._2))
-    EitherT.fromEither[cats.Id](response)
+    val response = ThisMonad.syntax.toOps(execReq(request).value).map(x => GitlabResponse(x._1, x._2))
+    response
   }
 
 }

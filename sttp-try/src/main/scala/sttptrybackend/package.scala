@@ -4,7 +4,7 @@ import query.{Method, Methods}
 
 package object sttptrybackend {
 
-  implicit def convertJiraMethodToSttpMethod(in: Method): sttp.model.Method = {
+  implicit def convertThisProjectMethodToSttpMethod(in: Method): sttp.model.Method = {
     in match {
       case Methods.Get    => sttp.model.Method.GET
       case Methods.Post   => sttp.model.Method.POST
