@@ -28,7 +28,7 @@ trait ProjectsAPIV2[F[_]] {
       wrap(sort).flatMap(_.toParams),
       Vector("min_access_level".eqParam("40")),
     ).flatten
-    val req = reqGen.get(API + s"/projects", q*)
+    val req = reqGen.get(API + s"/projects", q *)
     getAllPaginatedResponse(req, "get-all-projects", paging)
   }
 

@@ -5,6 +5,8 @@
 /core/target
 /sttp-jdk/target
 /sttp-try/target
+/sttp-zio1/target
+/sttp-zio/target
 /.ivy2
 /.sbt
 /.ssh

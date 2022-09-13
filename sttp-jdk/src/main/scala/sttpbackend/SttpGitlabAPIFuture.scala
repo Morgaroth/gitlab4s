@@ -24,8 +24,8 @@ class SttpGitlabAPIFuture(val config: GitlabConfig, apiConfig: GitlabRestAPIConf
     TrustAllCerts.configure()
   }
 
-  val backend = HttpClientFutureBackend()
-  private val requestsLogger          = Logger(LoggerFactory.getLogger(getClass.getPackage.getName + ".requests"))
+  val backend                = HttpClientFutureBackend()
+  private val requestsLogger = Logger(LoggerFactory.getLogger(getClass.getPackage.getName + ".requests"))
 
   private def logRequest[T](request: RequestT[Identity, Either[String, T], Nothing], requestData: GitlabRequest)(implicit
       requestId: RequestId,

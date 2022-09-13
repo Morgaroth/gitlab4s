@@ -38,7 +38,7 @@ trait PipelinesAPIV2[F[_]] {
       wrap(updatedBefore).map(_.toISO8601UTC).map("updated_before".eqParam(_)),
       wrap(sort).flatMap(s => List("order_by".eqParam(s.field.property), "sort".eqParam(s.direction.toString))),
     ).flatten
-    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/pipelines", params*).withProjectId(projectId)
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/pipelines", params *).withProjectId(projectId)
     getAllPaginatedResponse[PipelineShort](req, "get-pipelines-of-project", paging)
   }
 

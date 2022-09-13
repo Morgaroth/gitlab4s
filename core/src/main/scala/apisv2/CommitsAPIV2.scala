@@ -38,7 +38,7 @@ trait CommitsAPIV2[F[_]] {
       wrap(since).map(_.toISO8601UTC).map("since".eqParam(_)),
       wrap(until).map(_.toISO8601UTC).map("until".eqParam(_)),
     ).flatten
-    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits", params*).withProjectId(projectId)
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits", params *).withProjectId(projectId)
     getAllPaginatedResponse[CommitSimple](req, "get-commits", paging)
   }
 

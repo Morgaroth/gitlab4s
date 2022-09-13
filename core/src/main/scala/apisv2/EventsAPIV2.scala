@@ -24,7 +24,7 @@ trait EventsAPIV2[F[_]] {
       Vector("scope".eqParam("all")),
       wrap(sort).flatMap(_.toParams),
     ).flatten
-    val req = reqGen.get(API + s"/events", params*)
+    val req = reqGen.get(API + s"/events", params *)
     getAllPaginatedResponse[EventInfo](req, "events", paging)
   }
 
@@ -45,7 +45,7 @@ trait EventsAPIV2[F[_]] {
       wrap(action).map(_.name).map("action".eqParam(_)),
       wrap(sort).flatMap(_.toParams),
     ).flatten
-    val req = reqGen.get(API + s"/users/${userId.toStringId}/events", params*)
+    val req = reqGen.get(API + s"/users/${userId.toStringId}/events", params *)
     getAllPaginatedResponse[EventInfo](req, "events", paging)
   }
 

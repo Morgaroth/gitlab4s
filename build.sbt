@@ -43,7 +43,7 @@ val publishSettings = Seq(
 val commonSettings = publishSettings ++ Seq(
   organization := "io.gitlab.mateuszjaje",
   resolvers += "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/",
-  scalaVersion           := projectScalaVersion,
+  scalaVersion := projectScalaVersion,
   scalacOptions ++= Seq(
     "-unchecked",
     "-deprecation",
@@ -107,7 +107,7 @@ val sttpjdk = project
   .dependsOn(core)
   .settings(commonSettings: _*)
   .settings(
-    name := "gitlab4s-sttp",
+    name := "gitlab4s-sttp-jdk",
     libraryDependencies ++= Seq(
       "com.softwaremill.sttp.client3" %% "core"               % "3.7.6",
       "com.softwaremill.sttp.client3" %% "httpclient-backend" % "3.5.2",
@@ -119,7 +119,7 @@ val sttpzio1 = project
   .dependsOn(core)
   .settings(commonSettings: _*)
   .settings(
-    name := "gitlab4s-sttp",
+    name := "gitlab4s-sttp-zio1",
     libraryDependencies ++= Seq(
       "com.softwaremill.sttp.client3" %% "core" % "3.7.6",
       "com.softwaremill.sttp.client3" %% "zio1" % "3.7.6",// for ZIO 1.x
@@ -131,7 +131,7 @@ val sttpzio2 = project
   .dependsOn(core)
   .settings(commonSettings: _*)
   .settings(
-    name := "gitlab4s-sttp",
+    name := "gitlab4s-sttp-zio",
     libraryDependencies ++= Seq(
       "com.softwaremill.sttp.client3" %% "core" % "3.7.6",
       "com.softwaremill.sttp.client3" %% "zio"  % "3.7.6",
