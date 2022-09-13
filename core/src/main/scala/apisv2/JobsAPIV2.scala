@@ -2,7 +2,7 @@ package io.gitlab.mateuszjaje.gitlabclient
 package apisv2
 
 import apis.RawResponse.stringContentTypes
-import apisv2.ThisMonad.syntax.*
+import apisv2.GitlabApiT.syntax.*
 import models.JobFullInfo
 import query.GitlabResponse
 

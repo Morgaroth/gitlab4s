@@ -1,7 +1,7 @@
 package io.gitlab.mateuszjaje.gitlabclient
 package sttpbackend
 
-import apisv2.ThisMonad
+import apisv2.GitlabApiT
 import query.Methods.Get
 import query.{GitlabRequest, GitlabResponse}
 
@@ -24,7 +24,7 @@ class SttpGitlabAPIV2Future(val config: GitlabConfig, apiConfig: GitlabRestAPICo
     TrustAllCerts.configure()
   }
 
-  implicit override def m: ThisMonad[Future] = ThisMonad.fromCats[Future]
+  implicit override def m: GitlabApiT[Future] = GitlabApiT.fromCats[Future]
 
   val backend                = HttpClientFutureBackend()
   private val requestsLogger = Logger(LoggerFactory.getLogger(getClass.getPackage.getName + ".requests"))
@@ -85,8 +85,7 @@ class SttpGitlabAPIV2Future(val config: GitlabConfig, apiConfig: GitlabRestAPICo
   )(implicit requestId: RequestId): Future[Either[GitlabError, GitlabResponse[Array[Byte]]]] = {
     val request = createReq(requestData).response(asByteArray)
     logRequest(request, requestData)
-    val response = ThisMonad.syntax.toOps(execReq(request).value).map(x => GitlabResponse(x._1, x._2))
-    response
+    GitlabApiT[Future].map(execReq(request).value)(x => GitlabResponse(x._1, x._2))
   }
 
   override def invokeRequestRaw(
@@ -95,8 +94,7 @@ class SttpGitlabAPIV2Future(val config: GitlabConfig, apiConfig: GitlabRestAPICo
     val request = createReq(requestData)
       .header("Accept", "application/json")
     logRequest(request, requestData)
-    val response = ThisMonad.syntax.toOps(execReq(request).value).map(x => GitlabResponse(x._1, x._2))
-    response
+    GitlabApiT[Future].map(execReq(request).value)(x => GitlabResponse(x._1, x._2))
   }
 
 }

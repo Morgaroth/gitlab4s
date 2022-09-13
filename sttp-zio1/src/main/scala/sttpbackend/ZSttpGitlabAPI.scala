@@ -1,7 +1,7 @@
 package io.gitlab.mateuszjaje.gitlabclient
 package sttpbackend
 
-import apisv2.ThisMonad
+import apisv2.GitlabApiT
 import query.Methods.Get
 import query.{GitlabRequest, GitlabResponse}
 
@@ -23,14 +23,13 @@ class ZSttpGitlabAPI(val config: GitlabConfig, apiConfig: GitlabRestAPIConfig)(i
     TrustAllCerts.configure()
   }
 
-  implicit override def m: ThisMonad[UIO] = new ThisMonad[UIO] {
-    import apisv2.ThisMonad.AAA
-    override def subFlatMap[A, B](fa: UIO[Either[GitlabError, A]])(f: A => Either[GitlabError, B]): AAA[UIO, B] =
+  implicit override def m: GitlabApiT[UIO] = new GitlabApiT[UIO] {
+    override def subFlatMap[A, B](fa: UIO[Either[GitlabError, A]])(f: A => Either[GitlabError, B]): UIO[Either[GitlabError, B]] =
       fa.flatMap(x => UIO(x.flatMap(f)))
 
     override def pure[A](x: A): UIO[Either[GitlabError, A]] = UIO.right(x)
 
-    override def flatMap[A, B](fa: AAA[UIO, A])(f: A => AAA[UIO, B]): AAA[UIO, B] = {
+    override def flatMap[A, B](fa: UIO[Either[GitlabError, A]])(f: A => UIO[Either[GitlabError, B]]): UIO[Either[GitlabError, B]] = {
       fa.flatMap { (data: Either[GitlabError, A]) =>
         data
           .map(f)
@@ -41,14 +40,14 @@ class ZSttpGitlabAPI(val config: GitlabConfig, apiConfig: GitlabRestAPIConfig)(i
       }
     }
 
-    override def tailRecM[A, B](a: A)(f: A => AAA[UIO, Either[A, B]]): AAA[UIO, B] = {
+    override def tailRecM[A, B](a: A)(f: A => UIO[Either[GitlabError, Either[A, B]]]): UIO[Either[GitlabError, B]] = {
       flatMap(f(a)) {
         case Left(a)  => tailRecM(a)(f)
         case Right(b) => pure(b)
       }
     }
 
-    override def sequence[A](x: Vector[UIO[Either[GitlabError, A]]]): AAA[UIO, Vector[A]] = {
+    override def sequence[A](x: Vector[UIO[Either[GitlabError, A]]]): UIO[Either[GitlabError, Vector[A]]] = {
       ZIO.foreach(x)(identity).map {
         _.foldLeft[Either[GitlabError, Vector[A]]](Right(Vector.empty[A])) {
           case (e @ Left(_), _)       => e

@@ -3,7 +3,7 @@ package apisv2
 
 import models.TagInfo
 import query.ParamQuery.*
-import ThisMonad.syntax.*
+import GitlabApiT.syntax.*
 
 trait TagsAPIV2[F[_]] {
   this: GitlabRestAPIV2[F] =>
@@ -20,7 +20,7 @@ trait TagsAPIV2[F[_]] {
       wrap(sort).flatMap(_.toParams),
       wrap(search).map("search".eqParam),
     ).flatten
-    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/tags", q*)
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/tags", q *)
     getAllPaginatedResponse[TagInfo](req, "get-tags", paging)
   }
 
@@ -38,7 +38,7 @@ trait TagsAPIV2[F[_]] {
       message.map("message".eqParam).toList,
       description.map("release_description".eqParam).toList,
     ).flatten
-    val req = reqGen.post(s"$API/projects/${projectId.toStringId}/repository/tags", q*).withProjectId(projectId)
+    val req = reqGen.post(s"$API/projects/${projectId.toStringId}/repository/tags", q *).withProjectId(projectId)
     invokeRequest(req).unmarshall[TagInfo]
   }
 

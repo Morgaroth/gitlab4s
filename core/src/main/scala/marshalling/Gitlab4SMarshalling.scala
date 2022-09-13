@@ -1,13 +1,14 @@
 package io.gitlab.mateuszjaje.gitlabclient
 package marshalling
 
-import apisv2.ThisMonad
+import apisv2.GitlabApiT
+import apisv2.GitlabApiT.syntax.*
 import maintenance.MissingPropertiesLogger
 import query.GitlabResponse
 
 import cats.Functor
 import cats.data.EitherT
-import io.circe._
+import io.circe.*
 import io.circe.parser.{decode, parse}
 import io.circe.syntax.EncoderOps
 
@@ -21,7 +22,7 @@ trait Gitlab4SMarshalling {
     def read[T: Decoder](str: String): Either[Error, T] = decode[T](str)
 
     def loggingDecode[A](input: String)(implicit id: RequestId, decoder: Decoder[A]): Either[Error, A] = {
-      import cats.syntax.either._
+      import cats.syntax.either.*
       parse(input)
         .leftMap(_.asInstanceOf[Error])
         .flatMap { data =>
@@ -34,7 +35,7 @@ trait Gitlab4SMarshalling {
     }
 
     def readE[T: Decoder](str: String)(implicit requestId: RequestId): Either[GitlabError, T] = {
-      import cats.syntax.either._
+      import cats.syntax.either.*
       loggingDecode[T](str).leftMap[GitlabError](e => GitlabUnmarshallingError(e.getMessage, requestId.id, e))
     }
 
@@ -58,17 +59,15 @@ trait Gitlab4SMarshalling {
 
   }
 
-  implicit class unmarshallF[F[_]](data: F[Either[GitlabError, GitlabResponse[String]]])(implicit m: ThisMonad[F]) {
-    def unmarshall[TargetType: Decoder](implicit rId: RequestId): F[Either[GitlabError, TargetType]] = {
-      val value: F[Either[GitlabError, String]] = ThisMonad.syntax.toOps(data).map(_.payload)
-      ThisMonad.syntax.toOps(value).subFlatMap(MJson.readE[TargetType](_))
-    }
+  implicit class unmarshallF[F[_]](data: F[Either[GitlabError, GitlabResponse[String]]])(implicit m: GitlabApiT[F]) {
+    def unmarshall[TargetType: Decoder](implicit rId: RequestId): F[Either[GitlabError, TargetType]] =
+      data.map(_.payload).subFlatMap(MJson.readE[TargetType](_))
 
   }
 
-  implicit class unmarshallFF[F[_]](data: F[Either[GitlabError, String]])(implicit m: ThisMonad[F]) {
+  implicit class unmarshallFF[F[_]](data: F[Either[GitlabError, String]])(implicit m: GitlabApiT[F]) {
     def unmarshall[TargetType: Decoder](implicit rId: RequestId): F[Either[GitlabError, TargetType]] =
-      ThisMonad.syntax.toOps(data).subFlatMap(MJson.readE[TargetType](_))
+      data.subFlatMap(MJson.readE[TargetType](_))
 
   }
 

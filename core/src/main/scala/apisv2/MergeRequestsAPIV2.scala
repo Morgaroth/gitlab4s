@@ -1,11 +1,10 @@
 package io.gitlab.mateuszjaje.gitlabclient
 package apisv2
 
-import apisv2.ThisMonad.{AAA, syntax}
-import apisv2.ThisMonad.syntax.*
+import apisv2.GitlabApiT.syntax.*
 import helpers.{NullValue, NullableField}
-import models.SearchScope.MergeRequests
 import models.*
+import models.SearchScope.MergeRequests
 import query.ParamQuery.*
 import query.{NoParam, Search}
 
@@ -60,14 +59,14 @@ trait MergeRequestsAPIV2[F[_]] {
       withMergeStatusRecheck,
       sort,
     )
-    val req = reqGen.get(s"$API/projects/${projectID.toStringId}/merge_requests", q*).withProjectId(projectID)
+    val req = reqGen.get(s"$API/projects/${projectID.toStringId}/merge_requests", q *).withProjectId(projectID)
     getAllPaginatedResponse[MergeRequestInfo](req, "merge-requests-per-project", paging)
   }
 
   // traverse over all states and fetch merge requests for every state, gitlab doesn't offer search by multiple states
   def getMergeRequests(projectID: EntityId, states: Iterable[MergeRequestState]): F[Either[GitlabError, Vector[MergeRequestInfo]]] = {
     val value1 = m.sequence(states.toVector.map(state => getMergeRequests(projectID, state)))
-    val value: ThisMonad.Ops[F, Vector[Vector[MergeRequestInfo]]] = syntax.toOps(value1)
+    val value: GitlabApiT.Ops[F, Vector[Vector[MergeRequestInfo]]] = value1
     value.map(_.flatten)
   }
 
@@ -99,14 +98,14 @@ trait MergeRequestsAPIV2[F[_]] {
       sort,
     )
 
-    val req = reqGen.get(s"$API/groups/${groupId.toStringId}/merge_requests", q*)
+    val req = reqGen.get(s"$API/groups/${groupId.toStringId}/merge_requests", q *)
     getAllPaginatedResponse[MergeRequestInfo](req, "merge-requests-per-group", paging)
   }
 
   // traverse over all states and fetch merge requests for every state, gitlab doesn't offer search by multiple states
   def getGroupMergeRequests(groupId: EntityId, states: Iterable[MergeRequestState]): F[Either[GitlabError, Vector[MergeRequestInfo]]] = {
     val value = m.sequence(states.toVector.map(state => getGroupMergeRequests(groupId, state = state)))
-    val value1: ThisMonad.Ops[F, Vector[Vector[MergeRequestInfo]]] = syntax.toOps(value)
+    val value1: GitlabApiT.Ops[F, Vector[Vector[MergeRequestInfo]]] = value
     value1.map(_.flatten)
   }
 
@@ -127,7 +126,7 @@ trait MergeRequestsAPIV2[F[_]] {
   }
 
   // @see: https://docs.gitlab.com/ee/api/merge_requests.html#delete-a-merge-request
-  def deleteMergeRequest(projectID: EntityId, mrIid: BigInt): AAA[F, Unit] = {
+  def deleteMergeRequest(projectID: EntityId, mrIid: BigInt): F[Either[GitlabError, Unit]] = {
     implicit val rId: RequestId = RequestId.newOne("delete-merge-request")
     val req                     = reqGen.delete(s"$API/projects/${projectID.toStringId}/merge_requests/$mrIid")
     invokeRequest(req).map(_ => ())
@@ -208,7 +207,7 @@ trait MergeRequestsAPIV2[F[_]] {
       name: String,
       userIds: Vector[BigInt],
   ): F[Either[GitlabError, MergeRequestApprovalRule]] =
-    createApprovalRule(projectId, mergeRequestIId, CreateMergeRequestApprovalRule.oneOf(name, userIds*))
+    createApprovalRule(projectId, mergeRequestIId, CreateMergeRequestApprovalRule.oneOf(name, userIds *))
 
   // @see https://docs.gitlab.com/ee/api/merge_request_approvals.html#delete-merge-request-level-rule
   def deleteApprovalRule(projectId: EntityId, mergeRequestIId: BigInt, approvalRuleId: BigInt): F[Either[GitlabError, String]] = {
@@ -234,7 +233,7 @@ trait MergeRequestsAPIV2[F[_]] {
       sort: Option[Sorting[MergeRequestNotesSort]] = None,
   ): F[Either[GitlabError, Vector[MergeRequestNote]]] = {
     val q   = sort.map(s => Seq("order_by".eqParam(s.field.property), "sort".eqParam(s.direction.toString))).toList.flatten
-    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes", q*).withProjectId(projectId)
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes", q *).withProjectId(projectId)
 
     getAllPaginatedResponse[MergeRequestNote](req, "merge-request-notes", paging)
   }
@@ -284,7 +283,7 @@ trait MergeRequestsAPIV2[F[_]] {
   }
 
   // @see: https://docs.gitlab.com/ee/api/notes.html#delete-a-merge-request-note
-  def deleteMergeRequestNote(projectId: EntityId, mergeRequestIId: BigInt, noteId: BigInt): AAA[F, Unit] = {
+  def deleteMergeRequestNote(projectId: EntityId, mergeRequestIId: BigInt, noteId: BigInt): F[Either[GitlabError, Unit]] = {
     implicit val rId: RequestId = RequestId.newOne("merge-request-note-delete")
     val req                     = reqGen.delete(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes/$noteId")
     invokeRequest(req).map(_ => ())
@@ -402,7 +401,7 @@ trait MergeRequestsAPIV2[F[_]] {
       withMergeStatusRecheck.toList.map("with_merge_status_recheck" eqParam _),
       sort.toList.flatMap(s => List("order_by".eqParam(s.field.property), "sort".eqParam(s.direction.toString))),
     ).flatten
-    val req = reqGen.get(s"$API/merge_requests", q*)
+    val req = reqGen.get(s"$API/merge_requests", q *)
     invokeRequest(req).unmarshall[Vector[MergeRequestInfo]]
   }
 

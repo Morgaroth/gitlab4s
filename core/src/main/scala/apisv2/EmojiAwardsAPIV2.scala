@@ -1,7 +1,7 @@
 package io.gitlab.mateuszjaje.gitlabclient
 package apisv2
 
-import apisv2.ThisMonad.syntax.*
+import apisv2.GitlabApiT.syntax.*
 import models.{AwardableScope, EmojiAward, MergeRequestInfo}
 import query.ParamQuery.*
 

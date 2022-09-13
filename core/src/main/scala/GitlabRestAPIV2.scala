@@ -1,13 +1,12 @@
 package io.gitlab.mateuszjaje.gitlabclient
 
-import apisv2.ThisMonad.syntax
-import apisv2.ThisMonad.syntax.*
 import apisv2.*
+import apisv2.GitlabApiT.syntax.*
 import helpers.NullableField
 import marshalling.Gitlab4SMarshalling
 import models.*
-import query.ParamQuery.*
 import query.*
+import query.ParamQuery.*
 
 import com.typesafe.scalalogging.LazyLogging
 import io.circe.Decoder
@@ -27,7 +26,7 @@ trait GitlabRestAPIV2[F[_]]
     with ProjectsAPIV2[F]
     with CommitsAPIV2[F] {
 
-  implicit def m: ThisMonad[F]
+  implicit def m: GitlabApiT[F]
 
   val API            = "/api/v4"
   val AuthHeaderName = "Private-Token"
@@ -139,30 +138,14 @@ trait GitlabRestAPIV2[F[_]]
         } yield (nextPageNum, perPage)
       }
 
-      val resultF: F[Either[GitlabError, Vector[A]]]                = Gitlab4SMarshalling.unmarshallF(resp).unmarshall[Vector[A]]
-      val respHeadersF: F[Either[GitlabError, Map[String, String]]] = syntax.toOps(resp).map(_.headers)
-      val currentResultF: F[Either[GitlabError, Vector[A]]]         = syntax.toOps(resultF).map(acc ++ _)
-      val nextPageInfoF: F[Either[GitlabError, Option[(Int, Int)]]] = syntax.toOps2(respHeadersF).flatMap { respHeaders =>
-        syntax.toOps2(currentResultF).map { currentResult =>
-          nextPageHeaders(respHeaders).map(x => x._1 -> math.min(x._2, entitiesLimit - currentResult.length)).filter(_._2 > 0)
-        }
-      }
-      val resF: F[Either[GitlabError, Vector[A]]] = syntax.toOps2(nextPageInfoF).flatMap { nextPageInfO =>
-        syntax.toOps2(currentResultF).flatMap { currentResult =>
-         val a: F[Either[GitlabError, Vector[A]]] = nextPageInfO
-            .map(nextPageInfo => getAll(nextPageInfo._1, nextPageInfo._2, currentResult))
-            .getOrElse(syntax.pureOps(currentResult).pure)
-          a
-        }
-      }
-      resF
-//      for {
-//        result      <- resultF
-//        respHeaders <- syntax.toOps(resp).map(_.headers)
-//        currentResult = acc ++ result
-//        nextPageInfo  = nextPageHeaders(respHeaders).map(x => x._1 -> math.min(x._2, entitiesLimit - currentResult.length)).filter(_._2 > 0)
-//        res <- nextPageInfo.map(p => getAll(p._1, p._2, currentResult)).getOrElse(currentResult.pure)
-//      } yield res
+      for {
+        result      <- resp.unmarshall[Vector[A]]
+        respHeaders <- resp.map(_.headers)
+        currentResult = acc ++ result
+        nextPageInfo  = nextPageHeaders(respHeaders).map(x => x._1 -> math.min(x._2, entitiesLimit - currentResult.length)).filter(_._2 > 0)
+        res <- nextPageInfo.map(p => getAll(p._1, p._2, currentResult)).getOrElse(currentResult.pure)
+      } yield res
+
     }
 
     getAll(1, pageSize, Vector.empty)

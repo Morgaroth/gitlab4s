@@ -1,7 +1,7 @@
 package io.gitlab.mateuszjaje.gitlabclient
 package sttptrybackend
 
-import apisv2.ThisMonad
+import apisv2.GitlabApiT
 import query.Methods.Get
 import query.{GitlabRequest, GitlabResponse}
 
@@ -19,7 +19,7 @@ class SttpGitlabAPIV2Try(val config: GitlabConfig, apiConfig: GitlabRestAPIConfi
     TrustAllCerts.configure()
   }
 
-  implicit override def m: ThisMonad[Id] = ThisMonad.fromCats[cats.Id]
+  implicit override def m: GitlabApiT[Id] = GitlabApiT.fromCats[cats.Id]
 
   val backend: SttpBackend[Try, Any] = TryHttpURLConnectionBackend()
   val requestsLogger                 = Logger(LoggerFactory.getLogger(getClass.getPackage.getName + ".requests"))
