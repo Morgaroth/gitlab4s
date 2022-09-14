@@ -7,14 +7,30 @@ import query.{GitlabRequest, GitlabResponse}
 
 import com.typesafe.scalalogging.{LazyLogging, Logger}
 import org.slf4j.LoggerFactory
-import sttp.capabilities
-import sttp.capabilities.zio.ZioStreams
 import sttp.client3.*
 import sttp.client3.httpclient.zio.HttpClientZioBackend
-import zio.{Task, UIO, ZIO}
+import zio.{Task, UIO, URLayer, ZIO, ZLayer}
 
-class ZSttpGitlabAPI(val config: GitlabConfig, apiConfig: GitlabRestAPIConfig)
-    extends GitlabRestAPIV2[UIO]
+object ZSttpGitlabAPI {
+  def apply(config: GitlabConfig): ZSttpGitlabAPI =
+    new ZSttpGitlabAPI(config, GitlabRestAPIConfig(), HttpClientZioBackend())
+
+  def apply(config: GitlabConfig, backend: SttpBackend[Task, Any]): ZSttpGitlabAPI =
+    new ZSttpGitlabAPI(config, GitlabRestAPIConfig(), ZIO.succeed(backend))
+
+  val GitlabApiLayer: ZLayer[GitlabConfig & SttpBackend[Task, Any], Nothing, ZSttpGitlabAPI] =
+    ZLayer.fromFunction(apply(_: GitlabConfig, _: SttpBackend[Task, Any]))
+
+  val Default: URLayer[GitlabConfig, ZSttpGitlabAPI] =
+    ZLayer.fromFunction(apply(_: GitlabConfig))
+
+}
+
+class ZSttpGitlabAPI(
+    val config: GitlabConfig,
+    apiConfig: GitlabRestAPIConfig,
+    backend: Task[SttpBackend[Task, Any]],
+) extends GitlabRestAPIV2[UIO]
     with LazyLogging {
 
   implicit override def m: GitlabApiT[UIO] = new GitlabApiT[UIO] {
@@ -58,7 +74,7 @@ class ZSttpGitlabAPI(val config: GitlabConfig, apiConfig: GitlabRestAPIConfig)
     TrustAllCerts.configure()
   }
 
-  val backend: Task[SttpBackend[Task, ZioStreams & capabilities.WebSockets]] = HttpClientZioBackend()
+//  val backend: Task[SttpBackend[Task, ZioStreams & capabilities.WebSockets]] = HttpClientZioBackend()
   private val requestsLogger = Logger(LoggerFactory.getLogger(getClass.getPackage.getName + ".requests"))
 
   private def logRequest[T](request: RequestT[Identity, Either[String, T], Nothing], requestData: GitlabRequest)(implicit
