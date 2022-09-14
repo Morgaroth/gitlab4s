@@ -13,9 +13,7 @@ import sttp.client3.*
 import sttp.client3.httpclient.zio.HttpClientZioBackend
 import zio.{Task, UIO, ZIO}
 
-import scala.concurrent.ExecutionContext
-
-class ZSttpGitlabAPI(val config: GitlabConfig, apiConfig: GitlabRestAPIConfig)(implicit ex: ExecutionContext)
+class ZSttpGitlabAPI(val config: GitlabConfig, apiConfig: GitlabRestAPIConfig)
     extends GitlabRestAPIV2[UIO]
     with LazyLogging {
 
