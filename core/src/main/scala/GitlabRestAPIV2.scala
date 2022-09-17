@@ -101,7 +101,7 @@ trait GitlabRestAPIV2[F[_]]
 
   // @see: https://docs.gitlab.com/ee/api/branches.html#list-repository-branches
   def getBranches(projectID: EntityId, searchTerm: Option[String]): F[Either[GitlabError, Vector[GitlabBranchInfo]]] = {
-    val req = reqGen.get(s"$API/projects/${projectID.toStringId}/repository/branches", searchTerm.map(ParamQuery.search).getOrElse(NoParam))
+    val req = reqGen.get(s"$API/projects/${projectID.toStringId}/repository/branches", searchTerm.map(ParamQuery.search).getOrElse(NoParam)).withProjectId(projectID)
     getAllPaginatedResponse[GitlabBranchInfo](req, "merge-requests-per-project", AllPages)
   }
 
