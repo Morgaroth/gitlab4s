@@ -2,7 +2,7 @@ package io.gitlab.mateuszjaje.gitlabclient
 package apis
 
 import models.TagInfo
-import query.ParamQuery._
+import query.ParamQuery.*
 
 import cats.data.EitherT
 
@@ -21,7 +21,7 @@ trait TagsAPI[F[_]] {
       wrap(sort).flatMap(_.toParams),
       wrap(search).map("search".eqParam),
     ).flatten
-    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/tags", q: _*)
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/tags", projectId, q *)
     getAllPaginatedResponse[TagInfo](req, "get-tags", paging)
   }
 
@@ -39,21 +39,21 @@ trait TagsAPI[F[_]] {
       message.map("message".eqParam).toList,
       description.map("release_description".eqParam).toList,
     ).flatten
-    val req = reqGen.post(s"$API/projects/${projectId.toStringId}/repository/tags", q: _*).withProjectId(projectId)
+    val req = reqGen.post(s"$API/projects/${projectId.toStringId}/repository/tags", projectId, q *)
     invokeRequest(req).unmarshall[TagInfo]
   }
 
   // @see: https://docs.gitlab.com/ee/api/tags.html#get-a-single-repository-tag
   def getTag(projectId: EntityId, tagName: String): EitherT[F, GitlabError, TagInfo] = {
     implicit val rId: RequestId = RequestId.newOne("get-tag")
-    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/tags/$tagName").withProjectId(projectId)
+    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/tags/$tagName", projectId)
     invokeRequest(req).unmarshall[TagInfo]
   }
 
   // @see: https://docs.gitlab.com/ee/api/tags.html#delete-a-tag
   def deleteTag(projectId: EntityId, tagName: String): EitherT[F, GitlabError, Unit] = {
     implicit val rId: RequestId = RequestId.newOne("delete-tag")
-    val req                     = reqGen.delete(s"$API/projects/${projectId.toStringId}/repository/tags/$tagName")
+    val req                     = reqGen.delete(s"$API/projects/${projectId.toStringId}/repository/tags/$tagName", projectId)
     invokeRequest(req).map(_ => ())
   }
 

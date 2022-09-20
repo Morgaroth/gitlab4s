@@ -40,14 +40,14 @@ trait PipelinesAPI[F[_]] {
       wrap(updatedBefore).map(_.toISO8601UTC).map("updated_before".eqParam(_)),
       wrap(sort).flatMap(s => List("order_by".eqParam(s.field.property), "sort".eqParam(s.direction.toString))),
     ).flatten
-    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/pipelines", params: _*).withProjectId(projectId)
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/pipelines", projectId, params: _*)
     getAllPaginatedResponse[PipelineShort](req, "get-pipelines-of-project", paging)
   }
 
   // @see: https://docs.gitlab.com/ee/api/pipelines.html#get-a-single-pipeline
   def getPipeline(projectId: EntityId, pipelineId: BigInt): EitherT[F, GitlabError, PipelineFullInfo] = {
     implicit val rId: RequestId = RequestId.newOne("get-pipeline-by-id")
-    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/pipelines/$pipelineId").withProjectId(projectId)
+    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/pipelines/$pipelineId", projectId)
     invokeRequest(req).unmarshall[PipelineFullInfo]
   }
 
@@ -59,7 +59,7 @@ trait PipelinesAPI[F[_]] {
   ): EitherT[F, GitlabError, Vector[JobFullInfo]] = {
     implicit val rId: RequestId = RequestId.newOne("get-pipeline-jobs")
     val params                  = wrap(scope).flatMap(_.map(sc => "scope[]".eqParam(sc.name)))
-    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/pipelines/$pipelineId/jobs", params).withProjectId(projectId)
+    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/pipelines/$pipelineId/jobs", projectId, params)
     invokeRequest(req).unmarshall[Vector[JobFullInfo]]
   }
 
@@ -70,7 +70,7 @@ trait PipelinesAPI[F[_]] {
       vars: Vector[PipelineVar] = Vector.empty,
   ): EitherT[F, GitlabError, PipelineFullInfo] = {
     implicit val rId: RequestId = RequestId.newOne("trigger-pipeline")
-    val req = reqGen.post(s"$API/projects/${projectId.toStringId}/pipeline", MJson.write(TriggerPipelineRequest(branch, vars)))
+    val req = reqGen.post(s"$API/projects/${projectId.toStringId}/pipeline", MJson.write(TriggerPipelineRequest(branch, vars)), projectId)
     invokeRequest(req).unmarshall[PipelineFullInfo]
   }
 
@@ -80,7 +80,7 @@ trait PipelinesAPI[F[_]] {
       pipelineId: BigInt,
   ): EitherT[F, GitlabError, Vector[PipelineVar]] = {
     implicit val rId: RequestId = RequestId.newOne("get-pipeline-variables")
-    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/pipelines/$pipelineId/variables").withProjectId(projectId)
+    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/pipelines/$pipelineId/variables", projectId)
     invokeRequest(req).unmarshall[Vector[PipelineVar]]
   }
 

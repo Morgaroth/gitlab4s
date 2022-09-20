@@ -2,14 +2,14 @@ package io.gitlab.mateuszjaje.gitlabclient
 package apis
 
 import helpers.{NullValue, NullableField}
+import models.*
 import models.SearchScope.MergeRequests
-import models._
-import query.ParamQuery._
+import query.ParamQuery.*
 import query.{NoParam, Search}
 
 import cats.data.EitherT
-import cats.instances.vector._
-import cats.syntax.traverse._
+import cats.instances.vector.*
+import cats.syntax.traverse.*
 
 import java.time.ZonedDateTime
 
@@ -62,7 +62,7 @@ trait MergeRequestsAPI[F[_]] {
       withMergeStatusRecheck,
       sort,
     )
-    val req = reqGen.get(s"$API/projects/${projectID.toStringId}/merge_requests", q: _*).withProjectId(projectID)
+    val req = reqGen.get(s"$API/projects/${projectID.toStringId}/merge_requests", projectID, q: _*)
     getAllPaginatedResponse[MergeRequestInfo](req, "merge-requests-per-project", paging)
   }
 
@@ -110,29 +110,28 @@ trait MergeRequestsAPI[F[_]] {
   def updateMergeRequest(projectID: EntityId, mrId: BigInt, updateMrPayload: UpdateMRPayload): GitlabResponseT[MergeRequestFull] = {
     implicit val rId: RequestId = RequestId.newOne("update-mr")
     val req = reqGen
-      .put(s"$API/projects/${projectID.toStringId}/merge_requests/$mrId", MJson.write(updateMrPayload))
-      .withProjectId(projectID)
+      .put(s"$API/projects/${projectID.toStringId}/merge_requests/$mrId", MJson.write(updateMrPayload), projectID)
     invokeRequest(req).unmarshall[MergeRequestFull]
   }
 
   // @see: https://docs.gitlab.com/ee/api/merge_requests.html#get-single-mr
   def getMergeRequest(projectID: EntityId, mrId: BigInt): GitlabResponseT[MergeRequestFull] = {
     implicit val rId: RequestId = RequestId.newOne("get-merge-request-info")
-    val req                     = reqGen.get(s"$API/projects/${projectID.toStringId}/merge_requests/$mrId").withProjectId(projectID)
+    val req                     = reqGen.get(s"$API/projects/${projectID.toStringId}/merge_requests/$mrId", projectID)
     invokeRequest(req).unmarshall[MergeRequestFull]
   }
 
   // @see: https://docs.gitlab.com/ee/api/merge_requests.html#delete-a-merge-request
   def deleteMergeRequest(projectID: EntityId, mrIid: BigInt): GitlabResponseT[Unit] = {
     implicit val rId: RequestId = RequestId.newOne("delete-merge-request")
-    val req                     = reqGen.delete(s"$API/projects/${projectID.toStringId}/merge_requests/$mrIid")
+    val req                     = reqGen.delete(s"$API/projects/${projectID.toStringId}/merge_requests/$mrIid", projectID)
     invokeRequest(req).map(_ => ())
   }
 
   // @see: https://docs.gitlab.com/ee/api/merge_requests.html#get-single-mr-changes
   def getMergeRequestDiff(projectID: EntityId, mrId: BigInt): GitlabResponseT[MergeRequestFull] = {
     implicit val rId: RequestId = RequestId.newOne("get-merge-request-diff")
-    val req                     = reqGen.get(s"$API/projects/${projectID.toStringId}/merge_requests/$mrId/changes").withProjectId(projectID)
+    val req                     = reqGen.get(s"$API/projects/${projectID.toStringId}/merge_requests/$mrId/changes", projectID)
     invokeRequest(req).unmarshall[MergeRequestFull]
   }
 
@@ -141,7 +140,7 @@ trait MergeRequestsAPI[F[_]] {
   // @see: https://docs.gitlab.com/ee/api/merge_request_approvals.html#get-configuration-1
   def getApprovals(projectId: EntityId, mergeRequestIId: BigInt): GitlabResponseT[MergeRequestApprovals] = {
     implicit val rId: RequestId = RequestId.newOne("get-mr-approvals")
-    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approvals").withProjectId(projectId)
+    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approvals", projectId)
     invokeRequest(req).unmarshall[MergeRequestApprovals]
   }
 
@@ -156,7 +155,7 @@ trait MergeRequestsAPI[F[_]] {
   ): EitherT[F, GitlabError, MergeRequestApprovals] = {
     implicit val rId: RequestId = RequestId.newOne("approve-mr")
     val data                    = headSha.map("sha" -> _).toMap
-    val req = reqGen.post(API + s"/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approve", MJson.write(data))
+    val req = reqGen.post(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approve", MJson.write(data), projectId)
     invokeRequest(req).unmarshall[MergeRequestApprovals]
   }
 
@@ -171,7 +170,7 @@ trait MergeRequestsAPI[F[_]] {
       mergeRequestIId: BigInt,
   ): EitherT[F, GitlabError, MergeRequestApprovals] = {
     implicit val rId: RequestId = RequestId.newOne("unapprove-mr")
-    val req                     = reqGen.post(API + s"/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/unapprove")
+    val req                     = reqGen.post(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/unapprove", projectId)
     invokeRequest(req).unmarshall[MergeRequestApprovals]
   }
 
@@ -181,7 +180,7 @@ trait MergeRequestsAPI[F[_]] {
       mergeRequestIId: BigInt,
   ): GitlabResponseT[Vector[MergeRequestApprovalRule]] = {
     implicit val rId: RequestId = RequestId.newOne("get-mr-approval-rules")
-    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approval_rules").withProjectId(projectId)
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approval_rules", projectId)
     invokeRequest(req).unmarshall[Vector[MergeRequestApprovalRule]]
   }
 
@@ -193,8 +192,7 @@ trait MergeRequestsAPI[F[_]] {
   ): GitlabResponseT[MergeRequestApprovalRule] = {
     implicit val rId: RequestId = RequestId.newOne("create-mr-approval-rule")
     val req = reqGen
-      .post(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approval_rules", MJson.write(payload))
-      .withProjectId(projectId)
+      .post(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approval_rules", MJson.write(payload), projectId)
     invokeRequest(req).unmarshall[MergeRequestApprovalRule]
   }
 
@@ -209,7 +207,8 @@ trait MergeRequestsAPI[F[_]] {
   // @see https://docs.gitlab.com/ee/api/merge_request_approvals.html#delete-merge-request-level-rule
   def deleteApprovalRule(projectId: EntityId, mergeRequestIId: BigInt, approvalRuleId: BigInt): GitlabResponseT[String] = {
     implicit val rId: RequestId = RequestId.newOne("delete-mr-approval-rule")
-    val req = reqGen.delete(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approval_rules/$approvalRuleId")
+    val req =
+      reqGen.delete(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approval_rules/$approvalRuleId", projectId)
     invokeRequest(req)
   }
 
@@ -230,7 +229,7 @@ trait MergeRequestsAPI[F[_]] {
       sort: Option[Sorting[MergeRequestNotesSort]] = None,
   ): GitlabResponseT[Vector[MergeRequestNote]] = {
     val q   = sort.map(s => Seq("order_by".eqParam(s.field.property), "sort".eqParam(s.direction.toString))).toList.flatten
-    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes", q: _*).withProjectId(projectId)
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes", projectId, q: _*)
 
     getAllPaginatedResponse[MergeRequestNote](req, "merge-request-notes", paging)
   }
@@ -252,7 +251,7 @@ trait MergeRequestsAPI[F[_]] {
       noteId: BigInt,
   ): GitlabResponseT[MergeRequestNote] = {
     implicit val rId: RequestId = RequestId.newOne("get-merge-request-note")
-    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes/$noteId").withProjectId(projectId)
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes/$noteId", projectId)
     invokeRequest(req).unmarshall[MergeRequestNote]
   }
 
@@ -261,7 +260,7 @@ trait MergeRequestsAPI[F[_]] {
     implicit val rId: RequestId = RequestId.newOne("merge-request-note-create")
     val payload                 = MJson.write(MergeRequestNoteCreate(body))
     val req = reqGen
-      .post(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes", payload)
+      .post(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes", payload, projectId)
     invokeRequest(req).unmarshall[MergeRequestNote]
   }
 
@@ -275,20 +274,20 @@ trait MergeRequestsAPI[F[_]] {
     implicit val rId: RequestId = RequestId.newOne("merge-request-note-update")
     val payload                 = MJson.write(MergeRequestNoteCreate(newBody))
     val req = reqGen
-      .put(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes/$noteId", payload)
+      .put(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes/$noteId", payload, projectId)
     invokeRequest(req).unmarshall[MergeRequestNote]
   }
 
   // @see: https://docs.gitlab.com/ee/api/notes.html#delete-a-merge-request-note
   def deleteMergeRequestNote(projectId: EntityId, mergeRequestIId: BigInt, noteId: BigInt): GitlabResponseT[Unit] = {
     implicit val rId: RequestId = RequestId.newOne("merge-request-note-delete")
-    val req                     = reqGen.delete(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes/$noteId")
+    val req = reqGen.delete(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes/$noteId", projectId)
     invokeRequest(req).map(_ => ())
   }
 
   // @see: https://docs.gitlab.com/ee/api/discussions.html#list-project-merge-request-discussion-items
   def getMergeRequestDiscussions(projectId: EntityId, mergeRequestIId: BigInt): GitlabResponseT[Vector[MergeRequestDiscussion]] = {
-    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/discussions").withProjectId(projectId)
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/discussions", projectId)
     getAllPaginatedResponse[MergeRequestDiscussion](req, "get-merge-request-discussions", AllPages)
   }
 
@@ -300,8 +299,7 @@ trait MergeRequestsAPI[F[_]] {
   ): GitlabResponseT[MergeRequestDiscussion] = {
     implicit val rId: RequestId = RequestId.newOne("get-merge-request-discussion")
     val req = reqGen
-      .get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/discussions/$discussionId")
-      .withProjectId(projectId)
+      .get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/discussions/$discussionId", projectId)
     invokeRequest(req).unmarshall[MergeRequestDiscussion]
   }
 
@@ -313,8 +311,7 @@ trait MergeRequestsAPI[F[_]] {
   ): GitlabResponseT[MergeRequestDiscussion] = {
     implicit val rId: RequestId = RequestId.newOne("post-mr-discussion")
     val req = reqGen
-      .post(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/discussions", MJson.write(payload))
-      .withProjectId(projectId)
+      .post(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/discussions", MJson.write(payload), projectId)
     invokeRequest(req).unmarshall[MergeRequestDiscussion]
   }
 
@@ -328,8 +325,11 @@ trait MergeRequestsAPI[F[_]] {
     implicit val rId: RequestId = RequestId.newOne("resolve-mr-discussion")
     val payload                 = MRDiscussionUpdate.resolve(resolved)
     val req = reqGen
-      .put(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/discussions/$discussionId", MJson.write(payload))
-      .withProjectId(projectId)
+      .put(
+        s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/discussions/$discussionId",
+        MJson.write(payload),
+        projectId,
+      )
     invokeRequest(req).unmarshall[MergeRequestDiscussion]
   }
 
@@ -346,8 +346,8 @@ trait MergeRequestsAPI[F[_]] {
       .post(
         s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/discussions/$discussionId/notes",
         MJson.write(payload),
+        projectId,
       )
-      .withProjectId(projectId)
     invokeRequest(req).unmarshall[MergeRequestNote]
   }
 
@@ -364,8 +364,8 @@ trait MergeRequestsAPI[F[_]] {
       .put(
         s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/discussions/$discussionId/notes/$noteId",
         MJson.write(payload),
+        projectId,
       )
-      .withProjectId(projectId)
     invokeRequest(req).unmarshall[MergeRequestNote]
   }
 

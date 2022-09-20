@@ -13,21 +13,21 @@ trait JobsAPI[F[_]] {
   // @see: https://docs.gitlab.com/ee/api/jobs.html#get-a-single-job
   def getJob(projectId: EntityId, jobId: BigInt): EitherT[F, GitlabError, JobFullInfo] = {
     implicit val rId: RequestId = RequestId.newOne("get-pipeline-job-by-id")
-    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/jobs/$jobId").withProjectId(projectId)
+    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/jobs/$jobId", projectId)
     invokeRequest(req).unmarshall[JobFullInfo]
   }
 
   // @see: https://docs.gitlab.com/ee/api/jobs.html#cancel-a-job
   def cancelJob(projectId: EntityId, jobId: BigInt): EitherT[F, GitlabError, JobFullInfo] = {
     implicit val rId: RequestId = RequestId.newOne("cancel-pipeline-job")
-    val req                     = reqGen.post(s"$API/projects/${projectId.toStringId}/jobs/$jobId/cancel").withProjectId(projectId)
+    val req                     = reqGen.post(s"$API/projects/${projectId.toStringId}/jobs/$jobId/cancel", projectId)
     invokeRequest(req).unmarshall[JobFullInfo]
   }
 
   // @see: https://docs.gitlab.com/ee/api/jobs.html#cancel-a-job
   def retryJob(projectId: EntityId, jobId: BigInt): EitherT[F, GitlabError, JobFullInfo] = {
     implicit val rId: RequestId = RequestId.newOne("retry-pipeline-job")
-    val req                     = reqGen.post(s"$API/projects/${projectId.toStringId}/jobs/$jobId/retry").withProjectId(projectId)
+    val req                     = reqGen.post(s"$API/projects/${projectId.toStringId}/jobs/$jobId/retry", projectId)
     invokeRequest(req).unmarshall[JobFullInfo]
   }
 
@@ -38,7 +38,7 @@ trait JobsAPI[F[_]] {
       artifactPath: String,
   ): EitherT[F, GitlabError, RawResponse] = {
     implicit val rId: RequestId = RequestId.newOne("get-single-artifact")
-    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/jobs/$jobId/artifacts/$artifactPath").withProjectId(projectId)
+    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/jobs/$jobId/artifacts/$artifactPath", projectId)
     byteRequest(req).map(RawResponse.from)
   }
 
@@ -48,7 +48,7 @@ trait JobsAPI[F[_]] {
       jobId: BigInt,
   ): EitherT[F, GitlabError, RawResponse] = {
     implicit val rId: RequestId = RequestId.newOne("get-job-artifacts")
-    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/jobs/$jobId/artifacts").withProjectId(projectId)
+    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/jobs/$jobId/artifacts", projectId)
     byteRequest(req).map(RawResponse.from)
   }
 
@@ -58,7 +58,7 @@ trait JobsAPI[F[_]] {
       jobId: BigInt,
   ): EitherT[F, GitlabError, String] = {
     implicit val rId: RequestId = RequestId.newOne("get-job-log")
-    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/jobs/$jobId/trace").withProjectId(projectId)
+    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/jobs/$jobId/trace", projectId)
     invokeRequest(req)
   }
 

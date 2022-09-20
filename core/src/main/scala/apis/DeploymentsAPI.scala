@@ -1,9 +1,9 @@
 package io.gitlab.mateuszjaje.gitlabclient
 package apis
 
-import helpers.CustomDateTimeFormatter._
+import helpers.CustomDateTimeFormatter.*
 import models.DeploymentInfo
-import query.ParamQuery._
+import query.ParamQuery.*
 
 import cats.data.EitherT
 
@@ -30,7 +30,7 @@ trait DeploymentsAPI[F[_]] {
       wrap(updatedBefore).map(_.toISO8601UTC).map("updated_before".eqParam(_)),
       wrap(sort).flatMap(s => List("order_by".eqParam(s.field.property), "sort".eqParam(s.direction.toString))),
     ).flatten
-    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/deployments", params: _*)
+    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/deployments", projectId, params *)
     getAllPaginatedResponse[DeploymentInfo](req, "get-deployments", paging)
   }
 

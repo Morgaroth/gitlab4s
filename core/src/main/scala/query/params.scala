@@ -111,8 +111,14 @@ case class RequestGenerator(cfg: GitlabConfig) {
   def get(path: String): GitlabRequest =
     GitlabRequest(cfg.server, Methods.Get, path, Vector.empty, None, Map.empty, None)
 
+  def get(path: String, projectId: EntityId): GitlabRequest =
+    GitlabRequest(cfg.server, Methods.Get, path, Vector.empty, None, Map.empty, Some(projectId.toStringId))
+
   def delete(path: String): GitlabRequest =
     GitlabRequest(cfg.server, Methods.Delete, path, Vector.empty, None, Map.empty, None)
+
+  def delete(path: String, projectId: EntityId): GitlabRequest =
+    GitlabRequest(cfg.server, Methods.Delete, path, Vector.empty, None, Map.empty, Some(projectId.toStringId))
 
   def delete(path: String, query: ParamQuery*): GitlabRequest =
     GitlabRequest(cfg.server, Methods.Delete, path, query.toVector.filterNot(_ == NoParam), None, Map.empty, None)
@@ -120,17 +126,32 @@ case class RequestGenerator(cfg: GitlabConfig) {
   def get(path: String, query: ParamQuery*): GitlabRequest =
     GitlabRequest(cfg.server, Methods.Get, path, query.toVector.filterNot(_ == NoParam), None, Map.empty, None)
 
+  def get(path: String, projectId: EntityId, query: ParamQuery*): GitlabRequest =
+    GitlabRequest(cfg.server, Methods.Get, path, query.toVector.filterNot(_ == NoParam), None, Map.empty, Some(projectId.toStringId))
+
   def get(path: String, query: List[ParamQuery]): GitlabRequest =
     GitlabRequest(cfg.server, Methods.Get, path, query.toVector.filterNot(_ == NoParam), None, Map.empty, None)
+
+  def get(path: String, projectId: EntityId, query: List[ParamQuery]): GitlabRequest =
+    GitlabRequest(cfg.server, Methods.Get, path, query.toVector.filterNot(_ == NoParam), None, Map.empty, Some(projectId.toStringId))
 
   def post(path: String, query: ParamQuery*): GitlabRequest =
     GitlabRequest(cfg.server, Methods.Post, path, query.toVector.filterNot(_ == NoParam), None, Map.empty, None)
 
+  def post(path: String, projectId: EntityId, query: ParamQuery*): GitlabRequest =
+    GitlabRequest(cfg.server, Methods.Post, path, query.toVector.filterNot(_ == NoParam), None, Map.empty, Some(projectId.toStringId))
+
   def post(path: String, data: String, query: ParamQuery*): GitlabRequest =
     GitlabRequest(cfg.server, Methods.Post, path, query.toVector.filterNot(_ == NoParam), Some(data), Map.empty, None)
 
+  def post(path: String, data: String, projectId: EntityId, query: ParamQuery*): GitlabRequest =
+    GitlabRequest(cfg.server, Methods.Post, path, query.toVector.filterNot(_ == NoParam), Some(data), Map.empty, Some(projectId.toStringId))
+
   def put(path: String, data: String): GitlabRequest =
     GitlabRequest(cfg.server, Methods.Put, path, Vector.empty, Some(data), Map.empty, None)
+
+  def put(path: String, data: String, projectId: EntityId): GitlabRequest =
+    GitlabRequest(cfg.server, Methods.Put, path, Vector.empty, Some(data), Map.empty, Some(projectId.toStringId))
 
 }
 

@@ -14,7 +14,7 @@ trait EmojiAwardsAPI[F[_]] {
   // @see: https://docs.gitlab.com/ee/api/award_emoji.html#list-an-awardables-award-emoji
   def getEmojiAwards(projectID: EntityId, scope: AwardableScope, awardableId: BigInt): EitherT[F, GitlabError, Vector[EmojiAward]] = {
     implicit val rId: RequestId = RequestId.newOne(s"get-$scope-awards")
-    val req = reqGen.get(s"$API/projects/${projectID.toStringId}/$scope/$awardableId/award_emoji").withProjectId(projectID)
+    val req                     = reqGen.get(s"$API/projects/${projectID.toStringId}/$scope/$awardableId/award_emoji", projectID)
     invokeRequest(req).unmarshall[Vector[EmojiAward]]
   }
 
@@ -27,14 +27,14 @@ trait EmojiAwardsAPI[F[_]] {
   ): EitherT[F, GitlabError, EmojiAward] = {
     implicit val rId: RequestId = RequestId.newOne(s"award-$scope-emoji")
     val req = reqGen
-      .post(s"$API/projects/${projectID.toStringId}/$scope/$awardableId/award_emoji", "name".eqParam(emojiName))
+      .post(s"$API/projects/${projectID.toStringId}/$scope/$awardableId/award_emoji", projectID, "name".eqParam(emojiName))
     invokeRequest(req).unmarshall[EmojiAward]
   }
 
   // @see: https://docs.gitlab.com/ee/api/award_emoji.html#delete-an-award-emoji
   def unawardEmoji(projectID: EntityId, scope: AwardableScope, awardableId: BigInt, awardId: BigInt): EitherT[F, GitlabError, Unit] = {
     implicit val rId: RequestId = RequestId.newOne(s"unaward-$scope-emoji")
-    val req                     = reqGen.delete(s"$API/projects/${projectID.toStringId}/$scope/$awardableId/award_emoji/$awardId")
+    val req = reqGen.delete(s"$API/projects/${projectID.toStringId}/$scope/$awardableId/award_emoji/$awardId", projectID)
     invokeRequest(req).map(_ => ())
   }
 
