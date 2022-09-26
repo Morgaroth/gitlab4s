@@ -152,5 +152,7 @@ case class DownstreamPipelineInfo(
 )
 
 object DownstreamPipelineInfo {
-  implicit val DownstreamPipelineInfoCodec: Codec[PipelineShort] = MissingPropertiesLogger.loggingCodec(deriveCodec[DownstreamPipelineInfo])
+  implicit val DownstreamPipelineInfoCodec: Codec[DownstreamPipelineInfo] =
+    MissingPropertiesLogger.loggingCodec(deriveCodec[DownstreamPipelineInfo])
+
 }

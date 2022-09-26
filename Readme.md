@@ -1,7 +1,5 @@
 ### Project
 
-[Gugel](wwww.google.com)
-
 This project aims to provide scala SDK for communicating with Gitlab
 
 ### 3rd party
