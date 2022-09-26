@@ -2,8 +2,9 @@ package io.gitlab.mateuszjaje.gitlabclient
 package apis
 
 import apis.RawResponse.stringContentTypes
-import models.JobFullInfo
+import models.{JobFullInfo, PipelineBridgeJob, PipelineStatus}
 import query.GitlabResponse
+import query.ParamQuery.fromString
 
 import cats.data.EitherT
 
@@ -60,6 +61,18 @@ trait JobsAPI[F[_]] {
     implicit val rId: RequestId = RequestId.newOne("get-job-log")
     val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/jobs/$jobId/trace", projectId)
     invokeRequest(req)
+  }
+
+  // @see: https://docs.gitlab.com/ee/api/jobs.html#list-pipeline-bridges
+  def getPipelineBridges(
+      projectId: EntityId,
+      pipelineId: BigInt,
+      scopes: Seq[PipelineStatus] = Seq.empty,
+  ): EitherT[F, GitlabError, Vector[PipelineBridgeJob]] = {
+    implicit val rId: RequestId = RequestId.newOne("get-pipeline-bridges")
+    val scopeQueries = if (scopes.length == 1) Seq("scope".eqParam(scopes.head.name)) else scopes.map(x => "scope[]".eqParam(x.name))
+    val req          = reqGen.get(s"$API/projects/${projectId.toStringId}/pipelines/$pipelineId/bridges", projectId, scopeQueries *)
+    invokeRequest(req).unmarshall[Vector[PipelineBridgeJob]]
   }
 
 }

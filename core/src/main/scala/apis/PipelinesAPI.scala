@@ -1,9 +1,9 @@
 package io.gitlab.mateuszjaje.gitlabclient
 package apis
 
-import helpers.CustomDateTimeFormatter._
-import models.{JobFullInfo, JobScope, PipelineFullInfo, PipelineScope, PipelineShort, PipelineStatus, PipelineVar, TriggerPipelineRequest}
-import query.ParamQuery._
+import helpers.CustomDateTimeFormatter.*
+import models.*
+import query.ParamQuery.*
 
 import cats.data.EitherT
 

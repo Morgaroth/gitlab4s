@@ -115,3 +115,42 @@ case class JobRunner(
 object JobRunner {
   implicit val JobRunnerCodec: Codec[JobRunner] = deriveCodec[JobRunner]
 }
+
+case class PipelineBridgeJob(
+    id: BigInt,
+    status: JobStatus,
+    stage: String,
+    name: String,
+    ref: String,
+    tag: Boolean,
+    allow_failure: Boolean,
+    queued_duration: Option[Double],
+    created_at: ZonedDateTime,
+    started_at: Option[ZonedDateTime],
+    finished_at: Option[ZonedDateTime],
+    duration: Double,
+    user: GitlabUser,
+    commit: CommitSimple,
+    pipeline: PipelineShort,
+    web_url: String,
+    failure_reason: Option[String],
+    project: ProjectPropertyOfJobInfo,
+    downstream_pipeline: DownstreamPipelineInfo,
+)
+
+object PipelineBridgeJob {
+  implicit val PipelineBridgeJobCodec: Codec[PipelineBridgeJob] = MissingPropertiesLogger.loggingCodec(deriveCodec[PipelineBridgeJob])
+}
+
+case class DownstreamPipelineInfo(
+    id: BigInt,
+    sha: String,
+    ref: String,
+    status: PipelineStatus,
+    created_at: ZonedDateTime,
+    web_url: String,
+)
+
+object DownstreamPipelineInfo {
+  implicit val DownstreamPipelineInfoCodec: Codec[PipelineShort] = MissingPropertiesLogger.loggingCodec(deriveCodec[DownstreamPipelineInfo])
+}
