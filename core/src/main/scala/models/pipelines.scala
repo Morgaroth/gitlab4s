@@ -43,13 +43,38 @@ sealed abstract class PipelineSource(val name: String) extends Product with Seri
 
 object PipelineSource extends EnumMarshallingGlue[PipelineSource] {
 
-  case object API               extends PipelineSource("api")
-  case object Push              extends PipelineSource("push")
-  case object Web               extends PipelineSource("web")
-  case object Schedule          extends PipelineSource("schedule")
-  case object MergeRequestEvent extends PipelineSource("merge_request_event")
+  case object API                      extends PipelineSource("api")
+  case object Push                     extends PipelineSource("push")
+  case object Web                      extends PipelineSource("web")
+  case object Schedule                 extends PipelineSource("schedule")
+  case object MergeRequestEvent        extends PipelineSource("merge_request_event")
+  case object Trigger                  extends PipelineSource("trigger")
+  case object External                 extends PipelineSource("external")
+  case object Pipeline                 extends PipelineSource("pipeline")
+  case object Chat                     extends PipelineSource("chat")
+  case object WebIDE                   extends PipelineSource("webide")
+  case object ExternalPullRequestEvent extends PipelineSource("external_pull_request_event")
+  case object ParentPipeline           extends PipelineSource("parent_pipeline")
+  case object OnDemandDastScan         extends PipelineSource("ondemand_dast_scan")
+  case object OnDemandDastValidation   extends PipelineSource("ondemand_dast_validation")
 
-  val all: Seq[PipelineSource]            = Seq(API, Push, Web, Schedule, MergeRequestEvent)
+  val all: Seq[PipelineSource] = Seq(
+    API,
+    Push,
+    Web,
+    Schedule,
+    MergeRequestEvent,
+    Trigger,
+    External,
+    Pipeline,
+    Chat,
+    WebIDE,
+    ExternalPullRequestEvent,
+    ParentPipeline,
+    OnDemandDastScan,
+    OnDemandDastValidation,
+  )
+
   val byName: Map[String, PipelineSource] = all.map(x => x.name -> x).toMap
 
   override def rawValue: PipelineSource => String = _.name
