@@ -70,6 +70,7 @@ object DetailedMergeStatus extends EnumMarshallingGlue[DetailedMergeStatus] {
   case object Mergeable      extends DetailedMergeStatus("mergeable")
   case object IsDraft        extends DetailedMergeStatus("draft_status")
   case object Unchecked      extends DetailedMergeStatus("unchecked")
+  case object NotOpen      extends DetailedMergeStatus("not_open")
   case object CIMustPass     extends DetailedMergeStatus("ci_must_pass")
 
   val all: Seq[DetailedMergeStatus] = Seq(
@@ -77,6 +78,7 @@ object DetailedMergeStatus extends EnumMarshallingGlue[DetailedMergeStatus] {
     Mergeable,
     IsDraft,
     Unchecked,
+    NotOpen,
     CIMustPass,
   )
 
