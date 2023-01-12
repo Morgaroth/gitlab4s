@@ -9,7 +9,7 @@ val sttpVersion     = "3.7.6"
 val validate = Def.taskKey[Unit]("Validates entire project")
 
 val projectScalaVersion      = "2.13.10"
-val crossScalaVersionsValues = Seq(projectScalaVersion, "3.2.2")
+val crossScalaVersionsValues = Seq(projectScalaVersion, "3.1.2")
 
 val publishSettings = Seq(
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
