@@ -8,8 +8,10 @@ val sttpVersion     = "3.7.6"
 
 val validate = Def.taskKey[Unit]("Validates entire project")
 
-val projectScalaVersion      = "2.13.10"
-val crossScalaVersionsValues = Seq(projectScalaVersion, "3.1.2")
+val scala2                   = "2.13.10"
+val scala3                   = "3.2.2"
+val projectScala             = scala2
+val crossScalaVersionsValues = Seq(scala2, scala3, projectScala).distinct
 
 val publishSettings = Seq(
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
@@ -19,7 +21,7 @@ val publishSettings = Seq(
   organizationHomepage   := Some(url("https://gitlab.com/mateuszjaje")),
   versionScheme          := Some("semver-spec"),
   crossScalaVersions     := crossScalaVersionsValues,
-  scalaVersion           := projectScalaVersion,
+  scalaVersion           := projectScala,
   publishMavenStyle      := true,
   publishTo              := sonatypePublishToBundle.value,
   sonatypeCredentialHost := "s01.oss.sonatype.org",
@@ -43,7 +45,7 @@ val publishSettings = Seq(
 val commonSettings = publishSettings ++ Seq(
   organization := "io.gitlab.mateuszjaje",
   resolvers += "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/",
-  scalaVersion := projectScalaVersion,
+  scalaVersion := projectScala,
   scalacOptions ++= Seq(
     "-unchecked",
     "-deprecation",
@@ -64,6 +66,9 @@ val commonSettings = publishSettings ++ Seq(
       )
     else if (scalaVersion.value.startsWith("3."))
       Seq(
+        "-rewrite",
+        "-source",
+        "3.2-migration",
         "-Ykind-projector",
         "-Xmax-inlines",
         "110",

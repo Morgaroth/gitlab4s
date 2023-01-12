@@ -11,7 +11,7 @@ object MyFiles {
       val res = br
         .getLines()
         .map { x =>
-          val l :: r :: Nil = x.split(":").toList
+          val l :: r :: Nil = x.split(":").toList: @unchecked
           (BigInt(l), BigInt(r))
         }
         .toSet
