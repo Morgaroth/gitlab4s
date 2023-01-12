@@ -67,18 +67,17 @@ sealed abstract class DetailedMergeStatus(val name: String) extends Product with
 object DetailedMergeStatus extends EnumMarshallingGlue[DetailedMergeStatus] {
 
   case object NotApprovedYet extends DetailedMergeStatus("not_approved")
-
-  case object Mergeable extends DetailedMergeStatus("mergeable")
-
-  case object IsDraft extends DetailedMergeStatus("draft_status")
-
-  case object Unchecked extends DetailedMergeStatus("unchecked")
+  case object Mergeable      extends DetailedMergeStatus("mergeable")
+  case object IsDraft        extends DetailedMergeStatus("draft_status")
+  case object Unchecked      extends DetailedMergeStatus("unchecked")
+  case object CIMustPass     extends DetailedMergeStatus("ci_must_pass")
 
   val all: Seq[DetailedMergeStatus] = Seq(
     NotApprovedYet,
     Mergeable,
     IsDraft,
     Unchecked,
+    CIMustPass,
   )
 
   val byName: Map[String, DetailedMergeStatus] = all.map(x => x.name -> x).toMap
