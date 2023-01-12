@@ -62,6 +62,32 @@ object MergeStatus extends EnumMarshallingGlue[MergeStatus] {
   implicit val MergeStatusCirceCodec: Codec[MergeStatus] = EnumMarshalling.stringEnumCodecOf(MergeStatus)
 }
 
+sealed abstract class DetailedMergeStatus(val name: String) extends Product with Serializable
+
+object DetailedMergeStatus extends EnumMarshallingGlue[DetailedMergeStatus] {
+
+  case object NotApprovedYet extends DetailedMergeStatus("not_approved")
+
+  case object Mergeable extends DetailedMergeStatus("mergeable")
+
+  case object IsDraft extends DetailedMergeStatus("draft_status")
+
+  case object Unchecked extends DetailedMergeStatus("unchecked")
+
+  val all: Seq[DetailedMergeStatus] = Seq(
+    NotApprovedYet,
+    Mergeable,
+    IsDraft,
+    Unchecked,
+  )
+
+  val byName: Map[String, DetailedMergeStatus] = all.map(x => x.name -> x).toMap
+
+  override def rawValue: DetailedMergeStatus => String = _.name
+
+  implicit val DetailedMergeStatusCirceCodec: Codec[DetailedMergeStatus] = EnumMarshalling.stringEnumCodecOf(DetailedMergeStatus)
+}
+
 case class TaskStatus(count: Int, completed_count: Int)
 
 object TaskStatus {
@@ -76,26 +102,43 @@ object ReferencesInfo {
 
 trait MergeRequestID {
   def id: BigInt
+
   def iid: BigInt
+
   def project_id: BigInt
 }
 
 trait MergeRequestSimple extends MergeRequestID {
   def title: String
+
   def description: Option[String]
+
   def state: MergeRequestState
+
   def author: GitlabUser
+
   def created_at: ZonedDateTime
+
   def updated_at: ZonedDateTime
+
   def merged_by: Option[GitlabUser]
+
   def merged_at: Option[ZonedDateTime]
+
   def closed_by: Option[GitlabUser]
+
   def closed_at: Option[ZonedDateTime]
+
   def target_branch: String
+
   def source_branch: String
+
   def source_project_id: Option[BigInt]
+
   def target_project_id: BigInt
+
   def references: ReferencesInfo
+
   def web_url: String
 }
 
@@ -221,6 +264,7 @@ case class MergeRequestFull(
     target_project_id: BigInt,
     labels: Vector[String],
     merge_status: Option[MergeStatus],
+    detailed_merge_status: Option[DetailedMergeStatus],
     sha: Option[String],
     merge_commit_sha: Option[String],
     squash_commit_sha: Option[String],
@@ -282,7 +326,9 @@ object DiffRefs {
 sealed abstract class MergeRequestSearchScope(val name: String) extends Product with Serializable
 
 object MergeRequestSearchScope {
-  case object CreatedByMe  extends MergeRequestSearchScope("created_by_me")
+  case object CreatedByMe extends MergeRequestSearchScope("created_by_me")
+
   case object AssignedToMe extends MergeRequestSearchScope("assigned_to_me")
-  case object All          extends MergeRequestSearchScope("all")
+
+  case object All extends MergeRequestSearchScope("all")
 }
