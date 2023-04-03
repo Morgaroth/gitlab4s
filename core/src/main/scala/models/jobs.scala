@@ -135,7 +135,8 @@ case class PipelineBridgeJob(
     web_url: String,
     failure_reason: Option[String],
     project: ProjectPropertyOfJobInfo,
-    downstream_pipeline: DownstreamPipelineInfo,
+    downstream_pipeline: Option[DownstreamPipelineInfo],
+    erased_at: Option[ZonedDateTime],
 )
 
 object PipelineBridgeJob {
@@ -144,10 +145,14 @@ object PipelineBridgeJob {
 
 case class DownstreamPipelineInfo(
     id: BigInt,
+    iid: BigInt,
+    project_id: BigInt,
     sha: String,
     ref: String,
     status: PipelineStatus,
+    source: String,
     created_at: ZonedDateTime,
+    updated_at: Option[ZonedDateTime],
     web_url: String,
 )
 
