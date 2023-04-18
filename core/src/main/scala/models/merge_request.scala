@@ -70,8 +70,10 @@ object DetailedMergeStatus extends EnumMarshallingGlue[DetailedMergeStatus] {
   case object Mergeable      extends DetailedMergeStatus("mergeable")
   case object IsDraft        extends DetailedMergeStatus("draft_status")
   case object Unchecked      extends DetailedMergeStatus("unchecked")
-  case object NotOpen      extends DetailedMergeStatus("not_open")
+  case object NotOpen        extends DetailedMergeStatus("not_open")
+  case object Checking       extends DetailedMergeStatus("checking")
   case object CIMustPass     extends DetailedMergeStatus("ci_must_pass")
+  case object BrokenStatus   extends DetailedMergeStatus("broken_status")
 
   val all: Seq[DetailedMergeStatus] = Seq(
     NotApprovedYet,
@@ -79,7 +81,9 @@ object DetailedMergeStatus extends EnumMarshallingGlue[DetailedMergeStatus] {
     IsDraft,
     Unchecked,
     NotOpen,
+    Checking,
     CIMustPass,
+    BrokenStatus,
   )
 
   val byName: Map[String, DetailedMergeStatus] = all.map(x => x.name -> x).toMap
@@ -302,6 +306,7 @@ case class MergeRequestFull(
     time_stats: TimeStats,
     reviewers: Vector[GitlabUser],
     overflow: Option[Boolean],
+    squash_on_merge: Boolean,
 ) extends MergeRequestSimple
 
 object MergeRequestFull {
