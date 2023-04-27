@@ -195,6 +195,8 @@ case class MergeRequestInfo(
     reviewers: Vector[GitlabUser],
     approvals_before_merge: Option[Int],
     time_stats: TimeStats,
+    detailed_merge_status: Option[DetailedMergeStatus],
+    squash_on_merge: Boolean,
 ) extends MergeRequestSimple
 
 object MergeRequestInfo {
