@@ -65,7 +65,6 @@ class Obfuscate extends AnyFlatSpec with Matchers with Gitlab4SMarshalling {
     "restrict_user_defined_variables",
     "only_allow_merge_if_pipeline_succeeds",
     "analytics_access_level",
-    "operations_access_level",
     "snippets_access_level",
     "request_access_enabled",
     "issues_enabled",

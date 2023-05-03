@@ -245,7 +245,6 @@ case class ProjectInfo(
     allow_merge_on_skipped_pipeline: Option[Boolean],
     resolve_outdated_diff_discussions: Boolean,
     printing_merge_request_link_enabled: Boolean,
-    operations_access_level: Option[String],
     analytics_access_level: Option[String],
     requirements_access_level: Option[String],
     container_expiration_policy: ContainerExpirationPolicy,
@@ -313,7 +312,6 @@ case class EditProjectRequest private (
     mirror_user_id: Option[Int] = None,
     mirror: Option[Boolean] = None,
     name: Option[String] = None,
-    operations_access_level: Option[String] = None,
     only_allow_merge_if_all_discussions_are_resolved: Option[Boolean] = None,
     only_allow_merge_if_pipeline_succeeds: Option[Boolean] = None,
     only_mirror_protected_branches: Option[Boolean] = None,
@@ -405,8 +403,6 @@ case class EditProjectRequest private (
 
   def withName(value: String) = copy(name = Some(value))
 
-  def withOperationsAccessLevel(value: String) = copy(operations_access_level = Some(value))
-
   def withOnlyAllowMergeIfAllDiscussionsAreResolved(value: Boolean) = copy(only_allow_merge_if_all_discussions_are_resolved = Some(value))
 
   def withOnlyAllowMergeIfPipelineSucceeds(value: Boolean) = copy(only_allow_merge_if_pipeline_succeeds = Some(value))
@@ -456,12 +452,11 @@ case class EditProjectRequest private (
   def withWikiEnabled(value: Boolean) = copy(wiki_enabled = Some(value))
 
   override def toString: String = {
-    import io.circe.syntax._
+    import io.circe.syntax.*
     this.asJson.asObject.get
       .filter(!_._2.isNull)
       .toMap
       .map { case (k, v) => k -> v.asString.getOrElse(v.toString()) }
       .mkString("ProjectUpdates(", ", ", ")")
   }
-
 }
