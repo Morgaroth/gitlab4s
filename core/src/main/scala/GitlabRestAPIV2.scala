@@ -58,7 +58,7 @@ trait GitlabRestAPIV2[F[_]]
   }
 
   // @see: https://docs.gitlab.com/ee/api/search.html#scope-merge_requests-1
-  private def groupGlobalSearch(groupId: EntityId, scope: SearchScope, phrase: Option[String])(implicit rId: RequestId) = {
+  def groupGlobalSearch(groupId: EntityId, scope: SearchScope, phrase: Option[String])(implicit rId: RequestId) = {
     val req = reqGen.get(s"$API/groups/${groupId.toStringId}/search", scope.toParam, phrase.map(Search).getOrElse(NoParam))
     invokeRequest(req)
   }

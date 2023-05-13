@@ -21,6 +21,10 @@ object SearchScope {
 
   case object Users extends SearchScope("users")
 
-  val all: Seq[SearchScope]            = Seq(MergeRequests, WikiBlobs, Milestones, Issues, Projects, Commits, Blobs, Users)
+  case object Notes extends SearchScope("notes")
+
+  case object SnippetTitles extends SearchScope("snippet_titles")
+
+  val all: Seq[SearchScope] = Seq(MergeRequests, WikiBlobs, Milestones, Issues, Projects, Commits, Blobs, Users, Notes, SnippetTitles)
   val byName: Map[String, SearchScope] = all.map(x => x.name -> x).toMap
 }
