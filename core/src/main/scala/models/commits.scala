@@ -42,7 +42,7 @@ case class CommitSimple(
 )
 
 object CommitSimple {
-  implicit val CommitSimpleCodec: Codec[CommitSimple] = deriveCodec[CommitSimple]
+  implicit val CommitSimpleCodec: Codec[CommitSimple] = MissingPropertiesLogger.loggingCodec(deriveCodec[CommitSimple])
 }
 
 case class CommitStats(

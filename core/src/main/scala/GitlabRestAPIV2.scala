@@ -57,10 +57,18 @@ trait GitlabRestAPIV2[F[_]]
     getAllPaginatedResponse[MergeRequestInfo](req, s"global-search-${scope.name}", AllPages)
   }
 
+  // @see: https://docs.gitlab.com/ee/api/search.html#scope-commits-premium-1
+  def groupSearchCommits(groupId: EntityId, phrase: String): F[Either[GitlabError, Vector[CommitSimple]]] =
+    groupGlobalSearch[CommitSimple](groupId, SearchScope.Commits, Some(phrase))
+
+  // @see: https://docs.gitlab.com/ee/api/search.html#scope-commits-premium-1
+  def groupSearchBlobs(groupId: EntityId, phrase: String): F[Either[GitlabError, Vector[BlobInfo]]] =
+    groupGlobalSearch[BlobInfo](groupId, SearchScope.Blobs, Some(phrase))
+
   // @see: https://docs.gitlab.com/ee/api/search.html#scope-merge_requests-1
-  def groupGlobalSearch(groupId: EntityId, scope: SearchScope, phrase: Option[String])(implicit rId: RequestId) = {
+  private def groupGlobalSearch[T: Decoder](groupId: EntityId, scope: SearchScope, phrase: Option[String]) = {
     val req = reqGen.get(s"$API/groups/${groupId.toStringId}/search", scope.toParam, phrase.map(Search).getOrElse(NoParam))
-    invokeRequest(req)
+    getAllPaginatedResponse[T](req, "global-commits-search", AllPages)
   }
 
   protected def renderParams(
@@ -93,11 +101,6 @@ trait GitlabRestAPIV2[F[_]]
   }
 
   //  other
-
-  def groupSearchCommits(groupId: EntityId, phrase: String): F[Either[GitlabError, String]] = {
-    implicit val rId: RequestId = RequestId.newOne("group-search-mr")
-    groupGlobalSearch(groupId, SearchScope.Commits, Some(phrase))
-  }
 
   // @see: https://docs.gitlab.com/ee/api/branches.html#list-repository-branches
   def getBranches(projectID: EntityId, searchTerm: Option[String]): F[Either[GitlabError, Vector[GitlabBranchInfo]]] = {
