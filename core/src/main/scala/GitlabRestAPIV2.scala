@@ -23,6 +23,7 @@ trait GitlabRestAPIV2[F[_]]
     with DeploymentsAPIV2[F]
     with JobsAPIV2[F]
     with PipelinesAPIV2[F]
+    with GroupsAPIV2[F]
     with ProjectsAPIV2[F]
     with CommitsAPIV2[F] {
 

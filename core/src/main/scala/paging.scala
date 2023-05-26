@@ -114,6 +114,10 @@ object ProjectsSort {
     override val property: String = "path"
   }
 
+  case object Similarity extends ProjectsSort {
+    override val property: String = "similarity"
+  }
+
 }
 
 sealed trait EventsSort extends SortingFamily

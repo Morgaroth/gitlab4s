@@ -1,6 +1,7 @@
 package io.gitlab.mateuszjaje.gitlabclient
 package apisv2
 
+import apisv2.GitlabApiT.syntax.toOps
 import models.*
 import query.ParamQuery.*
 
@@ -86,6 +87,14 @@ trait ProjectsAPIV2[F[_]] {
     implicit val rId: RequestId = RequestId.newOne("update-project-approval-rule")
     val req = reqGen.put(s"$API/projects/${projectId.toStringId}/approval_rules/$approvalRuleId", MJson.write(payload), projectId)
     invokeRequest(req).unmarshall[ProjectApprovalRule]
+  }
+
+  def archiveProject(
+      projectId: EntityId,
+  ): F[Either[GitlabError, Unit]] = {
+    implicit val rId: RequestId = RequestId.newOne("archive-project")
+    val req                     = reqGen.post(s"$API/projects/${projectId.toStringId}/archive", projectId)
+    invokeRequest(req).map(_ => ())
   }
 
 }

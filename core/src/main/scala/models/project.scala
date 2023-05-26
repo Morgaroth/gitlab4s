@@ -7,7 +7,7 @@ import marshalling.{EnumMarshalling, EnumMarshallingGlue}
 import io.circe.generic.semiauto.{deriveCodec, deriveEncoder}
 import io.circe.{Codec, Encoder}
 
-import java.time.ZonedDateTime
+import java.time.{LocalDate, ZonedDateTime}
 
 sealed trait NamespaceKind {
   def repr: String
@@ -214,8 +214,8 @@ case class ProjectInfo(
     auto_devops_deploy_strategy: String,
     mirror: Boolean,
     external_authorization_classification_label: Option[String],
-    marked_for_deletion_at: Option[ZonedDateTime],
-    marked_for_deletion_on: Option[ZonedDateTime],
+    marked_for_deletion_at: Option[LocalDate],
+    marked_for_deletion_on: Option[LocalDate],
     compliance_frameworks: Vector[String],
     runner_token_expiration_interval: Option[String],
     // flags
@@ -459,4 +459,5 @@ case class EditProjectRequest private (
       .map { case (k, v) => k -> v.asString.getOrElse(v.toString()) }
       .mkString("ProjectUpdates(", ", ", ")")
   }
+
 }
