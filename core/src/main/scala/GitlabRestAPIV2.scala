@@ -43,12 +43,18 @@ trait GitlabRestAPIV2[F[_]]
 
   protected def byteRequest(request: GitlabRequest)(implicit requestId: RequestId): F[Either[GitlabError, GitlabResponse[Array[Byte]]]]
 
-  def authHeader(req: GitlabRequest) =
+  def authHeader(req: GitlabRequest): String =
     req.extraHeaders.getOrElse(AuthHeaderName, config.tokenForPath(req.projectId))
 
-  def getCurrentUser = {
+  def getCurrentUser: F[Either[GitlabError, GitlabFullUser]] = {
     implicit val rId: RequestId = RequestId.newOne("get-current-user")
     val req                     = reqGen.get(API + "/user")
+    invokeRequest(req).unmarshall[GitlabFullUser]
+  }
+
+  def getUserInfo(id: BigInt): F[Either[GitlabError, GitlabFullUser]] = {
+    implicit val rId: RequestId = RequestId.newOne("get-user-by-id")
+    val req                     = reqGen.get(API + s"/users/$id")
     invokeRequest(req).unmarshall[GitlabFullUser]
   }
 
