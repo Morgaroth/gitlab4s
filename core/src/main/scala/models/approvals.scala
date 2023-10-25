@@ -122,6 +122,7 @@ case class BranchProtectionEntry(
     access_level_description: String,
     user_id: Option[BigInt],
     group_id: Option[BigInt],
+    deploy_key_id: Option[BigInt],
 )
 
 object BranchProtectionEntry {

@@ -77,6 +77,7 @@ case class JobFullInfo(
     created_at: ZonedDateTime,
     started_at: Option[ZonedDateTime],
     finished_at: Option[ZonedDateTime],
+    erased_at: Option[ZonedDateTime],
     duration: Double,
     user: GitlabUser,
     commit: CommitSimple,

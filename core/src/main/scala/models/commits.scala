@@ -39,6 +39,8 @@ case class CommitSimple(
     created_at: ZonedDateTime,
     message: String,
     parent_ids: Vector[String],
+    trailers: Map[String, String],
+    web_url: String,
 )
 
 object CommitSimple {
