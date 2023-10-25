@@ -52,10 +52,16 @@ trait GitlabRestAPIV2[F[_]]
     invokeRequest(req).unmarshall[GitlabFullUser]
   }
 
-  def getUserInfo(id: BigInt): F[Either[GitlabError, GitlabFullUser]] = {
+  def getUserById(id: BigInt): F[Either[GitlabError, GitlabFullUser]] = {
     implicit val rId: RequestId = RequestId.newOne("get-user-by-id")
     val req                     = reqGen.get(API + s"/users/$id")
     invokeRequest(req).unmarshall[GitlabFullUser]
+  }
+
+  def genericRequest(path: String, requestCode: String): F[Either[GitlabError, GitlabResponse[String]]] = {
+    implicit val rId: RequestId = RequestId.newOne(requestCode)
+    val req                     = reqGen.get(API + s"/${path.stripPrefix("/")}")
+    invokeRequestRaw(req)
   }
 
   // @see: https://docs.gitlab.com/ee/api/search.html#scope-merge_requests
@@ -116,7 +122,16 @@ trait GitlabRestAPIV2[F[_]]
       projectID,
       searchTerm.map(ParamQuery.search).getOrElse(NoParam),
     )
-    getAllPaginatedResponse[GitlabBranchInfo](req, "merge-requests-per-project", AllPages)
+    getAllPaginatedResponse[GitlabBranchInfo](req, "branches-per-project", AllPages)
+  }
+
+  // @see: https://docs.gitlab.com/ee/api/protected_branches.html
+  def getProtectedBranches(projectID: EntityId): F[Either[GitlabError, Vector[ProtectedBranchesConfig]]] = {
+    val req = reqGen.get(
+      s"$API/projects/${projectID.toStringId}/protected_branches",
+      projectID,
+    )
+    getAllPaginatedResponse[ProtectedBranchesConfig](req, "protected-branches-per-project", AllPages)
   }
 
   protected def getAllPaginatedResponse[A: Decoder](
