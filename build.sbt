@@ -1,4 +1,4 @@
-import Syntax._
+import Syntax.*
 import com.jsuereth.sbtpgp.PgpKeys.publishSigned
 import xerial.sbt.Sonatype.GitLabHosting
 
@@ -26,7 +26,7 @@ val publishSettings = Seq(
   publishTo              := sonatypePublishToBundle.value,
   sonatypeCredentialHost := "s01.oss.sonatype.org",
   releaseProcess := {
-    import sbtrelease.ReleaseStateTransformations._
+    import sbtrelease.ReleaseStateTransformations.*
     Seq[ReleaseStep](
       checkSnapshotDependencies,
       inquireVersions,
@@ -71,7 +71,7 @@ val commonSettings = publishSettings ++ Seq(
         "3.2-migration",
         "-Ykind-projector",
         "-Xmax-inlines",
-        "110",
+        "130",
       )
     else Seq.empty
   },
