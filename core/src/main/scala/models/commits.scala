@@ -4,7 +4,7 @@ package models
 import maintenance.MissingPropertiesLogger
 import marshalling.{EnumMarshalling, EnumMarshallingGlue}
 
-import io.circe.Codec
+import io.circe.{Codec, Json}
 import io.circe.generic.semiauto.deriveCodec
 
 import java.time.ZonedDateTime
@@ -39,8 +39,9 @@ case class CommitSimple(
     created_at: ZonedDateTime,
     message: String,
     parent_ids: Vector[String],
-    trailers: Map[String, String],
     web_url: String,
+    extended_trailers: Json,
+    trailers: Json,
 )
 
 object CommitSimple {

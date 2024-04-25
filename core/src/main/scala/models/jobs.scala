@@ -89,6 +89,7 @@ case class JobFullInfo(
     coverage: Option[String],
     failure_reason: Option[String],
     project: ProjectPropertyOfJobInfo,
+    archived: Boolean,
 )
 
 object JobFullInfo {
@@ -108,7 +109,7 @@ object ProjectPropertyOfJobInfo {
 case class JobRunner(
     id: BigInt,
     description: String,
-    ip_address: String,
+    ip_address: Option[String],
     active: Boolean,
     is_shared: Boolean,
     runner_type: String,
