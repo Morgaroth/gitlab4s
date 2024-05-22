@@ -12,17 +12,17 @@ trait ProjectsAPI[F[_]] {
   this: GitlabRestAPI[F] =>
 
   // @see: https://docs.gitlab.com/ee/api/projects.html#get-single-project
-  def getProject(projectId: EntityId): GitlabResponseT[ProjectInfo] = {
+  def getProject(projectId: EntityId): EitherT[F, GitlabError, ProjectInfo] = {
     implicit val rId: RequestId = RequestId.newOne("get-project-by-id")
     val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}", projectId)
     invokeRequest(req).unmarshall[ProjectInfo]
   }
 
-  def getProjects(ids: Iterable[BigInt]): GitlabResponseT[Vector[ProjectInfo]] =
+  def getProjects(ids: Iterable[BigInt]): EitherT[F, GitlabError, Vector[ProjectInfo]] =
     ids.toVector.traverse(x => getProject(x))
 
   // @see: https://docs.gitlab.com/ee/api/projects.html#list-all-projects
-  def getProjects(paging: Paging = AllPages, sort: Sorting[ProjectsSort] = null): GitlabResponseT[Vector[ProjectInfo]] = {
+  def getProjects(paging: Paging = AllPages, sort: Sorting[ProjectsSort] = null): EitherT[F, GitlabError, Vector[ProjectInfo]] = {
     implicit val rId: RequestId = RequestId.newOne("get-all-projects")
     val q = Vector(
       wrap(sort).flatMap(_.toParams),
@@ -33,28 +33,28 @@ trait ProjectsAPI[F[_]] {
   }
 
   // @see: https://docs.gitlab.com/ee/api/projects.html#edit-project
-  def editProject(projectId: EntityId, updates: EditProjectRequest): GitlabResponseT[ProjectInfo] = {
+  def editProject(projectId: EntityId, updates: EditProjectRequest): EitherT[F, GitlabError, ProjectInfo] = {
     implicit val rId: RequestId = RequestId.newOne("edit-project")
     val req                     = reqGen.put(s"$API/projects/${projectId.toStringId}", MJson.write(updates), projectId)
     invokeRequest(req).unmarshall[ProjectInfo]
   }
 
   // @see: https://docs.gitlab.com/ee/api/projects.html#get-project-push-rules
-  def getPushRules(projectId: EntityId): GitlabResponseT[PushRules] = {
+  def getPushRules(projectId: EntityId): EitherT[F, GitlabError, PushRules] = {
     implicit val rId: RequestId = RequestId.newOne("get-project-push-rules")
     val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/push_rule", projectId)
     invokeRequest(req).unmarshall[PushRules]
   }
 
   // @see: https://docs.gitlab.com/ee/api/projects.html#get-project-push-rules
-  def editPushRules(projectId: EntityId, updates: EditPushRuleRequest): GitlabResponseT[PushRules] = {
+  def editPushRules(projectId: EntityId, updates: EditPushRuleRequest): EitherT[F, GitlabError, PushRules] = {
     implicit val rId: RequestId = RequestId.newOne("edit-project-push-rules")
     val req                     = reqGen.put(s"$API/projects/${projectId.toStringId}/push_rule", MJson.write(updates), projectId)
     invokeRequest(req).unmarshall[PushRules]
   }
 
   // @see: https://docs.gitlab.com/ee/api/projects.html#get-project-push-rules
-  def createPushRules(projectId: EntityId, pushRules: EditPushRuleRequest): GitlabResponseT[PushRules] = {
+  def createPushRules(projectId: EntityId, pushRules: EditPushRuleRequest): EitherT[F, GitlabError, PushRules] = {
     implicit val rId: RequestId = RequestId.newOne("create-project-push-rules")
     val req                     = reqGen.post(s"$API/projects/${projectId.toStringId}/push_rule", MJson.write(pushRules), projectId)
     invokeRequest(req).unmarshall[PushRules]

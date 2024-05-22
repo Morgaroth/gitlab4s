@@ -4,12 +4,12 @@ import xerial.sbt.Sonatype.GitLabHosting
 
 val circeVersion    = "0.14.2"
 val circeExtVersion = "0.14.2"
-val sttpVersion     = "3.7.6"
+val sttpVersion     = "3.9.7"
 
 val validate = Def.taskKey[Unit]("Validates entire project")
 
 val scala2                   = "2.13.10"
-val scala3                   = "3.2.2"
+val scala3                   = "3.3.1"
 val projectScala             = scala2
 val crossScalaVersionsValues = Seq(scala2, scala3, projectScala).distinct
 
@@ -114,8 +114,7 @@ val sttpjdk = project
   .settings(
     name := "gitlab4s-sttp-jdk",
     libraryDependencies ++= Seq(
-      "com.softwaremill.sttp.client3" %% "core"               % "3.7.6",
-      "com.softwaremill.sttp.client3" %% "httpclient-backend" % "3.5.2",
+      "com.softwaremill.sttp.client3" %% "core" % sttpVersion,
     ) ++ testDeps,
   )
 
@@ -126,8 +125,8 @@ val sttpzio1 = project
   .settings(
     name := "gitlab4s-sttp-zio1",
     libraryDependencies ++= Seq(
-      "com.softwaremill.sttp.client3" %% "core" % "3.7.6",
-      "com.softwaremill.sttp.client3" %% "zio1" % "3.7.6",// for ZIO 1.x
+      "com.softwaremill.sttp.client3" %% "core" % sttpVersion,
+      "com.softwaremill.sttp.client3" %% "zio1" % sttpVersion,// for ZIO 1.x
     ) ++ testDeps,
   )
 
@@ -138,8 +137,8 @@ val sttpzio2 = project
   .settings(
     name := "gitlab4s-sttp-zio",
     libraryDependencies ++= Seq(
-      "com.softwaremill.sttp.client3" %% "core" % "3.7.6",
-      "com.softwaremill.sttp.client3" %% "zio"  % "3.7.6",
+      "com.softwaremill.sttp.client3" %% "core" % sttpVersion,
+      "com.softwaremill.sttp.client3" %% "zio"  % sttpVersion,
     ) ++ testDeps,
   )
 

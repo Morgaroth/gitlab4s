@@ -16,7 +16,7 @@ import java.time.ZonedDateTime
 trait MergeRequestsAPI[F[_]] {
   this: GitlabRestAPI[F] =>
 
-  def globalMRsSearch(phrase: String): GitlabResponseT[Vector[MergeRequestInfo]] =
+  def globalMRsSearch(phrase: String): EitherT[F, GitlabError, Vector[MergeRequestInfo]] =
     globalSearch(MergeRequests, phrase)
 
   // @see: https://docs.gitlab.com/ee/api/search.html#scope-merge_requests-1
@@ -29,7 +29,7 @@ trait MergeRequestsAPI[F[_]] {
     invokeRequest(req)
   }
 
-  def groupSearchMrs(groupId: EntityId, phrase: String): GitlabResponseT[Vector[MergeRequestInfo]] = {
+  def groupSearchMrs(groupId: EntityId, phrase: String): EitherT[F, GitlabError, Vector[MergeRequestInfo]] = {
     implicit val rId: RequestId = RequestId.newOne("group-search-mr")
     groupGlobalSearch(groupId, SearchScope.MergeRequests, Some(phrase))
       .unmarshall[Vector[MergeRequestInfo]]
@@ -49,7 +49,7 @@ trait MergeRequestsAPI[F[_]] {
       withMergeStatusRecheck: NullableField[Boolean] = NullValue,
       paging: Paging = AllPages,
       sort: NullableField[Sorting[MergeRequestsSort]] = NullValue,
-  ): GitlabResponseT[Vector[MergeRequestInfo]] = {
+  ): EitherT[F, GitlabError, Vector[MergeRequestInfo]] = {
     val q = renderParams(
       myReaction,
       author,
@@ -67,7 +67,7 @@ trait MergeRequestsAPI[F[_]] {
   }
 
   // traverse over all states and fetch merge requests for every state, gitlab doesn't offer search by multiple states
-  def getMergeRequests(projectID: EntityId, states: Iterable[MergeRequestState]): GitlabResponseT[Vector[MergeRequestInfo]] =
+  def getMergeRequests(projectID: EntityId, states: Iterable[MergeRequestState]): EitherT[F, GitlabError, Vector[MergeRequestInfo]] =
     states.toVector.traverse(state => getMergeRequests(projectID, state)).map(_.flatten)
 
   // @see: https://docs.gitlab.com/ee/api/merge_requests.html#list-group-merge-requests
@@ -84,7 +84,7 @@ trait MergeRequestsAPI[F[_]] {
       withMergeStatusRecheck: NullableField[Boolean] = NullValue,
       paging: Paging = AllPages,
       sort: NullableField[Sorting[MergeRequestsSort]] = NullValue,
-  ): GitlabResponseT[Vector[MergeRequestInfo]] = {
+  ): EitherT[F, GitlabError, Vector[MergeRequestInfo]] = {
     val q = renderParams(
       myReaction,
       author,
@@ -103,11 +103,11 @@ trait MergeRequestsAPI[F[_]] {
   }
 
   // traverse over all states and fetch merge requests for every state, gitlab doesn't offer search by multiple states
-  def getGroupMergeRequests(groupId: EntityId, states: Iterable[MergeRequestState]): GitlabResponseT[Vector[MergeRequestInfo]] =
+  def getGroupMergeRequests(groupId: EntityId, states: Iterable[MergeRequestState]): EitherT[F, GitlabError, Vector[MergeRequestInfo]] =
     states.toVector.traverse(state => getGroupMergeRequests(groupId, state = state)).map(_.flatten)
 
   // @see: https://docs.gitlab.com/ee/api/merge_requests.html#update-mr
-  def updateMergeRequest(projectID: EntityId, mrId: BigInt, updateMrPayload: UpdateMRPayload): GitlabResponseT[MergeRequestFull] = {
+  def updateMergeRequest(projectID: EntityId, mrId: BigInt, updateMrPayload: UpdateMRPayload): EitherT[F, GitlabError, MergeRequestFull] = {
     implicit val rId: RequestId = RequestId.newOne("update-mr")
     val req = reqGen
       .put(s"$API/projects/${projectID.toStringId}/merge_requests/$mrId", MJson.write(updateMrPayload), projectID)
@@ -115,21 +115,21 @@ trait MergeRequestsAPI[F[_]] {
   }
 
   // @see: https://docs.gitlab.com/ee/api/merge_requests.html#get-single-mr
-  def getMergeRequest(projectID: EntityId, mrId: BigInt): GitlabResponseT[MergeRequestFull] = {
+  def getMergeRequest(projectID: EntityId, mrId: BigInt): EitherT[F, GitlabError, MergeRequestFull] = {
     implicit val rId: RequestId = RequestId.newOne("get-merge-request-info")
     val req                     = reqGen.get(s"$API/projects/${projectID.toStringId}/merge_requests/$mrId", projectID)
     invokeRequest(req).unmarshall[MergeRequestFull]
   }
 
   // @see: https://docs.gitlab.com/ee/api/merge_requests.html#delete-a-merge-request
-  def deleteMergeRequest(projectID: EntityId, mrIid: BigInt): GitlabResponseT[Unit] = {
+  def deleteMergeRequest(projectID: EntityId, mrIid: BigInt): EitherT[F, GitlabError, Unit] = {
     implicit val rId: RequestId = RequestId.newOne("delete-merge-request")
     val req                     = reqGen.delete(s"$API/projects/${projectID.toStringId}/merge_requests/$mrIid", projectID)
     invokeRequest(req).map(_ => ())
   }
 
   // @see: https://docs.gitlab.com/ee/api/merge_requests.html#get-single-mr-changes
-  def getMergeRequestDiff(projectID: EntityId, mrId: BigInt): GitlabResponseT[MergeRequestFull] = {
+  def getMergeRequestDiff(projectID: EntityId, mrId: BigInt): EitherT[F, GitlabError, MergeRequestFull] = {
     implicit val rId: RequestId = RequestId.newOne("get-merge-request-diff")
     val req                     = reqGen.get(s"$API/projects/${projectID.toStringId}/merge_requests/$mrId/changes", projectID)
     invokeRequest(req).unmarshall[MergeRequestFull]
@@ -138,13 +138,13 @@ trait MergeRequestsAPI[F[_]] {
   // approvals
 
   // @see: https://docs.gitlab.com/ee/api/merge_request_approvals.html#get-configuration-1
-  def getApprovals(projectId: EntityId, mergeRequestIId: BigInt): GitlabResponseT[MergeRequestApprovals] = {
+  def getApprovals(projectId: EntityId, mergeRequestIId: BigInt): EitherT[F, GitlabError, MergeRequestApprovals] = {
     implicit val rId: RequestId = RequestId.newOne("get-mr-approvals")
     val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approvals", projectId)
     invokeRequest(req).unmarshall[MergeRequestApprovals]
   }
 
-  def getApprovals(mergeRequest: MergeRequestID): GitlabResponseT[MergeRequestApprovals] =
+  def getApprovals(mergeRequest: MergeRequestID): EitherT[F, GitlabError, MergeRequestApprovals] =
     getApprovals(mergeRequest.project_id, mergeRequest.iid)
 
   //  @see: https://docs.gitlab.com/ee/api/merge_request_approvals.html#approve-merge-request
@@ -178,7 +178,7 @@ trait MergeRequestsAPI[F[_]] {
   def getMergeRequestApprovalRules(
       projectId: EntityId,
       mergeRequestIId: BigInt,
-  ): GitlabResponseT[Vector[MergeRequestApprovalRule]] = {
+  ): EitherT[F, GitlabError, Vector[MergeRequestApprovalRule]] = {
     implicit val rId: RequestId = RequestId.newOne("get-mr-approval-rules")
     val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approval_rules", projectId)
     invokeRequest(req).unmarshall[Vector[MergeRequestApprovalRule]]
@@ -189,7 +189,7 @@ trait MergeRequestsAPI[F[_]] {
       projectId: EntityId,
       mergeRequestIId: BigInt,
       payload: CreateMergeRequestApprovalRule,
-  ): GitlabResponseT[MergeRequestApprovalRule] = {
+  ): EitherT[F, GitlabError, MergeRequestApprovalRule] = {
     implicit val rId: RequestId = RequestId.newOne("create-mr-approval-rule")
     val req = reqGen
       .post(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approval_rules", MJson.write(payload), projectId)
@@ -201,11 +201,11 @@ trait MergeRequestsAPI[F[_]] {
       mergeRequestIId: BigInt,
       name: String,
       userIds: Vector[BigInt],
-  ): GitlabResponseT[MergeRequestApprovalRule] =
+  ): EitherT[F, GitlabError, MergeRequestApprovalRule] =
     createApprovalRule(projectId, mergeRequestIId, CreateMergeRequestApprovalRule.oneOf(name, userIds: _*))
 
   // @see https://docs.gitlab.com/ee/api/merge_request_approvals.html#delete-merge-request-level-rule
-  def deleteApprovalRule(projectId: EntityId, mergeRequestIId: BigInt, approvalRuleId: BigInt): GitlabResponseT[String] = {
+  def deleteApprovalRule(projectId: EntityId, mergeRequestIId: BigInt, approvalRuleId: BigInt): EitherT[F, GitlabError, String] = {
     implicit val rId: RequestId = RequestId.newOne("delete-mr-approval-rule")
     val req =
       reqGen.delete(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/approval_rules/$approvalRuleId", projectId)
@@ -216,7 +216,7 @@ trait MergeRequestsAPI[F[_]] {
       projectId: EntityId,
       mergeRequestIId: BigInt,
       approvalRule: MergeRequestApprovalRule,
-  ): GitlabResponseT[String] =
+  ): EitherT[F, GitlabError, String] =
     deleteApprovalRule(projectId, mergeRequestIId, approvalRule.id)
 
   // merge-request discussions & notes
@@ -227,21 +227,21 @@ trait MergeRequestsAPI[F[_]] {
       mergeRequestIId: BigInt,
       paging: Paging = AllPages,
       sort: Option[Sorting[MergeRequestNotesSort]] = None,
-  ): GitlabResponseT[Vector[MergeRequestNote]] = {
+  ): EitherT[F, GitlabError, Vector[MergeRequestNote]] = {
     val q   = sort.map(s => Seq("order_by".eqParam(s.field.property), "sort".eqParam(s.direction.toString))).toList.flatten
     val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes", projectId, q: _*)
 
     getAllPaginatedResponse[MergeRequestNote](req, "merge-request-notes", paging)
   }
 
-  def getMergeRequestNotes(mr: MergeRequestID): GitlabResponseT[Vector[MergeRequestNote]] =
+  def getMergeRequestNotes(mr: MergeRequestID): EitherT[F, GitlabError, Vector[MergeRequestNote]] =
     getMergeRequestNotes(mr.project_id, mr.iid)
 
   def getMergeRequestNotes(
       mr: MergeRequestID,
       paging: Paging,
       sort: Option[Sorting[MergeRequestNotesSort]],
-  ): GitlabResponseT[Vector[MergeRequestNote]] =
+  ): EitherT[F, GitlabError, Vector[MergeRequestNote]] =
     getMergeRequestNotes(mr.project_id, mr.iid, paging, sort)
 
   // @see: https://docs.gitlab.com/ee/api/notes.html#get-single-merge-request-note
@@ -249,14 +249,14 @@ trait MergeRequestsAPI[F[_]] {
       projectId: EntityId,
       mergeRequestIId: BigInt,
       noteId: BigInt,
-  ): GitlabResponseT[MergeRequestNote] = {
+  ): EitherT[F, GitlabError, MergeRequestNote] = {
     implicit val rId: RequestId = RequestId.newOne("get-merge-request-note")
     val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes/$noteId", projectId)
     invokeRequest(req).unmarshall[MergeRequestNote]
   }
 
   // @see: https://docs.gitlab.com/ee/api/notes.html#create-new-merge-request-note
-  def createMergeRequestNote(projectId: EntityId, mergeRequestIId: BigInt, body: String): GitlabResponseT[MergeRequestNote] = {
+  def createMergeRequestNote(projectId: EntityId, mergeRequestIId: BigInt, body: String): EitherT[F, GitlabError, MergeRequestNote] = {
     implicit val rId: RequestId = RequestId.newOne("merge-request-note-create")
     val payload                 = MJson.write(MergeRequestNoteCreate(body))
     val req = reqGen
@@ -270,7 +270,7 @@ trait MergeRequestsAPI[F[_]] {
       mergeRequestIId: BigInt,
       noteId: BigInt,
       newBody: String,
-  ): GitlabResponseT[MergeRequestNote] = {
+  ): EitherT[F, GitlabError, MergeRequestNote] = {
     implicit val rId: RequestId = RequestId.newOne("merge-request-note-update")
     val payload                 = MJson.write(MergeRequestNoteCreate(newBody))
     val req = reqGen
@@ -279,14 +279,14 @@ trait MergeRequestsAPI[F[_]] {
   }
 
   // @see: https://docs.gitlab.com/ee/api/notes.html#delete-a-merge-request-note
-  def deleteMergeRequestNote(projectId: EntityId, mergeRequestIId: BigInt, noteId: BigInt): GitlabResponseT[Unit] = {
+  def deleteMergeRequestNote(projectId: EntityId, mergeRequestIId: BigInt, noteId: BigInt): EitherT[F, GitlabError, Unit] = {
     implicit val rId: RequestId = RequestId.newOne("merge-request-note-delete")
     val req = reqGen.delete(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/notes/$noteId", projectId)
     invokeRequest(req).map(_ => ())
   }
 
   // @see: https://docs.gitlab.com/ee/api/discussions.html#list-project-merge-request-discussion-items
-  def getMergeRequestDiscussions(projectId: EntityId, mergeRequestIId: BigInt): GitlabResponseT[Vector[MergeRequestDiscussion]] = {
+  def getMergeRequestDiscussions(projectId: EntityId, mergeRequestIId: BigInt): EitherT[F, GitlabError, Vector[MergeRequestDiscussion]] = {
     val req = reqGen.get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/discussions", projectId)
     getAllPaginatedResponse[MergeRequestDiscussion](req, "get-merge-request-discussions", AllPages)
   }
@@ -296,7 +296,7 @@ trait MergeRequestsAPI[F[_]] {
       projectId: EntityId,
       mergeRequestIId: BigInt,
       discussionId: String,
-  ): GitlabResponseT[MergeRequestDiscussion] = {
+  ): EitherT[F, GitlabError, MergeRequestDiscussion] = {
     implicit val rId: RequestId = RequestId.newOne("get-merge-request-discussion")
     val req = reqGen
       .get(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/discussions/$discussionId", projectId)
@@ -308,7 +308,7 @@ trait MergeRequestsAPI[F[_]] {
       projectId: EntityId,
       mergeRequestIId: BigInt,
       payload: CreateMRDiscussion,
-  ): GitlabResponseT[MergeRequestDiscussion] = {
+  ): EitherT[F, GitlabError, MergeRequestDiscussion] = {
     implicit val rId: RequestId = RequestId.newOne("post-mr-discussion")
     val req = reqGen
       .post(s"$API/projects/${projectId.toStringId}/merge_requests/$mergeRequestIId/discussions", MJson.write(payload), projectId)
@@ -321,7 +321,7 @@ trait MergeRequestsAPI[F[_]] {
       mergeRequestIId: BigInt,
       discussionId: String,
       resolved: Boolean,
-  ): GitlabResponseT[MergeRequestDiscussion] = {
+  ): EitherT[F, GitlabError, MergeRequestDiscussion] = {
     implicit val rId: RequestId = RequestId.newOne("resolve-mr-discussion")
     val payload                 = MRDiscussionUpdate.resolve(resolved)
     val req = reqGen
@@ -339,7 +339,7 @@ trait MergeRequestsAPI[F[_]] {
       mergeRequestIId: BigInt,
       discussionId: String,
       body: String,
-  ): GitlabResponseT[MergeRequestNote] = {
+  ): EitherT[F, GitlabError, MergeRequestNote] = {
     implicit val rId: RequestId = RequestId.newOne("reply-mr-discussion")
     val payload                 = MergeRequestNoteCreate(body)
     val req = reqGen
@@ -358,7 +358,7 @@ trait MergeRequestsAPI[F[_]] {
       discussionId: String,
       noteId: BigInt,
       payload: MRDiscussionUpdate,
-  ): GitlabResponseT[MergeRequestNote] = {
+  ): EitherT[F, GitlabError, MergeRequestNote] = {
     implicit val rId: RequestId = RequestId.newOne("update-mr-discussion-note")
     val req = reqGen
       .put(
@@ -381,7 +381,7 @@ trait MergeRequestsAPI[F[_]] {
       updatedAfter: NullableField[ZonedDateTime] = NullValue,
       withMergeStatusRecheck: NullableField[Boolean] = NullValue,
       sort: NullableField[Sorting[MergeRequestsSort]] = NullValue,
-  ): GitlabResponseT[Vector[MergeRequestInfo]] = {
+  ): EitherT[F, GitlabError, Vector[MergeRequestInfo]] = {
     implicit val rId: RequestId = RequestId.newOne("list-mrs")
     val q = Vector(
       state.toList.map(_.toParam),

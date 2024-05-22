@@ -5,7 +5,8 @@ import maintenance.MissingPropertiesLogger.calculateMissingFields
 import marshalling.Gitlab4SMarshalling.MJson
 
 import com.typesafe.scalalogging.Logger
-import io.circe._
+import io.circe.*
+import io.circe.Decoder.Result
 import org.slf4j.LoggerFactory
 
 import scala.reflect.ClassTag
@@ -45,16 +46,16 @@ object MissingPropertiesLogger {
 }
 
 class MissingPropertiesLogger[T: ClassTag](underlying: Codec[T]) extends Codec[T] {
-  override def apply(a: T) = underlying.apply(a)
+  override def apply(a: T): Json = underlying.apply(a)
 
-  override def apply(c: HCursor) = {
+  override def apply(c: HCursor): Result[T] = {
     val result                           = underlying.apply(c)
     implicit val implicitCodec: Codec[T] = underlying
     calculateMissingFields(c.value, result, None)
     result
   }
 
-  def apply(c: HCursor, requestId: RequestId) = {
+  def apply(c: HCursor, requestId: RequestId): Result[T] = {
     val result                           = underlying.apply(c)
     implicit val implicitCodec: Codec[T] = underlying
     calculateMissingFields(c.value, result, Some(requestId))

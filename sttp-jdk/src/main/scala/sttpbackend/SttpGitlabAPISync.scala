@@ -10,7 +10,6 @@ import cats.syntax.either.*
 import com.typesafe.scalalogging.{LazyLogging, Logger}
 import org.slf4j.LoggerFactory
 import sttp.client3.*
-import sttp.client3.httpclient.HttpClientSyncBackend
 
 import scala.util.Try
 
