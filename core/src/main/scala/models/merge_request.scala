@@ -68,6 +68,7 @@ object DetailedMergeStatus extends EnumMarshallingGlue[DetailedMergeStatus] {
 
   case object NotApprovedYet         extends DetailedMergeStatus("not_approved")
   case object Mergeable              extends DetailedMergeStatus("mergeable")
+  case object NeedRebase             extends DetailedMergeStatus("need_rebase")
   case object IsDraft                extends DetailedMergeStatus("draft_status")
   case object Unchecked              extends DetailedMergeStatus("unchecked")
   case object NotOpen                extends DetailedMergeStatus("not_open")
@@ -79,6 +80,7 @@ object DetailedMergeStatus extends EnumMarshallingGlue[DetailedMergeStatus] {
   val all: Seq[DetailedMergeStatus] = Seq(
     NotApprovedYet,
     Mergeable,
+    NeedRebase,
     IsDraft,
     Unchecked,
     NotOpen,
@@ -199,6 +201,9 @@ case class MergeRequestInfo(
     time_stats: TimeStats,
     detailed_merge_status: Option[DetailedMergeStatus],
     squash_on_merge: Boolean,
+    imported: Boolean,
+    imported_from: Option[String],
+    prepared_at: ZonedDateTime,
 ) extends MergeRequestSimple
 
 object MergeRequestInfo {
