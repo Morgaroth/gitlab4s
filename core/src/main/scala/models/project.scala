@@ -251,7 +251,7 @@ case class ProjectInfo(
     environments_access_level: Option[String],
     releases_access_level: Option[String],
     ci_restrict_pipeline_cancellation_role: Option[String],
-    prevent_merge_without_jira_issue: Option[String],
+    prevent_merge_without_jira_issue: Boolean,
     allow_pipeline_trigger_approve_deployment: Boolean,
     warn_about_potentially_unwanted_characters: Boolean,
     // merge requests
