@@ -75,7 +75,9 @@ object DetailedMergeStatus extends EnumMarshallingGlue[DetailedMergeStatus] with
   case object NotApprovedYet             extends DetailedMergeStatus("not_approved")
   case object Mergeable                  extends DetailedMergeStatus("mergeable")
   case object NeedRebase                 extends DetailedMergeStatus("need_rebase")
+  case object Conflict                   extends DetailedMergeStatus("conflict")
   case object IsDraft                    extends DetailedMergeStatus("draft_status")
+  case object Preparing                  extends DetailedMergeStatus("preparing")
   case object Unchecked                  extends DetailedMergeStatus("unchecked")
   case object NotOpen                    extends DetailedMergeStatus("not_open")
   case object Checking                   extends DetailedMergeStatus("checking")
@@ -88,7 +90,9 @@ object DetailedMergeStatus extends EnumMarshallingGlue[DetailedMergeStatus] with
     NotApprovedYet,
     Mergeable,
     NeedRebase,
+    Conflict,
     IsDraft,
+    Preparing,
     Unchecked,
     NotOpen,
     Checking,
@@ -214,7 +218,7 @@ case class MergeRequestInfo(
     squash_on_merge: Boolean,
     imported: Boolean,
     imported_from: Option[String],
-    prepared_at: ZonedDateTime,
+    prepared_at: Option[ZonedDateTime],
 ) extends MergeRequestSimple
 
 object MergeRequestInfo {
@@ -327,7 +331,9 @@ case class MergeRequestFull(
     reviewers: Vector[GitlabUser],
     overflow: Option[Boolean],
     squash_on_merge: Boolean,
-    prepared_at: ZonedDateTime,
+    prepared_at: Option[ZonedDateTime],
+    imported: Boolean,
+    imported_from: Option[String],
 ) extends MergeRequestSimple
 
 object MergeRequestFull {
