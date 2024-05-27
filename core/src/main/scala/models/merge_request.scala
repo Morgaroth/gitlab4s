@@ -2,7 +2,7 @@ package io.gitlab.mateuszjaje.gitlabclient
 package models
 
 import maintenance.MissingPropertiesLogger
-import marshalling.{EnumMarshalling, EnumMarshallingGlue}
+import marshalling.{DefaultEnumMarshalling, EnumMarshalling, EnumMarshallingGlue}
 
 import io.circe.generic.semiauto.{deriveCodec, deriveEncoder}
 import io.circe.{Codec, Encoder}
@@ -35,7 +35,7 @@ object MergeRequestStates extends EnumMarshallingGlue[MergeRequestState] {
 
 sealed abstract class MergeStatus(val name: String) extends Product with Serializable
 
-object MergeStatus extends EnumMarshallingGlue[MergeStatus] {
+object MergeStatus extends EnumMarshallingGlue[MergeStatus] with DefaultEnumMarshalling[MergeStatus] {
 
   case object CanBeMerged extends MergeStatus("can_be_merged")
 
@@ -47,6 +47,9 @@ object MergeStatus extends EnumMarshallingGlue[MergeStatus] {
 
   case object CannotBeMergedRecheck extends MergeStatus("cannot_be_merged_recheck")
 
+  case class UncoveredMergeStatus(value: String) extends MergeStatus(value)
+
+  // possible additional uncovered statuses being instances of UncoveredMergeStatus
   val all: Seq[MergeStatus] = Seq(
     CanBeMerged,
     CannotBeMerged,
@@ -57,25 +60,29 @@ object MergeStatus extends EnumMarshallingGlue[MergeStatus] {
 
   val byName: Map[String, MergeStatus] = all.map(x => x.name -> x).toMap
 
+  override def wrapUnknown(value: String): MergeStatus = UncoveredMergeStatus(value)
+
   override def rawValue: MergeStatus => String = _.name
 
-  implicit val MergeStatusCirceCodec: Codec[MergeStatus] = EnumMarshalling.stringEnumCodecOf(MergeStatus)
+  implicit val MergeStatusCirceCodec: Codec[MergeStatus] = EnumMarshalling.unrestrictedStringEnumCodecOf(MergeStatus)
 }
 
 sealed abstract class DetailedMergeStatus(val name: String) extends Product with Serializable
 
-object DetailedMergeStatus extends EnumMarshallingGlue[DetailedMergeStatus] {
+object DetailedMergeStatus extends EnumMarshallingGlue[DetailedMergeStatus] with DefaultEnumMarshalling[DetailedMergeStatus] {
 
-  case object NotApprovedYet         extends DetailedMergeStatus("not_approved")
-  case object Mergeable              extends DetailedMergeStatus("mergeable")
-  case object NeedRebase             extends DetailedMergeStatus("need_rebase")
-  case object IsDraft                extends DetailedMergeStatus("draft_status")
-  case object Unchecked              extends DetailedMergeStatus("unchecked")
-  case object NotOpen                extends DetailedMergeStatus("not_open")
-  case object Checking               extends DetailedMergeStatus("checking")
-  case object CIMustPass             extends DetailedMergeStatus("ci_must_pass")
-  case object BrokenStatus           extends DetailedMergeStatus("broken_status")
-  case object DiscussionsNotResolved extends DetailedMergeStatus("discussions_not_resolved")
+  // possible additional uncovered statuses being direct instances of DetailedMergeStatus
+  case object NotApprovedYet             extends DetailedMergeStatus("not_approved")
+  case object Mergeable                  extends DetailedMergeStatus("mergeable")
+  case object NeedRebase                 extends DetailedMergeStatus("need_rebase")
+  case object IsDraft                    extends DetailedMergeStatus("draft_status")
+  case object Unchecked                  extends DetailedMergeStatus("unchecked")
+  case object NotOpen                    extends DetailedMergeStatus("not_open")
+  case object Checking                   extends DetailedMergeStatus("checking")
+  case object CIMustPass                 extends DetailedMergeStatus("ci_must_pass")
+  case object BrokenStatus               extends DetailedMergeStatus("broken_status")
+  case object DiscussionsNotResolved     extends DetailedMergeStatus("discussions_not_resolved")
+  case class UncoveredDMS(value: String) extends DetailedMergeStatus(value)
 
   val all: Seq[DetailedMergeStatus] = Seq(
     NotApprovedYet,
@@ -90,11 +97,15 @@ object DetailedMergeStatus extends EnumMarshallingGlue[DetailedMergeStatus] {
     DiscussionsNotResolved,
   )
 
+  override def wrapUnknown(value: String): DetailedMergeStatus = UncoveredDMS(value)
+
   val byName: Map[String, DetailedMergeStatus] = all.map(x => x.name -> x).toMap
 
   override def rawValue: DetailedMergeStatus => String = _.name
 
-  implicit val DetailedMergeStatusCirceCodec: Codec[DetailedMergeStatus] = EnumMarshalling.stringEnumCodecOf(DetailedMergeStatus)
+  implicit val DetailedMergeStatusCirceCodec: Codec[DetailedMergeStatus] =
+    EnumMarshalling.unrestrictedStringEnumCodecOf(DetailedMergeStatus)
+
 }
 
 case class TaskStatus(count: Int, completed_count: Int)
