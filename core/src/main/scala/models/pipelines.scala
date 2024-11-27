@@ -123,6 +123,7 @@ case class PipelineFullInfo(
     project_id: BigInt,
     sha: String,
     ref: String,
+    name: Option[String],
     status: PipelineStatus,
     created_at: ZonedDateTime,
     updated_at: ZonedDateTime,

@@ -85,6 +85,7 @@ case class JobFullInfo(
     web_url: String,
     artifacts: Vector[PipelineArtifactSimple],
     runner: Option[JobRunner],
+    runner_manager: Option[JobRunnerManager],
     artifacts_expire_at: Option[ZonedDateTime],
     coverage: Option[String],
     failure_reason: Option[String],
@@ -113,12 +114,29 @@ case class JobRunner(
     active: Boolean,
     is_shared: Boolean,
     runner_type: String,
-    name: String,
+    name: Option[String],
     online: Boolean,
 )
 
 object JobRunner {
   implicit val JobRunnerCodec: Codec[JobRunner] = deriveCodec[JobRunner]
+}
+
+case class JobRunnerManager(
+    id: 56232183,
+    system_id: String,
+    version: String,
+    revision: String,
+    platform: String,
+    architecture: String,
+    created_at: ZonedDateTime,
+    contacted_at: ZonedDateTime,
+    ip_address: String,
+    status: String,
+)
+
+object JobRunnerManager {
+  implicit val JobRunnerManagerCodec: Codec[JobRunnerManager] = deriveCodec[JobRunnerManager]
 }
 
 case class PipelineBridgeJob(
