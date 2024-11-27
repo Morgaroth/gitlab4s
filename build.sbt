@@ -1,6 +1,5 @@
 import Syntax.*
 import com.jsuereth.sbtpgp.PgpKeys.publishSigned
-import xerial.sbt.Sonatype.GitLabHosting
 
 val circeVersion    = "0.14.2"
 val circeExtVersion = "0.14.2"
@@ -8,14 +7,13 @@ val sttpVersion     = "3.9.7"
 
 val validate = Def.taskKey[Unit]("Validates entire project")
 
-val scala2                   = "2.13.10"
+val scala2                   = "2.13.13"
 val scala3                   = "3.3.1"
 val projectScala             = scala2
 val crossScalaVersionsValues = Seq(scala2, scala3, projectScala).distinct
 
 val publishSettings = Seq(
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
-  sonatypeProjectHosting := Some(GitLabHosting("mateuszjaje", "gitlab4s", "mateuszjaje@gmail.com")),
   developers       := List(Developer("Mateusz Jaje", "Mateusz Jaje", "mateuszjaje@gmail.com", new URL("https://gitlab.com/mateuszjaje"))),
   organizationName := "Mateusz Jaje",
   organizationHomepage   := Some(url("https://gitlab.com/mateuszjaje")),
@@ -23,8 +21,8 @@ val publishSettings = Seq(
   crossScalaVersions     := crossScalaVersionsValues,
   scalaVersion           := projectScala,
   publishMavenStyle      := true,
-  publishTo              := sonatypePublishToBundle.value,
-  sonatypeCredentialHost := "s01.oss.sonatype.org",
+  publishTo              := sonatypeCentralPublishToBundle.value,
+//  sonatypeCredentialHost := "s01.oss.sonatype.org",
   releaseProcess := {
     import sbtrelease.ReleaseStateTransformations.*
     Seq[ReleaseStep](
@@ -77,7 +75,7 @@ val commonSettings = publishSettings ++ Seq(
   },
   libraryDependencies ++= {
     if (scalaVersion.value.startsWith("2.13"))
-      Seq(compilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full))
+      Seq(compilerPlugin("org.typelevel" % "kind-projector" % "0.13.3" cross CrossVersion.full))
     else Seq.empty
   },
   idePackagePrefix.invisible := Some("io.gitlab.mateuszjaje.gitlabclient"),
