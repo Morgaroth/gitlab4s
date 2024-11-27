@@ -13,16 +13,16 @@ val projectScala             = scala2
 val crossScalaVersionsValues = Seq(scala2, scala3, projectScala).distinct
 
 val publishSettings = Seq(
+  homepage := Some(url("https://gitlab.com/mateuszjaje/gitlab4s")),
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
   developers       := List(Developer("Mateusz Jaje", "Mateusz Jaje", "mateuszjaje@gmail.com", new URL("https://gitlab.com/mateuszjaje"))),
   organizationName := "Mateusz Jaje",
-  organizationHomepage   := Some(url("https://gitlab.com/mateuszjaje")),
-  versionScheme          := Some("semver-spec"),
-  crossScalaVersions     := crossScalaVersionsValues,
-  scalaVersion           := projectScala,
-  publishMavenStyle      := true,
-  publishTo              := sonatypeCentralPublishToBundle.value,
-//  sonatypeCredentialHost := "s01.oss.sonatype.org",
+  organizationHomepage := Some(url("https://gitlab.com/mateuszjaje")),
+  versionScheme        := Some("semver-spec"),
+  crossScalaVersions   := crossScalaVersionsValues,
+  scalaVersion         := projectScala,
+  publishMavenStyle    := true,
+  publishTo            := sonatypeCentralPublishToBundle.value,
   releaseProcess := {
     import sbtrelease.ReleaseStateTransformations.*
     Seq[ReleaseStep](
