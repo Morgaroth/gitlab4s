@@ -31,15 +31,6 @@ Check formatting:
     - main
     - tags
 
-Pubilsh snapshot:
-  stage: publish
-  script:
-    - gpg --batch --yes --import $GPG_SIGNING_KEY
-    - gpg --list-keys
-    - sbt -v +publishSigned
-  except:
-    - tags
-
 Release next version:
   stage: publish
   only:
