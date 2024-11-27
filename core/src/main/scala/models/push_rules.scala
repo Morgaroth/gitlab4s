@@ -29,7 +29,7 @@ object PushRules {
   implicit val PushRulesCodec: Codec[PushRules] = MissingPropertiesLogger.loggingCodec(deriveCodec[PushRules])
 }
 
-case class EditPushRuleRequest private (
+case class EditPushRuleRequest (
     author_email_regex: Option[String] = None,
     branch_name_regex: Option[String] = None,
     commit_committer_check: Option[Boolean] = None,

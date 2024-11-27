@@ -193,7 +193,7 @@ object CreateMRDiscussion {
 
 }
 
-case class MRDiscussionUpdate private (
+case class MRDiscussionUpdate (
     body: Option[String],
     resolved: Option[Boolean],
 )

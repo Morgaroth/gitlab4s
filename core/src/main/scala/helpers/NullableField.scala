@@ -6,11 +6,11 @@ sealed abstract class NullableField[+T] {
 }
 
 case object NullValue extends NullableField[Nothing] {
-  override def toList = Nil
+  override def toList: List[Nothing] = Nil
 }
 
 case class SomeValue[T](value: T) extends NullableField[T] {
-  override def toList = List(value)
+  override def toList: List[T] = List(value)
 }
 
 object NullableField {

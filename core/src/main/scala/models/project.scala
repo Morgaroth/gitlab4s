@@ -295,7 +295,7 @@ object EditProjectRequest {
   val Builder = new EditProjectRequest()
 }
 
-case class EditProjectRequest private (
+case class EditProjectRequest (
     allow_merge_on_skipped_pipeline: Option[Boolean] = None,
     analytics_access_level: Option[String] = None,
     approvals_before_merge: Option[Int] = None,
