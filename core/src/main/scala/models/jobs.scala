@@ -123,7 +123,7 @@ object JobRunner {
 }
 
 case class JobRunnerManager(
-    id: Option[String],
+//    id: Option[BigInt],
     system_id: Option[String],
     version: Option[String],
     revision: Option[String],
