@@ -123,16 +123,16 @@ object JobRunner {
 }
 
 case class JobRunnerManager(
-    id: 56232183,
-    system_id: String,
-    version: String,
-    revision: String,
-    platform: String,
-    architecture: String,
-    created_at: ZonedDateTime,
-    contacted_at: ZonedDateTime,
-    ip_address: String,
-    status: String,
+    id: Option[String],
+    system_id: Option[String],
+    version: Option[String],
+    revision: Option[String],
+    platform: Option[String],
+    architecture: Option[String],
+    created_at: Option[ZonedDateTime],
+    contacted_at: Option[ZonedDateTime],
+    ip_address: Option[String],
+    status: Option[String],
 )
 
 object JobRunnerManager {
