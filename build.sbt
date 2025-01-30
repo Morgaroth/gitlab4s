@@ -69,7 +69,7 @@ val commonSettings = publishSettings ++ Seq(
         "3.2-migration",
         "-Ykind-projector",
         "-Xmax-inlines",
-        "130",
+        "150",
       )
     else Seq.empty
   },
