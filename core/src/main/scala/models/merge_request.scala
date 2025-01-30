@@ -84,6 +84,7 @@ object DetailedMergeStatus extends EnumMarshallingGlue[DetailedMergeStatus] with
   case object CIMustPass                 extends DetailedMergeStatus("ci_must_pass")
   case object BrokenStatus               extends DetailedMergeStatus("broken_status")
   case object DiscussionsNotResolved     extends DetailedMergeStatus("discussions_not_resolved")
+  case object CommitsStatus              extends DetailedMergeStatus("commits_status")
   case class UncoveredDMS(value: String) extends DetailedMergeStatus(value)
 
   val all: Seq[DetailedMergeStatus] = Seq(
@@ -99,6 +100,7 @@ object DetailedMergeStatus extends EnumMarshallingGlue[DetailedMergeStatus] with
     CIMustPass,
     BrokenStatus,
     DiscussionsNotResolved,
+    CommitsStatus,
   )
 
   override def wrapUnknown(value: String): DetailedMergeStatus = UncoveredDMS(value)
@@ -219,6 +221,7 @@ case class MergeRequestInfo(
     imported: Boolean,
     imported_from: Option[String],
     prepared_at: Option[ZonedDateTime],
+    merge_after: Option[ZonedDateTime],
 ) extends MergeRequestSimple
 
 object MergeRequestInfo {

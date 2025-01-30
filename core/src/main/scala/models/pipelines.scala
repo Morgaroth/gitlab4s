@@ -131,7 +131,7 @@ case class PipelineFullInfo(
     before_sha: String,
     tag: Boolean,
     yaml_errors: Option[String],
-    user: GitlabUser,
+    user: Option[GitlabUser],
     started_at: Option[ZonedDateTime],
     finished_at: Option[ZonedDateTime],
     committed_at: Option[ZonedDateTime],

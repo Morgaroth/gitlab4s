@@ -283,6 +283,10 @@ case class ProjectInfo(
     enforce_auth_checks_on_uploads: Option[Boolean],
     ci_allow_fork_pipelines_to_run_in_parent_project: Option[Boolean],
     ci_opt_in_jwt: Option[Boolean],
+    ci_id_token_sub_claim_components: Option[List[String]],
+    ci_pipeline_variables_minimum_override_role: Option[String],
+    ci_push_repository_for_job_token_allowed: Boolean,
+    pre_receive_secret_detection_enabled: Boolean,
 )
 
 object ProjectInfo {
@@ -295,7 +299,7 @@ object EditProjectRequest {
   val Builder = new EditProjectRequest()
 }
 
-case class EditProjectRequest (
+case class EditProjectRequest(
     allow_merge_on_skipped_pipeline: Option[Boolean] = None,
     analytics_access_level: Option[String] = None,
     approvals_before_merge: Option[Int] = None,
