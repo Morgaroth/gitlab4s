@@ -286,7 +286,7 @@ case class ProjectInfo(
     ci_id_token_sub_claim_components: Option[List[String]],
     ci_pipeline_variables_minimum_override_role: Option[String],
     ci_push_repository_for_job_token_allowed: Boolean,
-    pre_receive_secret_detection_enabled: Boolean,
+    pre_receive_secret_detection_enabled: Option[Boolean],
 )
 
 object ProjectInfo {

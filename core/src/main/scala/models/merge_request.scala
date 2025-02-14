@@ -72,35 +72,37 @@ sealed abstract class DetailedMergeStatus(val name: String) extends Product with
 object DetailedMergeStatus extends EnumMarshallingGlue[DetailedMergeStatus] with DefaultEnumMarshalling[DetailedMergeStatus] {
 
   // possible additional uncovered statuses being direct instances of DetailedMergeStatus
-  case object NotApprovedYet             extends DetailedMergeStatus("not_approved")
+  case object Blocked                    extends DetailedMergeStatus("merge_request_blocked")
+  case object BrokenStatus               extends DetailedMergeStatus("broken_status")
+  case object CIMustPass                 extends DetailedMergeStatus("ci_must_pass")
+  case object Checking                   extends DetailedMergeStatus("checking")
+  case object CommitsStatus              extends DetailedMergeStatus("commits_status")
+  case object Conflict                   extends DetailedMergeStatus("conflict")
+  case object DiscussionsNotResolved     extends DetailedMergeStatus("discussions_not_resolved")
+  case object IsDraft                    extends DetailedMergeStatus("draft_status")
   case object Mergeable                  extends DetailedMergeStatus("mergeable")
   case object NeedRebase                 extends DetailedMergeStatus("need_rebase")
-  case object Conflict                   extends DetailedMergeStatus("conflict")
-  case object IsDraft                    extends DetailedMergeStatus("draft_status")
+  case object NotApprovedYet             extends DetailedMergeStatus("not_approved")
+  case object NotOpen                    extends DetailedMergeStatus("not_open")
   case object Preparing                  extends DetailedMergeStatus("preparing")
   case object Unchecked                  extends DetailedMergeStatus("unchecked")
-  case object NotOpen                    extends DetailedMergeStatus("not_open")
-  case object Checking                   extends DetailedMergeStatus("checking")
-  case object CIMustPass                 extends DetailedMergeStatus("ci_must_pass")
-  case object BrokenStatus               extends DetailedMergeStatus("broken_status")
-  case object DiscussionsNotResolved     extends DetailedMergeStatus("discussions_not_resolved")
-  case object CommitsStatus              extends DetailedMergeStatus("commits_status")
   case class UncoveredDMS(value: String) extends DetailedMergeStatus(value)
 
   val all: Seq[DetailedMergeStatus] = Seq(
-    NotApprovedYet,
+    Blocked,
+    BrokenStatus,
+    CIMustPass,
+    Checking,
+    CommitsStatus,
+    Conflict,
+    DiscussionsNotResolved,
+    IsDraft,
     Mergeable,
     NeedRebase,
-    Conflict,
-    IsDraft,
+    NotApprovedYet,
+    NotOpen,
     Preparing,
     Unchecked,
-    NotOpen,
-    Checking,
-    CIMustPass,
-    BrokenStatus,
-    DiscussionsNotResolved,
-    CommitsStatus,
   )
 
   override def wrapUnknown(value: String): DetailedMergeStatus = UncoveredDMS(value)
