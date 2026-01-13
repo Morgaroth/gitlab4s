@@ -56,11 +56,11 @@ trait PipelinesAPI[F[_]] {
       projectId: EntityId,
       pipelineId: BigInt,
       scope: Set[JobScope] = null,
+      paging: Paging = AllPages,
   ): EitherT[F, GitlabError, Vector[JobFullInfo]] = {
-    implicit val rId: RequestId = RequestId.newOne("get-pipeline-jobs")
-    val params                  = wrap(scope).flatMap(_.map(sc => "scope[]".eqParam(sc.name)))
-    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/pipelines/$pipelineId/jobs", projectId, params)
-    invokeRequest(req).unmarshall[Vector[JobFullInfo]]
+    val params = wrap(scope).flatMap(_.map(sc => "scope[]".eqParam(sc.name)))
+    val req    = reqGen.get(s"$API/projects/${projectId.toStringId}/pipelines/$pipelineId/jobs", projectId, params)
+    getAllPaginatedResponse[JobFullInfo](req, "get-pipeline-jobs", paging)
   }
 
   // @see: https://docs.gitlab.com/ee/api/pipelines.html#create-a-new-pipeline
