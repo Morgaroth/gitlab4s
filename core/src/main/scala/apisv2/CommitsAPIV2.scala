@@ -1,28 +1,17 @@
 package io.gitlab.mateuszjaje.gitlabclient
 package apisv2
 
-import helpers.CustomDateTimeFormatter.RichZonedDateTime
 import models.*
-import query.ParamQuery.*
 
 import java.time.ZonedDateTime
 
-trait CommitsAPIV2[F[_]] {
-  this: GitlabRestAPIV2[F] =>
+trait CommitsAPIV2[F[_]] extends CommitsRawAPIV2[F] {
+  this: GitlabRestBaseV2[F] =>
 
-  // @see: https://docs.gitlab.com/ee/api/commits.html#get-a-single-commit
-  def getCommit(projectId: EntityId, ref: String): F[Either[GitlabError, Commit]] = {
-    implicit val rId: RequestId = RequestId.newOne("get-single-commit")
-    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$ref", projectId)
-    invokeRequest(req).unmarshall[Commit]
-  }
+  def getCommit(projectId: EntityId, ref: String): F[Either[GitlabError, Commit]] = getCommitRaw[Commit](projectId, ref)
 
-  // @see: https://docs.gitlab.com/ee/api/commits.html#get-references-a-commit-is-pushed-to
-  def getCommitRefs(projectId: EntityId, commitId: String): F[Either[GitlabError, Vector[RefSimpleInfo]]] = {
-    implicit val rId: RequestId = RequestId.newOne("get-refs-of-a-commit")
-    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$commitId/refs", projectId)
-    invokeRequest(req).unmarshall[Vector[RefSimpleInfo]]
-  }
+  def getCommitRefs(projectId: EntityId, commitId: String): F[Either[GitlabError, Vector[RefSimpleInfo]]] =
+    getCommitRefsRaw[RefSimpleInfo](projectId, commitId)
 
   def getCommits(
       projectId: EntityId,
@@ -31,36 +20,15 @@ trait CommitsAPIV2[F[_]] {
       since: ZonedDateTime = null,
       until: ZonedDateTime = null,
       paging: Paging = AllPages,
-  ): F[Either[GitlabError, Vector[CommitSimple]]] = {
-    val params = Vector(
-      wrap(ref).map("ref_name".eqParam(_)),
-      wrap(path).map("path".eqParam(_)),
-      wrap(since).map(_.toISO8601UTC).map("since".eqParam(_)),
-      wrap(until).map(_.toISO8601UTC).map("until".eqParam(_)),
-    ).flatten
-    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits", projectId, params *)
-    getAllPaginatedResponse[CommitSimple](req, "get-commits", paging)
-  }
+  ): F[Either[GitlabError, Vector[CommitSimple]]] = getCommitsRaw[CommitSimple](projectId, path, ref, since, until, paging)
 
-  // @see: https://docs.gitlab.com/ee/api/commits.html#get-the-diff-of-a-commit
-  def getDiffOfACommit(projectId: EntityId, ref: String): F[Either[GitlabError, Vector[FileDiff]]] = {
-    implicit val rId: RequestId = RequestId.newOne("get-commits-diff")
-    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$ref/diff", projectId)
-    invokeRequest(req).unmarshall[Vector[FileDiff]]
-  }
+  def getDiffOfACommit(projectId: EntityId, ref: String): F[Either[GitlabError, Vector[FileDiff]]] =
+    getDiffOfACommitRaw[FileDiff](projectId, ref)
 
-  // @see: https://docs.gitlab.com/ee/api/commits.html#list-merge-requests-associated-with-a-commit
-  def getMergeRequestsOfCommit(projectId: EntityId, commitSha: String): F[Either[GitlabError, Vector[MergeRequestInfo]]] = {
-    implicit val rId: RequestId = RequestId.newOne("get-commit-merge-requests")
-    val req = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$commitSha/merge_requests", projectId)
-    invokeRequest(req).unmarshall[Vector[MergeRequestInfo]]
-  }
+  def getMergeRequestsOfCommit(projectId: EntityId, commitSha: String): F[Either[GitlabError, Vector[MergeRequestInfo]]] =
+    getMergeRequestsOfCommitRaw[MergeRequestInfo](projectId, commitSha)
 
-  // @see: https://docs.gitlab.com/ee/api/commits.html#get-references-a-commit-is-pushed-to
-  def getCommitsReferences(projectId: EntityId, commitSha: String): F[Either[GitlabError, Vector[CommitReference]]] = {
-    implicit val rId: RequestId = RequestId.newOne("get-commit-references")
-    val req                     = reqGen.get(s"$API/projects/${projectId.toStringId}/repository/commits/$commitSha/refs", projectId)
-    invokeRequest(req).unmarshall[Vector[CommitReference]]
-  }
+  def getCommitsReferences(projectId: EntityId, commitSha: String): F[Either[GitlabError, Vector[CommitReference]]] =
+    getCommitsReferencesRaw[CommitReference](projectId, commitSha)
 
 }

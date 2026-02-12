@@ -50,7 +50,7 @@ trait TagsAPIV2[F[_]] {
   }
 
   // @see: https://docs.gitlab.com/ee/api/tags.html#delete-a-tag
-  def deleteTag(projectId: EntityId, tagName: String): Any = {
+  def deleteTag(projectId: EntityId, tagName: String): F[Either[GitlabError, Unit]] = {
     implicit val rId: RequestId = RequestId.newOne("delete-tag")
     val req                     = reqGen.delete(s"$API/projects/${projectId.toStringId}/repository/tags/$tagName", projectId)
     invokeRequest(req).map(_ => ())

@@ -156,6 +156,4 @@ trait GitlabRestAPI[F[_]]
 
     getAll(1, pageSize, Vector.empty)
   }
-
-  def wrap[T](value: T): List[T] = Option(value).toList
 }
