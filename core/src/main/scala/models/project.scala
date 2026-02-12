@@ -207,7 +207,7 @@ case class ProjectInfo(
     ci_default_git_depth: Option[Int],
     public_jobs: Boolean,
     build_git_strategy: Option[String],
-    build_timeout: Int,
+    build_timeout: Option[Int],
     auto_cancel_pending_pipelines: String,
     build_coverage_regex: Option[String],
     ci_config_path: Option[String],

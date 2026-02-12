@@ -87,7 +87,7 @@ val commonSettings = publishSettings ++ Seq(
 val testDeps = Seq(
   "org.scalatest" %% "scalatest-flatspec"       % "3.2.13" % Test,
   "org.scalatest" %% "scalatest-shouldmatchers" % "3.2.13" % Test,
-  "ch.qos.logback" % "logback-classic"          % "1.2.11" % Test,
+  "ch.qos.logback" % "logback-classic"          % "1.5.13" % Test,
 )
 
 val core = project
