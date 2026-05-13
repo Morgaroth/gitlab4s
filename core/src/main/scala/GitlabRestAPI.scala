@@ -156,4 +156,5 @@ trait GitlabRestAPI[F[_]]
 
     getAll(1, pageSize, Vector.empty)
   }
+
 }
