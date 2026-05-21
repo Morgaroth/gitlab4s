@@ -34,6 +34,9 @@ trait GitlabRestBaseV2[F[_]] extends LazyLogging with Gitlab4SMarshalling {
   def authHeader(req: GitlabRequest): String =
     req.extraHeaders.getOrElse(AuthHeaderName, config.tokenForPath(req.projectId))
 
+  def genericRequest(request: GitlabRequest => GitlabRequest, requestId: RequestId): F[Either[GitlabError, GitlabResponse[String]]] =
+    invokeRequestRaw(request(reqGen.get("")))(requestId)
+
   def genericRequest(path: String, requestCode: String): F[Either[GitlabError, GitlabResponse[String]]] = {
     implicit val rId: RequestId = RequestId.newOne(requestCode)
     val req                     = reqGen.get(API + s"/${path.stripPrefix("/")}")

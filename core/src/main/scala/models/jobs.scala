@@ -184,3 +184,20 @@ object DownstreamPipelineInfo {
     MissingPropertiesLogger.loggingCodec(deriveCodec[DownstreamPipelineInfo])
 
 }
+
+case class TriggerJobParam(
+    key: String,
+    value: String,
+)
+
+object TriggerJobParam {
+  implicit val TriggerJobParamCodec: Codec[TriggerJobParam] = deriveCodec
+}
+
+case class TriggerJobPayload(
+    job_variables_attributes: Vector[TriggerJobParam],
+)
+
+object TriggerJobPayload {
+  implicit val TriggerJobPayloadCodec: Codec[TriggerJobPayload] = deriveCodec
+}
